@@ -1,0 +1,30 @@
+# Variables d'environnement
+.env
+
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Données sensibles du bot
+data/
+*.db
+*.json
+
+# Fichiers temporaires
+temp/
+.tmp/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Fichiers de configuration IDE
+.vscode/
+.idea/
+
+# Fichiers de build
+dist/
+build/
