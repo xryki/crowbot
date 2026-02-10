@@ -76,6 +76,9 @@ module.exports = {
                 currentOwners.push(userToAdd.id);
                 client.serverOwners.set(guild.id, currentOwners);
                 
+                // Mettre à jour la whitelist anti-raid
+                client.updateAntiRaidWhitelist();
+                
                 // Sauvegarder les données
                 if (client.dataSaver) {
                     client.dataSaver.saveAllData(client);
@@ -100,6 +103,9 @@ module.exports = {
                 ownersList.splice(index, 1);
                 client.serverOwners.set(guild.id, ownersList);
                 
+                // Mettre à jour la whitelist anti-raid
+                client.updateAntiRaidWhitelist();
+                
                 // Sauvegarder les données
                 if (client.dataSaver) {
                     client.dataSaver.saveAllData(client);
@@ -114,6 +120,9 @@ module.exports = {
                 }
                 
                 client.serverOwners.delete(guild.id);
+                
+                // Mettre à jour la whitelist anti-raid
+                client.updateAntiRaidWhitelist();
                 
                 // Sauvegarder les données
                 if (client.dataSaver) {

@@ -26,17 +26,20 @@ module.exports = {
             return message.reply('Mentionne un utilisateur ou donne un ID valide !');
         }
         
+        const targetName = target ? target.tag : `Utilisateur ${targetId}`;
+        
         if (client.whitelist.includes(targetId)) {
             client.whitelist = client.whitelist.filter(id => id !== targetId);
-            const targetName = target ? target.tag : `Utilisateur ${targetId}`;
             message.reply(`${targetName} retiré de la whitelist.`);
         } else {
             client.whitelist.push(targetId);
-            const targetName = target ? target.tag : `Utilisateur ${targetId}`;
             message.reply(`${targetName} ajouté à la whitelist.`);
         }
         
+        // Mettre à jour la whitelist anti-raid si c'est un owner
+        client.updateAntiRaidWhitelist();
+        
         // Envoyer les logs
-        await client.sendCommandLog(message.guild, { name: 'wl', description: this.description }, message.author, [targetName || targetId]);
+        await client.sendCommandLog(message.guild, { name: 'wl', description: this.description }, message.author, [targetName]);
     }
 };

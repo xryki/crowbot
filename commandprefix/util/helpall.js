@@ -35,62 +35,20 @@ module.exports = {
                 return;
             }
             
-            // Déterminer le niveau de permission
-            let permLevel = null; // Commencer à null au lieu de 'public'
-            const guildId = message.guild.id;
+            // Déterminer si c'est une commande owner ou publique
+            let permLevel = 'public'; // Par défaut publique
             
-            // Vérifier si c'est une commande owner spécifique
+            // Commandes owner spécifiques
             if (['eval', 'restart', 'boostmsg', 'helpall', 'setperm', 'delperm', 'editperm', 'perms', 'myperm', 'owners', 'ownerlist', 'setowner', 'serverowners', 'gw'].includes(cmd.name)) {
                 permLevel = 'owner';
-            } else {
-                
-                // Vérifier d'abord les permissions personnalisées du serveur
-                if (client.serverPermLevels && client.serverPermLevels.has(guildId)) {
-                    const serverPerms = client.serverPermLevels.get(guildId);
-                    for (let level = 1; level <= 9; level++) {
-                        const commands = serverPerms[level];
-                        if (commands && commands.includes(cmd.name)) {
-                            // Commandes publiques spécifiques
-                            if (['banner', 'pic', 'snipe', 'user', 'profile', 'ping'].includes(cmd.name)) {
-                                permLevel = 'public';
-                            } else {
-                                permLevel = level.toString();
-                            }
-                            break;
-                            permLevel = level.toString();
-                        }
-                        break;
-                    }
-                }
-            }
-            
-            // Si pas trouvé dans les permissions serveur, vérifier les globales
-            if (permLevel === null) {
-                for (let level = 1; level <= 9; level++) {
-                    const commands = client.permissionSystem.client.permLevels.get(level);
-                    if (commands && commands.includes(cmd.name)) {
-                        // Commandes publiques spécifiques
-                        if (['banner', 'pic', 'snipe', 'user', 'profile', 'ping'].includes(cmd.name)) {
-                            permLevel = 'public';
-                        } else {
-                            permLevel = level.toString();
-                        }
-                        break;
-                    }
-                }
-            }
-            
-            // Si toujours pas trouvé, mettre en public
-            if (permLevel === null) {
-                permLevel = 'public';
             }
             
             commandsByPermLevel.get(permLevel).push(cmd);
         });
         
-        // Créer les pages dans l'ordre : Public, Perm 1, Perm 2, etc., Owner à la fin
+        // Créer les pages : Public et Owner
         const pages = [];
-        const orderedLevels = ['public', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'owner'];
+        const orderedLevels = ['public', 'owner'];
         
         orderedLevels.forEach(level => {
             const commands = commandsByPermLevel.get(level) || [];

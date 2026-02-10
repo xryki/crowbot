@@ -251,8 +251,12 @@ class GiveawayHandler {
                 try {
                     await message.delete();
                 } catch (error) {
-                    // Le message a déjà été supprimé, on continue
-                    console.log(`Message giveaway ${messageId} déjà supprimé`);
+                    // Le message a déjà été supprimé ou n'existe plus, on continue
+                    if (error.code === 10008) {
+                        console.log(`Message giveaway ${messageId} déjà supprimé ou introuvable`);
+                    } else {
+                        console.error(`Erreur suppression message giveaway ${messageId}:`, error);
+                    }
                 }
 
                 // Envoyer un message simple de félicitations pour chaque gagnant

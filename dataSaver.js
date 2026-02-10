@@ -41,6 +41,11 @@ class DataSaver {
         this.saveData('config', client.config || {});
         this.saveData('owners', client.owners || []);
         
+        // Sauvegarder la configuration anti-raid
+        if (client.antiraid) {
+            this.saveData('antiraid', client.antiraid);
+        }
+        
         // Sauvegarder les messages de bienvenue
         if (client.welcomeMessages) {
             const welcomeData = {};
@@ -77,23 +82,6 @@ class DataSaver {
             this.saveData('serverOwners', serverOwnersData);
         }
         
-        // Sauvegarder les permissions par serveur
-        if (client.permissions) {
-            const permissionsData = {};
-            for (const [guildId, perms] of client.permissions) {
-                permissionsData[guildId] = perms;
-            }
-            this.saveData('permissions', permissionsData);
-        }
-        
-        // Sauvegarder les permissions de commandes par serveur
-        if (client.serverPermLevels) {
-            const serverPermLevelsData = {};
-            for (const [guildId, perms] of client.serverPermLevels) {
-                serverPermLevelsData[guildId] = perms;
-            }
-            this.saveData('serverPermLevels', serverPermLevelsData);
-        }
         
         // Sauvegarder les tickets actifs
         if (client.ticketData) {
@@ -115,6 +103,59 @@ class DataSaver {
         client.config = this.loadData('config', {});
         client.owners = this.loadData('owners', []);
         client.snipes = new Map(); // Reset les snipes au démarrage
+        
+        // Charger la configuration anti-raid
+        client.antiraid = this.loadData('antiraid', {
+            enabled: false,
+            antiLink: {
+                enabled: true,
+                action: 'delete',
+                whitelist: []
+            },
+            antiSpam: {
+                enabled: false,
+                maxMessages: 5,
+                timeWindow: 5000,
+                action: 'mute',
+                whitelist: []
+            },
+            antiToken: {
+                enabled: true,
+                maxAccountAge: 7 * 24 * 60 * 60 * 1000,
+                action: 'kick',
+                whitelist: []
+            },
+            antiWebhook: {
+                enabled: true,
+                action: 'delete',
+                whitelist: []
+            },
+            antiBot: {
+                enabled: false,
+                action: 'kick'
+            },
+            antiMassMention: {
+                enabled: false,
+                maxMentions: 5,
+                action: 'mute'
+            },
+            antiCaps: {
+                enabled: false,
+                maxCaps: 70,
+                action: 'delete'
+            },
+            antiInvite: {
+                enabled: false,
+                action: 'delete'
+            },
+            antiBan: {
+                enabled: false,
+                maxBans: 3,
+                timeWindow: 10000
+            },
+            globalWhitelist: [],
+            logChannel: null
+        });
         
         // Charger les messages de bienvenue
         const welcomeData = this.loadData('welcomeMessages', {});
@@ -153,19 +194,6 @@ class DataSaver {
             client.serverOwners.set(guildId, owners);
         }
         
-        // Charger les permissions par serveur
-        const permissionsData = this.loadData('permissions', {});
-        client.permissions = new Map();
-        for (const [guildId, perms] of Object.entries(permissionsData)) {
-            client.permissions.set(guildId, perms);
-        }
-        
-        // Charger les permissions de commandes par serveur
-        const serverPermLevelsData = this.loadData('serverPermLevels', {});
-        client.serverPermLevels = new Map();
-        for (const [guildId, perms] of Object.entries(serverPermLevelsData)) {
-            client.serverPermLevels.set(guildId, perms);
-        }
     }
 }
 

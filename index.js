@@ -3,7 +3,6 @@ const { Client, GatewayIntentBits, Collection, PermissionsBitField } = require('
 const fs = require('fs');
 const DataSaver = require('./dataSaver');
 const GiveawayHandler = require('./commands/giveaway/giveawayHandler');
-const PermissionSystem = require('./permissionSystem');
 
 // 👇 REMPLACE par TON ID Discord (Mode Développeur ON → Clic droit → Copier ID)
 const OWNERS = ['1422102360246980792'];                    // Toi + amis owners
@@ -88,8 +87,6 @@ console.log(`Commandes chargées: ${client.prefixCommands.size} commandes`); // 
 client.welcomeMessages = new Map();
 client.boostConfig = new Map();
 
-// Initialiser le système de permissions AVANT de charger les données
-client.permissionSystem = new PermissionSystem(client);
 
 // Charger les données sauvegardées
 dataSaver.loadAllData(client);
@@ -104,7 +101,26 @@ console.log(`- Whitelist: ${client.whitelist.length} utilisateurs`);
 console.log(`- Préfixes: ${Object.keys(client.prefixes).length} serveurs`);
 console.log(`- Config: ${Object.keys(client.config).length} serveurs`);
 console.log(`- Owners: ${client.owners.length} utilisateurs`);
-console.log(`- Permissions: ${client.permissions.size} serveurs`);
+
+// Fonction pour mettre à jour la whitelist anti-raid avec les owners
+client.updateAntiRaidWhitelist = function() {
+    if (!client.antiraid || !client.antiraid.globalWhitelist) return;
+    
+    // Ajouter seulement les owners globaux à la whitelist globale
+    if (client.owners && Array.isArray(client.owners)) {
+        client.owners.forEach(ownerId => {
+            if (!client.antiraid.globalWhitelist.includes(ownerId)) {
+                client.antiraid.globalWhitelist.push(ownerId);
+            }
+        });
+    }
+    
+    // NE PAS ajouter les server owners à la whitelist globale
+    // Ils seront vérifiés par serveur dans la logique anti-raid
+};
+
+// Mettre à jour la whitelist au démarrage
+client.updateAntiRaidWhitelist();
 
 // Fonction pour vérifier si un utilisateur est owner (principal ou serveur)
 client.isOwner = function(userId, guildId = null) {
@@ -334,6 +350,9 @@ client.on('messageCreate', async (message) => {
     // Vérifier whitelist globale
     if (client.antiraid.globalWhitelist.includes(message.author.id)) return;
     
+    // Vérifier si c'est un server owner (immunité seulement sur ce serveur)
+    if (client.isOwner(message.author.id, message.guild.id)) return;
+    
     // Anti-Link (avec exception pour les GIF)
     if (client.antiraid.antiLink.enabled) {
         const linkRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|discord\.(gg|io|me|com)\/[^\s]+)/gi;
@@ -346,18 +365,42 @@ client.on('messageCreate', async (message) => {
             try {
                 switch (client.antiraid.antiLink.action) {
                     case 'delete':
-                        await message.delete();
+                        try {
+                            await message.delete();
+                        } catch (error) {
+                            if (error.code === 10008) {
+                                console.log(`Message déjà supprimé ou introuvable dans anti-link`);
+                            } else {
+                                console.error('Erreur suppression message anti-link:', error);
+                            }
+                        }
                         await message.channel.send(`${message.author}, les liens ne sont pas autorisés ici.`).then(msg => 
                             setTimeout(() => msg.delete(), 5000)
                         );
                         break;
                     case 'warn':
                         await message.reply(`⚠️ Les liens sont interdits ici.`);
-                        await message.delete();
+                        try {
+                            await message.delete();
+                        } catch (error) {
+                            if (error.code === 10008) {
+                                console.log(`Message déjà supprimé ou introuvable dans anti-link warn`);
+                            } else {
+                                console.error('Erreur suppression message anti-link warn:', error);
+                            }
+                        }
                         break;
                     case 'kick':
                         await message.member.kick('Anti-Link - Lien détecté');
-                        await message.delete();
+                        try {
+                            await message.delete();
+                        } catch (error) {
+                            if (error.code === 10008) {
+                                console.log(`Message déjà supprimé ou introuvable dans anti-link kick`);
+                            } else {
+                                console.error('Erreur suppression message anti-link kick:', error);
+                            }
+                        }
                         break;
                 }
             } catch (error) {
@@ -375,6 +418,9 @@ client.on('guildMemberAdd', async (member) => {
     
     // Vérifier whitelist globale
     if (client.antiraid.globalWhitelist.includes(member.id)) return;
+    
+    // Vérifier si c'est un server owner (immunité seulement sur ce serveur)
+    if (client.isOwner(member.id, member.guild.id)) return;
     
     const now = Date.now();
     const accountAge = now - member.user.createdTimestamp;
@@ -946,14 +992,10 @@ client.on('messageCreate', async (message) => {
         return message.reply('Permissions Discord insuffisantes.');
     }
     
-    // Vérification permissions personnalisées (si le système est initialisé)
-    if (client.permissionSystem && !client.permissionSystem.canUseCommand(message.guild.id, message.author.id, command.name)) {
-        console.log('Permissions personnalisées insuffisantes');
-        return message.reply('Vous n\'avez pas la permission d\'utiliser cette commande. Utilisez `!myperms` pour voir vos permissions.');
-    }
+   
     
     // Vérifier si c'est une commande owner
-    if (command.name === 'eval' || command.name === 'restart' || command.name === 'owner') {
+    if (command.name === 'eval' || command.name === 'restart' || command.name === 'owner' || command.name === 'antiraid' || command.name === 'help') {
         if (!client.isOwner(message.author.id)) {
             return message.reply('Commande owner uniquement.');
         }

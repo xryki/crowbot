@@ -5,6 +5,16 @@ module.exports = {
     description: 'Mute temporaire (28j par défaut, ou temps personnalisé)',
     permissions: PermissionsBitField.Flags.ModerateMembers,
     async execute(message, args, client) {
+        // Vérifier les permissions du bot
+        if (!message.guild.members.me.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
+            return message.reply('Je n\'ai pas la permission "Moderate Members". Veuillez l\'activer dans les paramètres du serveur.');
+        }
+        
+        // Vérifier les permissions de l'utilisateur
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
+            return message.reply('Tu n\'as pas la permission "Moderate Members" pour utiliser cette commande.');
+        }
+        
         // Récupérer la cible soit par mention, soit par réponse
         let target;
         let timeInput;
@@ -39,7 +49,7 @@ module.exports = {
             const unit = timeMatch[2].toLowerCase();
             
             const multipliers = {
-                's': 7 * 24 * 60 * 60 * 1000,    // semaine
+                's': 1000,                           // seconde
                 'j': 24 * 60 * 60 * 1000,         // jour
                 'd': 24 * 60 * 60 * 1000,         // jour (alternative)
                 'h': 60 * 60 * 1000,              // heure
