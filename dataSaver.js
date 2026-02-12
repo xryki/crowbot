@@ -82,6 +82,11 @@ class DataSaver {
             this.saveData('serverOwners', serverOwnersData);
         }
         
+        // Sauvegarder la configuration ghost ping
+        if (client.ghostPingConfig) {
+            this.saveData('ghostPingConfig', client.ghostPingConfig);
+        }
+        
         
         // Sauvegarder les tickets actifs
         if (client.ticketData) {
@@ -193,6 +198,10 @@ class DataSaver {
         for (const [guildId, owners] of Object.entries(serverOwnersData)) {
             client.serverOwners.set(guildId, owners);
         }
+        
+        // Charger la configuration ghost ping
+        const ghostPingConfigData = this.loadData('ghostPingConfig', {});
+        client.ghostPingConfig = ghostPingConfigData;
         
     }
 }

@@ -67,7 +67,13 @@ module.exports = {
         
         try {
             await target.timeout(duration);
-            message.reply(`${target.user.tag} muté pour ${displayTime}`);
+            
+            // Message différent selon si durée spécifiée ou non
+            if (!timeInput) {
+                message.reply(`${target.user.tag} a été **timeout**`);
+            } else {
+                message.reply(`${target.user.tag} a été **timeout** pour ${displayTime}`);
+            }
             
             // Envoyer les logs
             await client.sendLog(message.guild, 'Mute', message.member, target, `Durée: ${displayTime}`);

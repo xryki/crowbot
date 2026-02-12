@@ -32,7 +32,7 @@ module.exports = {
                     categories.mod.commands.push(cmd);
                 } else if (['autorole', 'setup', 'bl', 'unbl', 'bls', 'wl', 'unwl', 'logs', 'antiraid', 'welcome', 'ticket', 'massrole', 'gw'].includes(cmd.name)) {
                     categories.admin.commands.push(cmd);
-                } else if (['eval', 'owner', 'restart', 'boostmsg', 'unbanall', 'invite'].includes(cmd.name)) {
+                } else if (['eval', 'owner', 'restart', 'boostmsg', 'unbanall', 'invite', 'backup', 'restore', 'deletebackup', 'hide', 'unhide'].includes(cmd.name)) {
                     categories.owner.commands.push(cmd);
                 } else {
                     // Commandes utilitaires dans info

@@ -311,34 +311,95 @@ client.on('ready', async () => {
     setInterval(() => {
         dataSaver.saveAllData(client);
         console.log('Données sauvegardées automatiquement');
-    }, 5 * 60 * 1000); // 5 minutes
+    }, 300000);
 });
 
 // Système de bienvenue
 client.on('guildMemberAdd', async (member) => {
+    console.log(`=== NOUVEAU MEMBRE DÉTECTÉ ===`);
+    console.log(`Utilisateur: ${member.user.tag} (${member.id})`);
+    console.log(`Serveur: ${member.guild.name} (${member.guild.id})`);
+    console.log(`Timestamp: ${new Date().toISOString()}`);
+    
     // Vérifier si un message de bienvenue est configuré
     const welcomeData = client.welcomeMessages?.get(member.guild.id);
-    if (!welcomeData) return;
+    console.log(`Welcome data: ${welcomeData ? 'Oui' : 'Non'}`);
     
     try {
-        const channel = member.guild.channels.cache.get(welcomeData.channelId);
-        if (!channel) return;
-        
-        // Remplacer les variables
-        let messageContent = welcomeData.message || '';
-        if (messageContent) {
-            messageContent = messageContent
-                .replace(/{user}/g, member.toString())
-                .replace(/{username}/g, member.user.username)
-                .replace(/{server}/g, member.guild.name)
-                .replace(/{memberCount}/g, member.guild.memberCount.toString())
-                .replace(/{avatar}/g, member.user.displayAvatarURL());
+        // Envoyer le message de bienvenue seulement si configuré
+        if (welcomeData) {
+            const channel = member.guild.channels.cache.get(welcomeData.channelId);
+            if (channel) {
+                // Remplacer les variables
+                let messageContent = welcomeData.message || '';
+                if (messageContent) {
+                    messageContent = messageContent
+                        .replace(/{user}/g, member.toString())
+                        .replace(/{username}/g, member.user.username)
+                        .replace(/{server}/g, member.guild.name)
+                        .replace(/{memberCount}/g, member.guild.memberCount.toString())
+                        .replace(/{avatar}/g, member.user.displayAvatarURL());
+                }
+                
+                await channel.send(messageContent);
+                console.log(`Message de bienvenue envoyé dans ${channel.name}`);
+            }
         }
         
-        await channel.send(messageContent);
+        // Système de ghost ping automatique pour les nouveaux membres
+        console.log(`Vérification ghost ping...`);
+        let ghostPingChannels = client.ghostPingConfig?.[member.guild.id] || [];
+        console.log(`Ghost ping config brute:`, JSON.stringify(client.ghostPingConfig?.[member.guild.id]));
+        console.log(`Ghost ping channels:`, ghostPingChannels);
+        
+        // Convertir en tableau si c'est une chaîne (ancienne config)
+        if (typeof ghostPingChannels === 'string') {
+            ghostPingChannels = [ghostPingChannels];
+            client.ghostPingConfig[member.guild.id] = ghostPingChannels;
+            console.log(`Conversion ancienne config en tableau:`, ghostPingChannels);
+        }
+        
+        console.log(`Nombre de salons pour ghost ping: ${ghostPingChannels.length}`);
+        
+        if (ghostPingChannels.length > 0) {
+            console.log(`=== ENVOI GHOST PINGS ===`);
+            console.log(`Ghost ping dans ${ghostPingChannels.length} salon(s) pour ${member.user.tag}`);
+            
+            // Envoyer dans tous les salons configurés
+            for (const channelId of ghostPingChannels) {
+                const ghostPingChannel = member.guild.channels.cache.get(channelId);
+                
+                if (ghostPingChannel) {
+                    try {
+                        console.log(`-> Envoi du ghost ping pour ${member.user.tag} dans ${ghostPingChannel.name} (${channelId})`);
+                        
+                        // Envoyer juste la mention de l'utilisateur
+                        const pingMessage = await ghostPingChannel.send(`${member}`);
+                        console.log(`-> Message envoyé dans ${ghostPingChannel.name}, ID: ${pingMessage.id}`);
+                        
+                        // Supprimer immédiatement (0.5 secondes)
+                        setTimeout(async () => {
+                            try {
+                                await pingMessage.delete();
+                                console.log(`-> Message ghost ping supprimé dans ${ghostPingChannel.name}`);
+                            } catch (error) {
+                                console.log(`-> Message déjà supprimé dans ${ghostPingChannel.name}`);
+                            }
+                        }, 500);
+                        
+                    } catch (error) {
+                        console.error(`-> Erreur ghost ping dans ${ghostPingChannel.name}:`, error);
+                    }
+                } else {
+                    console.log(`-> Salon ${channelId} introuvable pour le ghost ping`);
+                }
+            }
+        } else {
+            console.log(`Aucun salon configuré pour le ghost ping sur ce serveur`);
+        }
         
     } catch (error) {
-        console.error('Erreur envoi message de bienvenue:', error);
+        console.error('Erreur globale guildMemberAdd:', error);
     }
 });
 
@@ -995,8 +1056,8 @@ client.on('messageCreate', async (message) => {
    
     
     // Vérifier si c'est une commande owner
-    if (command.name === 'eval' || command.name === 'restart' || command.name === 'owner' || command.name === 'antiraid' || command.name === 'help') {
-        if (!client.isOwner(message.author.id)) {
+    if (command.name === 'eval' || command.name === 'restart' || command.name === 'owner' || command.name === 'antiraid' || command.name === 'help' || command.name === 'backup' || command.name === 'restore' || command.name === 'deletebackup' || command.name === 'hide' || command.name === 'unhide') {
+        if (!client.isOwner(message.author.id, message.guild.id)) {
             return message.reply('Commande owner uniquement.');
         }
     }

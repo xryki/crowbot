@@ -18,7 +18,7 @@ module.exports = {
         
         try {
             await target.timeout(null);
-            message.reply(`${target.user.tag} démuté.`);
+            message.reply(`${target.user.tag} n'est plus **timeout**.`);
             
             // Envoyer les logs
             await client.sendLog(message.guild, 'Unmute', message.member, target, 'Mute retiré');
