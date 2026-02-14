@@ -23,7 +23,7 @@ module.exports = {
         
         const embed = new EmbedBuilder()
             .setTitle('Message supprimé')
-            .setColor('#ff0000')
+            .setColor('#FFFFFF')
             .setAuthor({
                 name: snipedMessage.author.tag,
                 iconURL: snipedMessage.author.displayAvatarURL({ dynamic: true })

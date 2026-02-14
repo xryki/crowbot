@@ -18,7 +18,7 @@ module.exports = {
             
             const embed = new EmbedBuilder()
                 .setTitle('Eval Result')
-                .setColor('#00ff00')
+                .setColor('#FFFFFF')
                 .addFields(
                     { name: 'Input', value: `\`\`\`js\n${code}\n\`\`\``, inline: false },
                     { name: 'Output', value: `\`\`\`js\n${evaled}\n\`\`\``, inline: false }
@@ -28,7 +28,7 @@ module.exports = {
         } catch (error) {
             const embed = new EmbedBuilder()
                 .setTitle('Eval Error')
-                .setColor('#ff0000')
+                .setColor('#FFFFFF')
                 .addFields({ name: 'Erreur', value: `\`\`\`${error.message}\n\`\`\`` });
             message.reply({ embeds: [embed] });
         }

@@ -5,6 +5,11 @@ module.exports = {
     description: 'Crée une sauvegarde complète du serveur',
     ownerOnly: true,
     async execute(message, args, client) {
+        // Vérifier si l'utilisateur est owner (global ou serveur)
+        if (!client.isOwner(message.author.id, message.guild.id)) {
+            return message.reply('Commande réservée aux owners du bot.');
+        }
+        
         const guild = message.guild;
         
         // Vérifier si un nom de backup est fourni

@@ -27,7 +27,7 @@ module.exports = {
                 const embed = new EmbedBuilder()
                     .setTitle('Owners du Serveur')
                     .setDescription(`Aucun owner serveur configuré.\nUtilisez \`${client.getPrefix(guild.id)}serverowners add @utilisateur\` pour en ajouter.`)
-                    .setColor('#ff9900')
+                    .setColor('#FFFFFF')
                     .setTimestamp();
                 
                 return message.reply({ embeds: [embed] });
@@ -35,7 +35,7 @@ module.exports = {
             
             const embed = new EmbedBuilder()
                 .setTitle('Owners du Serveur')
-                .setColor('#0099ff')
+                .setColor('#FFFFFF')
                 .setThumbnail(guild.iconURL({ dynamic: true, size: 256 }))
                 .setFooter({ text: `Serveur: ${guild.name}` })
                 .setTimestamp();
@@ -79,10 +79,8 @@ module.exports = {
                 // Mettre à jour la whitelist anti-raid
                 client.updateAntiRaidWhitelist();
                 
-                // Sauvegarder les données
-                if (client.dataSaver) {
-                    client.dataSaver.saveAllData(client);
-                }
+                // Sauvegarder automatiquement
+                client.saveData();
                 
                 await message.reply(`${userToAdd} est maintenant owner du serveur !`);
                 break;
@@ -106,12 +104,10 @@ module.exports = {
                 // Mettre à jour la whitelist anti-raid
                 client.updateAntiRaidWhitelist();
                 
-                // Sauvegarder les données
-                if (client.dataSaver) {
-                    client.dataSaver.saveAllData(client);
-                }
+                // Sauvegarder automatiquement
+                client.saveData();
                 
-                await message.reply(`${userToRemove} n\'est plus owner du serveur.`);
+                await message.reply(`${userToRemove} n'est plus owner du serveur.`);
                 break;
                 
             case 'clear':
@@ -124,10 +120,8 @@ module.exports = {
                 // Mettre à jour la whitelist anti-raid
                 client.updateAntiRaidWhitelist();
                 
-                // Sauvegarder les données
-                if (client.dataSaver) {
-                    client.dataSaver.saveAllData(client);
-                }
+                // Sauvegarder automatiquement
+                client.saveData();
                 
                 await message.reply('Tous les owners du serveur ont été retirés.');
                 break;

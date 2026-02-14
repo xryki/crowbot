@@ -14,6 +14,9 @@ module.exports = {
             client.whitelist = client.whitelist.filter(id => id !== target.id);
             message.reply(`${target.tag} retiré de la whitelist.`);
             
+            // Sauvegarder automatiquement
+            client.saveData();
+            
             // Envoyer les logs
             await client.sendCommandLog(message.guild, { name: 'unwl', description: this.description }, message.author, [target.tag]);
         } else {

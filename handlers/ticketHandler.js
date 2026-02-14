@@ -161,7 +161,7 @@ module.exports = {
                 const ticketEmbed = new EmbedBuilder()
                     .setTitle(`Ticket #${ticketNumber}`)
                     .setDescription(`Raison : ${reasonLabels[reason] || reason}\n\nCréé par : ${interaction.user}\n\nVeuillez décrire votre demande en détail.`)
-                    .setColor('#0099ff')
+                    .setColor('#808080')
                     .addFields(
                         { name: 'Instructions', value: '• Décrivez votre problème clairement\n• Attendez qu\'un membre du staff réponde\n• Soyez patient et respectueux', inline: false }
                     )
@@ -236,7 +236,7 @@ module.exports = {
             const confirmEmbed = new EmbedBuilder()
                 .setTitle('Fermeture du ticket')
                 .setDescription('Êtes-vous sûr de vouloir fermer ce ticket ?')
-                .setColor('#ff9900');
+                .setColor('#808080');
             
             const row = new ActionRowBuilder()
                 .addComponents(
@@ -286,7 +286,7 @@ module.exports = {
                         const transcriptEmbed = new EmbedBuilder()
                             .setTitle(`Transcript - Ticket #${channel.name}`)
                             .setDescription(`Transcript du ticket fermé par ${interaction.user}`)
-                            .setColor('#ff9900')
+                            .setColor('#808080')
                             .setTimestamp();
                         
                         await transcriptChannel.send({
@@ -306,7 +306,7 @@ module.exports = {
                         const dmEmbed = new EmbedBuilder()
                             .setTitle('Ticket Fermé - Transcript')
                             .setDescription(`Votre ticket "${channel.name}" a été fermé par ${interaction.user.tag}`)
-                            .setColor('#ff9900')
+                            .setColor('#808080')
                             .addFields(
                                 { name: 'Raison du ticket', value: ticketData.reason, inline: false },
                                 { name: 'Durée', value: `<t:${Math.floor(ticketData.createdAt / 1000)}:R>`, inline: false }
@@ -387,7 +387,7 @@ module.exports = {
             const claimEmbed = new EmbedBuilder()
                 .setTitle('Ticket pris en charge')
                 .setDescription(`Ce ticket est maintenant pris en charge par ${interaction.user}`)
-                .setColor('#00ff00')
+                .setColor('#808080')
                 .setTimestamp();
             
             await channel.send({ embeds: [claimEmbed] });
@@ -476,7 +476,7 @@ module.exports = {
                 const renameEmbed = new EmbedBuilder()
                     .setTitle('Ticket renommé')
                     .setDescription(`Le ticket a été renommé en \`${finalName}\` par ${interaction.user}`)
-                    .setColor('#00ff00')
+                    .setColor('#808080')
                     .setTimestamp();
                 
                 await channel.send({ embeds: [renameEmbed] });

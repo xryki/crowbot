@@ -6,6 +6,11 @@ module.exports = {
     description: 'Restaure une sauvegarde de serveur',
     ownerOnly: true,
     async execute(message, args, client) {
+        // Vérifier si l'utilisateur est owner (global ou serveur)
+        if (!client.isOwner(message.author.id, message.guild.id)) {
+            return message.reply('Commande réservée aux owners du bot.');
+        }
+        
         const guild = message.guild;
         
         if (!args[0]) {
@@ -43,7 +48,7 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setTitle('Sauvegardes disponibles')
                 .setDescription(response)
-                .setColor('#0099ff')
+                .setColor('#FFFFFF')
                 .setTimestamp()
                 .setFooter({ text: `Pour restaurer: ${client.getPrefix(guild.id)}restore <fichier> ou ${client.getPrefix(guild.id)}restore <timestamp>` });
             
@@ -54,7 +59,7 @@ module.exports = {
                     embeds: [new EmbedBuilder()
                         .setTitle('Sauvegardes disponibles')
                         .setDescription('Liste trop longue, voir fichier attaché')
-                        .setColor('#0099ff')
+                        .setColor('#FFFFFF')
                         .setTimestamp()],
                     files: ['./backups_list.txt']
                 });

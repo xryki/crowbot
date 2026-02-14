@@ -35,14 +35,14 @@ module.exports = {
         let displayTime;
         
         if (!timeInput) {
-            // 28 jours par défaut si aucun temps spécifié
-            duration = 28 * 24 * 60 * 60 * 1000;
-            displayTime = '28j';
+            // 20 jours par défaut si aucun temps spécifié
+            duration = 20 * 24 * 60 * 60 * 1000;
+            displayTime = '20j';
         } else {
             // Parser le temps personnalisé
             const timeMatch = timeInput.match(/^(\d+)([smhjd])$/i);
             if (!timeMatch) {
-                return message.reply('Format invalide ! Exemples: 30m, 2h, 3j, 1s, 5d (ou aucun pour 28j par défaut)');
+                return message.reply('Format invalide ! Exemples: 30m, 2h, 3j, 1s, 5d (ou aucun pour 20j par défaut)');
             }
             
             const amount = parseInt(timeMatch[1]);
@@ -59,13 +59,25 @@ module.exports = {
             duration = amount * multipliers[unit];
             displayTime = `${amount}${unit}`;
             
-            // Limiter à 1 an maximum
-            if (duration > 365 * 24 * 60 * 60 * 1000) {
-                return message.reply('Durée maximum de 1 an autorisée !');
+            // Limiter à 20 jours maximum (limite Discord)
+            if (duration > 20 * 24 * 60 * 60 * 1000) {
+                return message.reply('Durée maximum de 20 jours autorisée !');
             }
         }
         
         try {
+            // Vérifier si le bot peut mute cette personne
+            if (!target.manageable) {
+                console.log(`[MUTE ERROR] Bot ne peut pas gérer l'utilisateur ${target.user.tag} - rôle supérieur`);
+                return message.reply('Je ne peux pas mute cet utilisateur.');
+            }
+            
+            // Vérifier si l'utilisateur peut mute cette personne
+            if (target.roles.highest.position >= message.member.roles.highest.position && message.member.id !== message.guild.ownerId) {
+                console.log(`[MUTE ERROR] ${message.author.tag} ne peut pas mute ${target.user.tag} - hiérarchie des rôles`);
+                return message.reply('Tu ne peux pas mute cet utilisateur.');
+            }
+            
             await target.timeout(duration);
             
             // Message différent selon si durée spécifiée ou non
@@ -78,8 +90,22 @@ module.exports = {
             // Envoyer les logs
             await client.sendLog(message.guild, 'Mute', message.member, target, `Durée: ${displayTime}`);
         } catch (error) {
-            console.error(error);
-            message.reply('Erreur lors du mute.');
+            console.error('[MUTE ERROR] Erreur complète:', error);
+            
+            // Messages d'erreur simples sur Discord
+            if (error.code === 50013) {
+                console.log(`[MUTE ERROR] Permission manquante - Guild: ${message.guild.name}, User: ${target.user.tag}`);
+                message.reply('Permission refusée.');
+            } else if (error.code === 10013) {
+                console.log(`[MUTE ERROR] Utilisateur introuvable - ID: ${target.id}`);
+                message.reply('Utilisateur introuvable.');
+            } else if (error.code === 50007) {
+                console.log(`[MUTE ERROR] Cannot send DMs to user ${target.user.tag}`);
+                message.reply('Erreur lors du mute.');
+            } else {
+                console.log(`[MUTE ERROR] Erreur inconnue - Code: ${error.code}, Message: ${error.message}`);
+                message.reply('Erreur lors du mute.');
+            }
         }
     }
 };

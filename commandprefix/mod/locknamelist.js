@@ -1,54 +1,69 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 module.exports = {
-    name: 'bls',
-    description: 'Affiche la liste des utilisateurs blacklistés',
-    ownerOnly: true,
+    name: 'locknamelist',
+    description: 'Affiche la liste des utilisateurs avec un pseudo verrouillé',
+    permissions: PermissionsBitField.Flags.ManageNicknames,
     async execute(message, args, client) {
         try {
-            client.blacklist = client.blacklist || [];
-            
-            if (client.blacklist.length === 0) {
-                return message.reply('pas de blacklist ici');
+            // Vérifier si des pseudos sont lockés sur ce serveur
+            if (!client.lockedNames || client.lockedNames.size === 0) {
+                return message.reply('pas de pseudo lock ici');
             }
             
-            // Créer un tableau avec les données des utilisateurs blacklistés
-            const blacklistedUsers = [];
+            // Créer un tableau avec les données des utilisateurs présents sur ce serveur
+            const lockedUsers = [];
             
-            for (const userId of client.blacklist) {
+            for (const [userId, lockData] of client.lockedNames.entries()) {
                 try {
-                    // Récupérer l'utilisateur depuis l'API Discord
-                    const user = await client.users.fetch(userId).catch(() => null);
-                    if (user) {
-                        blacklistedUsers.push({
-                            user: user
-                        });
+                    // Vérifier si l'utilisateur est sur ce serveur
+                    const member = message.guild.members.cache.get(userId);
+                    if (!member) {
+                        continue; // Ignorer les utilisateurs qui ne sont pas sur ce serveur
                     }
+                    
+                    lockedUsers.push({
+                        user: member.user,
+                        lockData: lockData
+                    });
                 } catch (error) {
                     console.error(`Erreur traitement utilisateur ${userId}:`, error);
                 }
             }
             
-            // Trier par nom d'utilisateur
-            blacklistedUsers.sort((a, b) => a.user.username.localeCompare(b.user.username));
+            // Trier par date de lock (plus récent d'abord)
+            lockedUsers.sort((a, b) => b.lockData.timestamp - a.lockData.timestamp);
             
-            // Créer les pages (15 utilisateurs par page)
-            const itemsPerPage = 15;
+            // Vérifier s'il y a des utilisateurs lockés sur ce serveur
+            if (lockedUsers.length === 0) {
+                return message.reply('pas de pseudo lock ici');
+            }
+            
+            // Créer les pages (10 utilisateurs par page)
+            const itemsPerPage = 10;
             const pages = [];
             
-            for (let i = 0; i < blacklistedUsers.length; i += itemsPerPage) {
-                const pageUsers = blacklistedUsers.slice(i, i + itemsPerPage);
+            for (let i = 0; i < lockedUsers.length; i += itemsPerPage) {
+                const pageUsers = lockedUsers.slice(i, i + itemsPerPage);
                 
                 const description = pageUsers.map((item, index) => {
-                    return `**${i + index + 1}.** ${item.user.tag} (${item.user.id})`;
-                }).join('\n');
+                    const date = new Date(item.lockData.timestamp).toLocaleDateString('fr-FR');
+                    const moderator = client.users.cache.get(item.lockData.moderatorId);
+                    const moderatorTag = moderator ? moderator.tag : `ID: ${item.lockData.moderatorId}`;
+                    
+                    return `**${i + index + 1}.** ${item.user.tag} (${item.user.id})
+**Pseudo locké:** \`${item.lockData.lockedName}\`
+**Pseudo original:** \`${item.lockData.originalName}\`
+**Lock par:** ${moderatorTag}
+**Date:** ${date}`;
+                }).join('\n\n');
                 
                 const embed = new EmbedBuilder()
-                    .setTitle('Liste des blacklistés')
+                    .setTitle(`Liste des pseudos verrouillés - ${message.guild.name}`)
                     .setDescription(description)
                     .setColor('#FFFFFF')
                     .setFooter({ 
-                        text: `Page ${Math.floor(i / itemsPerPage) + 1}/${Math.ceil(blacklistedUsers.length / itemsPerPage)} • Total: ${blacklistedUsers.length} utilisateur(s)` 
+                        text: `Page ${Math.floor(i / itemsPerPage) + 1}/${Math.ceil(lockedUsers.length / itemsPerPage)} • Total: ${lockedUsers.length} utilisateur(s)` 
                     })
                     .setTimestamp();
                 
@@ -137,8 +152,8 @@ module.exports = {
             });
             
         } catch (error) {
-            console.error('Erreur dans la commande bls:', error);
-            return message.reply('Une erreur est survenue lors de l\'affichage de la blacklist.');
+            console.error('Erreur dans la commande locknamelist:', error);
+            return message.reply('Une erreur est survenue lors de l\'affichage de la liste des pseudos verrouillés.');
         }
     }
 };

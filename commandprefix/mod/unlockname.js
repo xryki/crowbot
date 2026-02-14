@@ -28,6 +28,9 @@ module.exports = {
             // Retirer le lock
             client.lockedNames.delete(target.id);
             
+            // Sauvegarder automatiquement
+            client.saveData();
+            
             // Remettre l'ancien pseudo
             await target.setNickname(originalName);
             

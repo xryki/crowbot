@@ -60,10 +60,8 @@ module.exports = {
             // Ajouter le salon
             currentChannels.push(targetChannel.id);
             
-            // Sauvegarder dans le dataSaver
-            if (client.dataSaver) {
-                client.dataSaver.saveData('ghostPingConfig', client.ghostPingConfig);
-            }
+            // Sauvegarder automatiquement
+            client.saveData();
             
             await message.reply(`Salon ajouté pour les ghost pings: ${targetChannel}`);
             
@@ -93,10 +91,8 @@ module.exports = {
             
             currentChannels.splice(index, 1);
             
-            // Sauvegarder dans le dataSaver
-            if (client.dataSaver) {
-                client.dataSaver.saveData('ghostPingConfig', client.ghostPingConfig);
-            }
+            // Sauvegarder automatiquement
+            client.saveData();
             
             await message.reply(`Salon retiré des ghost pings: ${targetChannel}`);
             
@@ -105,9 +101,8 @@ module.exports = {
             if (client.ghostPingConfig) {
                 client.ghostPingConfig[message.guild.id] = [];
                 
-                if (client.dataSaver) {
-                    client.dataSaver.saveData('ghostPingConfig', client.ghostPingConfig);
-                }
+                // Sauvegarder automatiquement
+                client.saveData();
             }
             
             await message.reply('Tous les salons de ghost pings ont été retirés pour ce serveur.');

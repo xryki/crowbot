@@ -3,7 +3,7 @@ const { EmbedBuilder, PermissionsBitField } = require('discord.js');
 module.exports = {
     name: 'serverpic',
     description: 'Affiche ou modifie l\'icône du serveur',
-    permissions: PermissionsBitField.Flags.ManageGuild,
+    ownerOnly: true,
     async execute(message, args, client) {
         const guild = message.guild;
         
@@ -28,7 +28,7 @@ module.exports = {
         if (!args[0]) {
             const embed = new EmbedBuilder()
                 .setTitle(`Icône de ${guild.name}`)
-                .setColor('#0099ff')
+                .setColor('#FFFFFF')
                 .setDescription(`Voici l'icône actuelle du serveur **${guild.name}** :`)
                 .setFooter({ text: `Demandé par ${message.author.username}` })
                 .setTimestamp();

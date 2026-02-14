@@ -12,7 +12,7 @@ module.exports = {
         
         const embed = new EmbedBuilder()
             .setTitle(`Bannières de ${fetchedUser.username}`)
-            .setColor('#0099ff')
+            .setColor('#FFFFFF')
             .setDescription(`Voici les bannières de **${fetchedUser.username}** :`);
         
         // Bannière principale du profil (Nitro)

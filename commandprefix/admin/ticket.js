@@ -69,7 +69,7 @@ module.exports = {
                 const ticketEmbed = new EmbedBuilder()
                     .setTitle(panelKey === 'recrutement' ? 'Recrutement - Tickets' : 'Support - Tickets')
                     .setDescription('Cliquez sur le bouton ci-dessous pour créer un ticket.')
-                    .setColor('#0099ff')
+                    .setColor('#FFFFFF')
                     .setTimestamp();
 
                 const row = new ActionRowBuilder().addComponents(
@@ -91,10 +91,8 @@ module.exports = {
 
                 client.tickets.set(guild.id, cfg);
                 
-                // Sauvegarder les données
-                const DataSaver = require('../../dataSaver');
-                const dataSaver = new DataSaver();
-                dataSaver.saveAllData(client);
+                // Sauvegarder automatiquement
+                client.saveData();
 
                 await channel.send({ embeds: [ticketEmbed], components: [row] });
                 
@@ -123,10 +121,8 @@ module.exports = {
                 cfg.panels[panelKey].categoryId = category.id;
                 client.tickets.set(guild.id, cfg);
                 
-                // Sauvegarder
-                const DataSaver2 = require('../../dataSaver');
-                const dataSaver2 = new DataSaver2();
-                dataSaver2.saveAllData(client);
+                // Sauvegarder automatiquement
+                client.saveData();
                 
                 await message.reply(`Catégorie du panel "${panelKey}" configurée : ${category.name}`);
                 break;
@@ -150,10 +146,8 @@ module.exports = {
                     cfg.panels[panelKey].supportRoles.push(roleToAdd.id);
                     client.tickets.set(guild.id, cfg);
                     
-                    // Sauvegarder
-                    const DataSaver4 = require('../../dataSaver');
-                    const dataSaver4 = new DataSaver4();
-                    dataSaver4.saveAllData(client);
+                    // Sauvegarder automatiquement
+                    client.saveData();
                     
                     await message.reply(`Rôle ${roleToAdd.name} ajouté au support du panel "${panelKey}".`);
                 } else {
@@ -181,10 +175,8 @@ module.exports = {
                     cfg.panels[panelKey].supportRoles.splice(index, 1);
                     client.tickets.set(guild.id, cfg);
                     
-                    // Sauvegarder
-                    const DataSaver5 = require('../../dataSaver');
-                    const dataSaver5 = new DataSaver5();
-                    dataSaver5.saveAllData(client);
+                    // Sauvegarder automatiquement
+                    client.saveData();
                     
                     await message.reply(`Rôle ${roleToRemove.name} retiré du support du panel "${panelKey}".`);
                 } else {
@@ -214,10 +206,8 @@ module.exports = {
                 cfg.panels[panelKey].transcriptChannelId = transcriptChannel.id;
                 client.tickets.set(guild.id, cfg);
                 
-                // Sauvegarder
-                const DataSaver3 = require('../../dataSaver');
-                const dataSaver3 = new DataSaver3();
-                dataSaver3.saveAllData(client);
+                // Sauvegarder automatiquement
+                client.saveData();
                 
                 await message.reply(`Salon des transcripts du panel "${panelKey}" configuré : ${transcriptChannel.name}`);
                 break;
@@ -237,10 +227,8 @@ module.exports = {
                 supportData.supportRoleId = supportRole.id;
                 client.tickets.set(guild.id, supportData);
                 
-                // Sauvegarder
-                const DataSaver4 = require('../../dataSaver');
-                const dataSaver4 = new DataSaver4();
-                dataSaver4.saveAllData(client);
+                // Sauvegarder automatiquement
+                client.saveData();
                 
                 await message.reply(`Rôle de support configuré : ${supportRole.name}`);
                 break;
@@ -248,10 +236,8 @@ module.exports = {
             case 'disable':
                 client.tickets.delete(guild.id);
                 
-                // Sauvegarder
-                const DataSaver5 = require('../../dataSaver');
-                const dataSaver5 = new DataSaver5();
-                dataSaver5.saveAllData(client);
+                // Sauvegarder automatiquement
+                client.saveData();
                 
                 await message.reply('Système de tickets désactivé.');
                 break;

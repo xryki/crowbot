@@ -16,6 +16,9 @@ module.exports = {
         client.config[message.guild.id].roleLogs = channel.id;
         client.config[message.guild.id].chatLogs = channel.id;
         
+        // Sauvegarder automatiquement
+        client.saveData();
+        
         message.reply(`Tous les logs configurés dans: ${channel}`);
         
         // Envoyer les logs

@@ -73,10 +73,8 @@ module.exports = {
                         
                         client.boostConfig.set(guild.id, config);
                         
-                        // Sauvegarder les données
-                        const DataSaver = require('../../dataSaver');
-                        const dataSaver = new DataSaver();
-                        dataSaver.saveAllData(client);
+                        // Sauvegarder automatiquement
+                        client.saveData();
                         
                         await setupMessage.edit(`Configuration terminée !\n• Salon: ${mentionedChannel.name}\n• Message: "${customMessage}"\n\nLes messages de boost sont maintenant activés.`);
                     });
@@ -98,10 +96,8 @@ module.exports = {
             case 'disable':
                 client.boostConfig.delete(guild.id);
                 
-                // Sauvegarder les données
-                const DataSaver = require('../../dataSaver');
-                const dataSaver = new DataSaver();
-                dataSaver.saveAllData(client);
+                // Sauvegarder automatiquement
+                client.saveData();
                 
                 await message.reply('Messages de boost désactivés pour ce serveur.');
                 break;

@@ -16,7 +16,7 @@ module.exports = {
                 { name: 'Rejoint le serveur', value: `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>`, inline: true },
                 { name: 'Rôles', value: member.roles.cache.map(r => r.name).join(', ') || 'Aucun', inline: false }
             )
-            .setColor('#00ff88');
+            .setColor('#FFFFFF');
         
         message.reply({ embeds: [embed] });
     }

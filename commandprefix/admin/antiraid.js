@@ -219,9 +219,7 @@ module.exports = {
         
         // Fonction pour sauvegarder la configuration anti-raid
         const saveAntiRaidConfig = () => {
-            if (client.dataSaver) {
-                client.dataSaver.saveData('antiraid', client.antiraid);
-            }
+            client.saveData();
         };
         
         switch (subcommand) {

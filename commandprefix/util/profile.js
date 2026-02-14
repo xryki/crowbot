@@ -12,7 +12,7 @@ module.exports = {
         
         const embed = new EmbedBuilder()
             .setTitle(`Profil de ${fetchedUser.username}`)
-            .setColor('#0099ff')
+            .setColor('#FFFFFF')
             .setThumbnail(fetchedUser.displayAvatarURL({ dynamic: true, size: 256 }))
             .addFields(
                 {

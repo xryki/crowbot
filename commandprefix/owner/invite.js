@@ -23,7 +23,7 @@ module.exports = {
                 { name: 'Permissions requises', value: 'Administrateur (8) - Toutes les permissions' },
                 { name: 'Scopes', value: 'Bot + Applications Commands' }
             )
-            .setColor('#0099ff')
+            .setColor('#FFFFFF')
             .setTimestamp()
             .setFooter({ text: `Demandé par ${message.author.tag}`, iconURL: message.author.displayAvatarURL() });
         
@@ -34,7 +34,7 @@ module.exports = {
             // Confirmer en public
             if (message.channel.type !== 1) { // Si ce n'est pas un MP
                 const confirmEmbed = new EmbedBuilder()
-                    .setColor('#00ff00')
+                    .setColor('#FFFFFF')
                     .setDescription('Le lien d\'invitation t\'a été envoyé en message privé !')
                     .setTimestamp();
                 
@@ -43,7 +43,7 @@ module.exports = {
         } catch (error) {
             // Si les MP sont désactivés
             const errorEmbed = new EmbedBuilder()
-                .setColor('#ff0000')
+                .setColor('#FFFFFF')
                 .setDescription('Je ne peux pas t\'envoyer le lien en MP. Active tes messages privés ou utilise le lien direct :')
                 .addFields({ name: 'Lien direct', value: inviteUrl })
                 .setTimestamp();

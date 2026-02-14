@@ -1,26 +1,25 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 module.exports = {
-    name: 'bls',
-    description: 'Affiche la liste des utilisateurs blacklistés',
+    name: 'wls',
+    description: 'Affiche la liste des utilisateurs whitelistés',
     ownerOnly: true,
     async execute(message, args, client) {
         try {
-            client.blacklist = client.blacklist || [];
-            
-            if (client.blacklist.length === 0) {
-                return message.reply('pas de blacklist ici');
+            // Vérifier si des utilisateurs sont whitelistés
+            if (!client.whitelist || client.whitelist.length === 0) {
+                return message.reply('pas de whitelist ici');
             }
             
-            // Créer un tableau avec les données des utilisateurs blacklistés
-            const blacklistedUsers = [];
+            // Créer un tableau avec les données des utilisateurs whitelistés
+            const whitelistedUsers = [];
             
-            for (const userId of client.blacklist) {
+            for (const userId of client.whitelist) {
                 try {
                     // Récupérer l'utilisateur depuis l'API Discord
                     const user = await client.users.fetch(userId).catch(() => null);
                     if (user) {
-                        blacklistedUsers.push({
+                        whitelistedUsers.push({
                             user: user
                         });
                     }
@@ -29,26 +28,31 @@ module.exports = {
                 }
             }
             
+            // Vérifier s'il y a des utilisateurs whitelistés
+            if (whitelistedUsers.length === 0) {
+                return message.reply('pas de whitelist ici');
+            }
+            
             // Trier par nom d'utilisateur
-            blacklistedUsers.sort((a, b) => a.user.username.localeCompare(b.user.username));
+            whitelistedUsers.sort((a, b) => a.user.username.localeCompare(b.user.username));
             
             // Créer les pages (15 utilisateurs par page)
             const itemsPerPage = 15;
             const pages = [];
             
-            for (let i = 0; i < blacklistedUsers.length; i += itemsPerPage) {
-                const pageUsers = blacklistedUsers.slice(i, i + itemsPerPage);
+            for (let i = 0; i < whitelistedUsers.length; i += itemsPerPage) {
+                const pageUsers = whitelistedUsers.slice(i, i + itemsPerPage);
                 
                 const description = pageUsers.map((item, index) => {
                     return `**${i + index + 1}.** ${item.user.tag} (${item.user.id})`;
                 }).join('\n');
                 
                 const embed = new EmbedBuilder()
-                    .setTitle('Liste des blacklistés')
+                    .setTitle('Liste des whitelistés')
                     .setDescription(description)
                     .setColor('#FFFFFF')
                     .setFooter({ 
-                        text: `Page ${Math.floor(i / itemsPerPage) + 1}/${Math.ceil(blacklistedUsers.length / itemsPerPage)} • Total: ${blacklistedUsers.length} utilisateur(s)` 
+                        text: `Page ${Math.floor(i / itemsPerPage) + 1}/${Math.ceil(whitelistedUsers.length / itemsPerPage)} • Total: ${whitelistedUsers.length} utilisateur(s)` 
                     })
                     .setTimestamp();
                 
@@ -137,8 +141,8 @@ module.exports = {
             });
             
         } catch (error) {
-            console.error('Erreur dans la commande bls:', error);
-            return message.reply('Une erreur est survenue lors de l\'affichage de la blacklist.');
+            console.error('Erreur dans la commande wls:', error);
+            return message.reply('Une erreur est survenue lors de l\'affichage de la whitelist.');
         }
     }
 };

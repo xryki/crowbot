@@ -14,6 +14,9 @@ module.exports = {
             client.blacklist = client.blacklist.filter(id => id !== target.id);
             message.reply(`${target.tag} retiré de la blacklist.`);
             
+            // Sauvegarder automatiquement
+            client.saveData();
+            
             // Envoyer les logs
             await client.sendCommandLog(message.guild, { name: 'unbl', description: this.description }, message.author, [target.tag]);
         } else {

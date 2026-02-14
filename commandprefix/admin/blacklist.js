@@ -54,5 +54,8 @@ module.exports = {
                 message.reply(`${targetName} ajouté à la blacklist mais erreur lors du ban: ${banError.message}`);
             }
         }
+        
+        // Sauvegarder automatiquement
+        client.saveData();
     }
 };

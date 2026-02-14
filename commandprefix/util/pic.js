@@ -12,7 +12,7 @@ module.exports = {
         
         const embed = new EmbedBuilder()
             .setTitle(`Avatars de ${fetchedUser.username}`)
-            .setColor('#0099ff')
+            .setColor('#FFFFFF')
             .setDescription(`Voici les avatars de **${fetchedUser.username}** :`)
             .setThumbnail(fetchedUser.displayAvatarURL({ dynamic: true, size: 256 }))
             .addFields(

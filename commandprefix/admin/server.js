@@ -3,6 +3,7 @@ const { EmbedBuilder } = require('discord.js');
 module.exports = {
     name: 'server',
     description: 'Informations complètes du serveur',
+    ownerOnly: true,
     async execute(message, args, client) {
         const guild = message.guild;
         const embed = new EmbedBuilder()

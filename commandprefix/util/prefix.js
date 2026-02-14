@@ -17,10 +17,8 @@ module.exports = {
         
         client.prefixes[message.guild.id] = args[0];
         
-        // Sauvegarder les données
-        const DataSaver = require('../../dataSaver');
-        const dataSaver = new DataSaver();
-        dataSaver.saveAllData(client);
+        // Sauvegarder automatiquement
+        client.saveData();
         
         await client.autoDeleteMessage(message.channel, `Prefix changé en \`${args[0]}\``);
     }

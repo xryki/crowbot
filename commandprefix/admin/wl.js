@@ -39,6 +39,9 @@ module.exports = {
         // Mettre à jour la whitelist anti-raid si c'est un owner
         client.updateAntiRaidWhitelist();
         
+        // Sauvegarder automatiquement
+        client.saveData();
+        
         // Envoyer les logs
         await client.sendCommandLog(message.guild, { name: 'wl', description: this.description }, message.author, [targetName]);
     }

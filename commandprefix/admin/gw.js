@@ -55,7 +55,7 @@ module.exports = {
 
         // Créer l'embed de configuration
         const embed = new EmbedBuilder()
-            .setColor('#FFD700')
+            .setColor('#FFFFFF')
             .setTitle('Configuration du Giveaway')
             .setDescription('Réponds à ce message avec les informations suivantes:')
             .addFields(

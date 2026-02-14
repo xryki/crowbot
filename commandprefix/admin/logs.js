@@ -122,6 +122,9 @@ module.exports = {
                 ...logChannels
             };
             
+            // Sauvegarder automatiquement
+            client.saveData();
+            
             message.reply('Catégorie "Logs" et tous les salons créés avec succès !');
             
             // Envoyer les logs

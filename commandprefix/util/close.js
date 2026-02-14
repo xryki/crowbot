@@ -29,7 +29,7 @@ module.exports = {
         const confirmEmbed = new EmbedBuilder()
             .setTitle('Fermeture du ticket')
             .setDescription('Êtes-vous sûr de vouloir fermer ce ticket ?')
-            .setColor('#ff9900')
+            .setColor('#FFFFFF')
             .addFields(
                 { name: 'Ticket', value: `#${channel.name}`, inline: true },
                 { name: 'Créé par', value: `<@${ticketData.userId}>`, inline: true }
@@ -88,7 +88,7 @@ module.exports = {
                             const transcriptEmbed = new EmbedBuilder()
                                 .setTitle(`Transcript - Ticket #${channel.name}`)
                                 .setDescription(`Transcript du ticket fermé par ${message.author}`)
-                                .setColor('#ff9900')
+                                .setColor('#FFFFFF')
                                 .setTimestamp();
                             
                             await transcriptChannel.send({
@@ -108,7 +108,7 @@ module.exports = {
                             const dmEmbed = new EmbedBuilder()
                                 .setTitle('Ticket Fermé - Transcript')
                                 .setDescription(`Votre ticket "${channel.name}" a été fermé par ${message.author.tag}`)
-                                .setColor('#ff9900')
+                                .setColor('#FFFFFF')
                                 .addFields(
                                     { name: 'Raison du ticket', value: ticketData.reason, inline: false },
                                     { name: 'Durée', value: `<t:${Math.floor(ticketData.createdAt / 1000)}:R>`, inline: false }
@@ -136,6 +136,9 @@ module.exports = {
                     try {
                         await channel.delete('Ticket fermé par commande');
                         client.ticketData.delete(channel.id);
+                        
+                        // Sauvegarder automatiquement
+                        client.saveData();
                     } catch (error) {
                         console.error('Erreur suppression canal ticket:', error);
                     }

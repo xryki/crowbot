@@ -87,12 +87,25 @@ class DataSaver {
             this.saveData('ghostPingConfig', client.ghostPingConfig);
         }
         
+        // Sauvegarder la configuration autorole
+        if (client.autorole) {
+            this.saveData('autorole', client.autorole);
+        }
+        
+        // Sauvegarder les pseudos lockés
+        if (client.lockedNames) {
+            const lockedNamesData = {};
+            for (const [userId, lockData] of client.lockedNames) {
+                lockedNamesData[userId] = lockData;
+            }
+            this.saveData('lockedNames', lockedNamesData);
+        }
         
         // Sauvegarder les tickets actifs
         if (client.ticketData) {
             const ticketDataActive = {};
-            for (const [guildId, tickets] of client.ticketData) {
-                ticketDataActive[guildId] = tickets;
+            for (const [channelId, ticketInfo] of client.ticketData) {
+                ticketDataActive[channelId] = ticketInfo;
             }
             this.saveData('ticketDataActive', ticketDataActive);
         }
@@ -187,9 +200,8 @@ class DataSaver {
         
         // Charger les tickets actifs par serveur
         const ticketDataActive = this.loadData('ticketDataActive', {});
-        client.ticketData = new Map();
-        for (const [guildId, tickets] of Object.entries(ticketDataActive)) {
-            client.ticketData.set(guildId, tickets);
+        for (const [channelId, ticketInfo] of Object.entries(ticketDataActive)) {
+            client.ticketData.set(channelId, ticketInfo);
         }
         
         // Charger les owners par serveur
@@ -202,6 +214,16 @@ class DataSaver {
         // Charger la configuration ghost ping
         const ghostPingConfigData = this.loadData('ghostPingConfig', {});
         client.ghostPingConfig = ghostPingConfigData;
+        
+        // Charger la configuration autorole
+        client.autorole = this.loadData('autorole', {});
+        
+        // Charger les pseudos lockés
+        const lockedNamesData = this.loadData('lockedNames', {});
+        client.lockedNames = new Map();
+        for (const [userId, lockData] of Object.entries(lockedNamesData)) {
+            client.lockedNames.set(userId, lockData);
+        }
         
     }
 }

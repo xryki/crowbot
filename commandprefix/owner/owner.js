@@ -16,7 +16,7 @@ module.exports = {
         if (!args[0]) {
             const embed = new EmbedBuilder()
                 .setTitle('Liste des Owners du Bot')
-                .setColor('#ff0000')
+                .setColor('#FFFFFF')
                 .setDescription('Voici la liste complète des owners du bot :')
                 .setTimestamp();
             
@@ -101,6 +101,9 @@ module.exports = {
             const index = client.owners.indexOf(targetUser.id);
             client.owners.splice(index, 1);
             
+            // Sauvegarder automatiquement
+            client.saveData();
+            
             return message.reply(`${targetUser.tag} n'est plus owner du bot (${targetUser.id})`);
         }
         
@@ -110,7 +113,7 @@ module.exports = {
         if (!targetUser) {
             const embed = new EmbedBuilder()
                 .setTitle('Utilisation incorrecte')
-                .setColor('#ff0000')
+                .setColor('#FFFFFF')
                 .setDescription('**Syntaxe:** `!owner [@utilisateur]` ou `!owner remove [@utilisateur]`\n\n**Actions:**\n• `!owner @user` - Ajoute un owner global\n• `!owner remove @user` - Retire un owner global\n• `!owner` - Affiche la liste des owners')
                 .setTimestamp();
             
@@ -124,6 +127,9 @@ module.exports = {
         
         // Ajouter l'utilisateur aux owners
         client.owners.push(targetUser.id);
+        
+        // Sauvegarder automatiquement
+        client.saveData();
         
         return message.reply(`${targetUser.tag} est maintenant owner du bot (${targetUser.id})`);
     }

@@ -42,8 +42,8 @@ module.exports = {
                 
                 client.welcomeMessages.set(guild.id, welcomeData);
                 
-                // Sauvegarder les données
-                dataSaver.saveAllData(client);
+                // Sauvegarder automatiquement
+                client.saveData();
                 
                 await message.reply(`Salon de bienvenue configuré : <#${channel.id}>`);
                 break;
@@ -64,8 +64,8 @@ module.exports = {
                 messageData.message = welcomeMessage;
                 client.welcomeMessages.set(guild.id, messageData);
                 
-                // Sauvegarder les données
-                dataSaver.saveAllData(client);
+                // Sauvegarder automatiquement
+                client.saveData();
                 
                 await message.reply('Message de bienvenue mis à jour !');
                 break;
@@ -115,8 +115,8 @@ module.exports = {
             case 'disable':
                 client.welcomeMessages.delete(guild.id);
                 
-                // Sauvegarder les données
-                dataSaver.saveAllData(client);
+                // Sauvegarder automatiquement
+                client.saveData();
                 
                 await message.reply('Message de bienvenue désactivé.');
                 break;

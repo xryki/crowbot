@@ -47,6 +47,9 @@ module.exports = {
             // Appliquer le nouveau pseudo
             await target.setNickname(newNickname);
             
+            // Sauvegarder automatiquement
+            client.saveData();
+            
             await client.autoDeleteMessage(message.channel, `Le pseudo de **${target.user.tag}** a été verrouillé sur "${newNickname}"`);
             
         } catch (error) {

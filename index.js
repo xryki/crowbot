@@ -15,7 +15,11 @@ const client = new Client({
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildVoiceStates
-    ] 
+    ],
+    rest: {
+        timeout: 30000, // 30 seconds timeout
+        userAgent: 'DiscordBot (https://discord.js.org)'
+    }
 });
 
 // Fonctions de sauvegarde automatique
@@ -172,7 +176,7 @@ client.sendLog = async function(guild, action, moderator, target, reason) {
     
     const embed = new EmbedBuilder()
         .setTitle(`Modération - ${action}`)
-        .setColor('#ff0000')
+        .setColor('#000000')
         .addFields(
             { name: 'Modérateur', value: `${moderator.user.tag} (${moderator.id})`, inline: true },
             { name: 'Cible', value: target ? `${target.user.tag} (${target.id})` : 'N/A', inline: true },
@@ -326,6 +330,24 @@ client.on('guildMemberAdd', async (member) => {
     console.log(`Welcome data: ${welcomeData ? 'Oui' : 'Non'}`);
     
     try {
+        // Système d'autorole
+        const autoroleRoleId = client.autorole?.[member.guild.id];
+        if (autoroleRoleId) {
+            const role = member.guild.roles.cache.get(autoroleRoleId);
+            if (role) {
+                try {
+                    await member.roles.add(role);
+                    console.log(`Autorole attribué: ${role.name} à ${member.user.tag}`);
+                } catch (error) {
+                    console.error('Erreur attribution autorole:', error);
+                }
+            } else {
+                console.log(`Rôle autorole introuvable: ${autoroleRoleId}`);
+                delete client.autorole[member.guild.id];
+                client.saveData();
+            }
+        }
+        
         // Envoyer le message de bienvenue seulement si configuré
         if (welcomeData) {
             const channel = member.guild.channels.cache.get(welcomeData.channelId);
@@ -508,7 +530,7 @@ client.on('guildMemberAdd', async (member) => {
                     const { EmbedBuilder } = require('discord.js');
                     const embed = new EmbedBuilder()
                         .setTitle('ANTI-TOKEN - Compte récent détecté')
-                        .setColor('#ff9900')
+                        .setColor('#000000')
                         .addFields(
                             { name: 'Utilisateur', value: `${member.user.tag} (${member.id})`, inline: true },
                             { name: 'Âge du compte', value: `${days} jours`, inline: true },
@@ -555,7 +577,7 @@ client.on('guildBanAdd', async (ban) => {
                     const { EmbedBuilder } = require('discord.js');
                     const embed = new EmbedBuilder()
                         .setTitle('ALERT ANTI-BAN MASSIF')
-                        .setColor('#ff0000')
+                        .setColor('#000000')
                         .addFields(
                             { name: 'Nombre de bans', value: `${recentBans.length}`, inline: true },
                             { name: 'Période', value: `${client.antiraid.antiBan.timeWindow/1000} secondes`, inline: true },
@@ -633,7 +655,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     if (!oldState.channelId && newState.channelId) {
         const embed = new EmbedBuilder()
             .setTitle('Rejoint un vocal')
-            .setColor('#00ff00')
+            .setColor('#000000')
             .addFields(
                 { name: 'Membre', value: `${member.user.tag} (${member.id})`, inline: true },
                 { name: 'Salon', value: `<#${newState.channelId}>`, inline: true }
@@ -646,7 +668,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     else if (oldState.channelId && !newState.channelId) {
         const embed = new EmbedBuilder()
             .setTitle('Quitte un vocal')
-            .setColor('#ff0000')
+            .setColor('#000000')
             .addFields(
                 { name: 'Membre', value: `${member.user.tag} (${member.id})`, inline: true },
                 { name: 'Salon', value: `<#${oldState.channelId}>`, inline: true }
@@ -659,7 +681,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     else if (oldState.channelId && newState.channelId && oldState.channelId !== newState.channelId) {
         const embed = new EmbedBuilder()
             .setTitle('Change de vocal')
-            .setColor('#ffff00')
+            .setColor('#000000')
             .addFields(
                 { name: 'Membre', value: `${member.user.tag} (${member.id})`, inline: true },
                 { name: 'De', value: `<#${oldState.channelId}>`, inline: true },
@@ -717,7 +739,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
                 const { EmbedBuilder } = require('discord.js');
                 const embed = new EmbedBuilder()
                     .setTitle('Pseudo verrouillé - Changement détecté')
-                    .setColor('#ff6600')
+                    .setColor('#000000')
                     .addFields(
                         { name: 'Utilisateur', value: `${newMember.user.tag} (${newMember.id})`, inline: true },
                         { name: 'Tentative de pseudo', value: oldMember.nickname || newMember.user.username, inline: true },
@@ -747,7 +769,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
     if (addedRoles.size > 0) {
         const embed = new EmbedBuilder()
             .setTitle('Role(s) ajoute(s)')
-            .setColor('#00ff00')
+            .setColor('#000000')
             .addFields(
                 { name: 'Membre', value: `${newMember.user.tag} (${newMember.id})`, inline: true },
                 { name: 'Role(s)', value: addedRoles.map(r => r.name).join(', '), inline: false }
@@ -761,7 +783,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
     if (removedRoles.size > 0) {
         const embed = new EmbedBuilder()
             .setTitle('Role(s) retire(s)')
-            .setColor('#ff0000')
+            .setColor('#000000')
             .addFields(
                 { name: 'Membre', value: `${newMember.user.tag} (${newMember.id})`, inline: true },
                 { name: 'Role(s)', value: removedRoles.map(r => r.name).join(', '), inline: false }
@@ -809,7 +831,7 @@ client.on('messageDelete', (message) => {
     
     const embed = new EmbedBuilder()
         .setTitle('Message supprime')
-        .setColor('#ff0000')
+        .setColor('#000000')
         .addFields(
             { name: 'Auteur', value: `${message.author.tag} (${message.author.id})`, inline: true },
             { name: 'Salon', value: `<#${message.channelId}>`, inline: true },
@@ -1077,7 +1099,34 @@ client.on('messageCreate', async (message) => {
     }
 });
 
+// Gestion des erreurs de connexion
+client.on('disconnect', () => {
+    console.log('Bot déconnecté, tentative de reconnexion...');
+});
+
+client.on('reconnecting', () => {
+    console.log('Tentative de reconnexion en cours...');
+});
+
+client.on('error', (error) => {
+    console.error('Erreur Discord.js:', error);
+    if (error.code === 'UND_ERR_CONNECT_TIMEOUT') {
+        console.log('Timeout de connexion - Nouvelle tentative dans 30 secondes...');
+        setTimeout(() => {
+            client.login(process.env.TOKEN);
+        }, 30000);
+    }
+});
+
 client.login(process.env.TOKEN).catch(err => {
     console.error('Erreur de connexion:', err.message);
-    console.log('Vérifie ton token Discord et ta connexion internet');
+    if (err.code === 'UND_ERR_CONNECT_TIMEOUT') {
+        console.log('Timeout de connexion initial - Nouvelle tentative dans 30 secondes...');
+        setTimeout(() => {
+            console.log('Nouvelle tentative de connexion...');
+            client.login(process.env.TOKEN);
+        }, 30000);
+    } else {
+        console.log('Vérifie ton token Discord et ta connexion internet');
+    }
 });

@@ -5,6 +5,12 @@ module.exports = {
     description: 'Ajoute rôle par nom texte',
     permissions: PermissionsBitField.Flags.ManageRoles,
     async execute(message, args, client) {
+        // Vérifier si l'utilisateur a les permissions nécessaires (Manage Roles ou Administrator)
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageRoles) && 
+            !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+            return message.reply('Tu n\'as pas la permission de gérer les rôles (Manage Roles) ou d\'être administrateur.');
+        }
+        
         // Récupérer la cible soit par mention, soit par réponse
         let target;
         let roleName;

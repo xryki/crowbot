@@ -5,6 +5,11 @@ module.exports = {
     description: 'Affiche ou modifie l\'avatar du bot',
     permissions: PermissionsBitField.Flags.Administrator,
     async execute(message, args, client) {
+        // Vérifier si l'utilisateur est owner (global ou serveur)
+        if (!client.isOwner(message.author.id, message.guild.id)) {
+            return message.reply('Commande réservée aux owners du bot.');
+        }
+        
         const bot = client.user;
         
         // Si il y a une pièce jointe (image/gif), l'utiliser directement
