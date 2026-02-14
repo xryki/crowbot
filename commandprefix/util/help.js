@@ -26,13 +26,13 @@ module.exports = {
                 // Déterminer la catégorie
                 if (['8ball', 'coinflip'].includes(cmd.name)) {
                     categories.fun.commands.push(cmd);
-                } else if (['botinfo', 'server', 'user', 'profile', 'pic', 'banner', 'help', 'helpall', 'ping', 'prefix', 'snipe', 'serverpic', 'serverbanner', 'botpic', 'botbanner'].includes(cmd.name)) {
+                } else if (['botinfo', 'server', 'user', 'profile', 'pic', 'banner', 'help', 'helpall', 'ping', 'prefix', 'snipe'].includes(cmd.name)) {
                     categories.info.commands.push(cmd);
-                } else if (['ban', 'kick', 'mute', 'unmute', 'clear', 'lock', 'unlock', 'addrole', 'delrole', 'nick', 'unban', 'derank', 'renew', 'say', 'lockname', 'unlockname', 'slowmode', 'unmuteall', 'cmute', 'cunmute'].includes(cmd.name)) {
+                } else if (['ban', 'kick', 'mute', 'unmute', 'clear', 'lock', 'unlock', 'addrole', 'delrole', 'nick', 'unban', 'derank', 'renew', 'say', 'lockname', 'unlockname', 'unlocknameall', 'locknamelist', 'slowmode', 'unmuteall', 'cmute', 'cunmute'].includes(cmd.name)) {
                     categories.mod.commands.push(cmd);
-                } else if (['autorole', 'setup', 'bl', 'unbl', 'bls', 'wl', 'unwl', 'logs', 'antiraid', 'welcome', 'ticket', 'massrole', 'gw'].includes(cmd.name)) {
+                } else if (['autorole', 'setup', 'bl', 'unbl', 'wl', 'unwl', 'wls', 'wlclear', 'blclear', 'logs', 'antiraid', 'welcome', 'ticket', 'massrole', 'gw', 'serverpic', 'serverbanner', 'testghostping', 'ghostping', 'ghostpinguser', 'hideall', 'unhideall', 'mv', 'find'].includes(cmd.name)) {
                     categories.admin.commands.push(cmd);
-                } else if (['eval', 'owner', 'restart', 'boostmsg', 'unbanall', 'invite', 'backup', 'restore', 'deletebackup', 'hide', 'unhide'].includes(cmd.name)) {
+                } else if (['eval', 'owner', 'restart', 'boostmsg', 'unbanall', 'invite', 'backup', 'restore', 'deletebackup', 'hide', 'unhide', 'botpic', 'botbanner'].includes(cmd.name)) {
                     categories.owner.commands.push(cmd);
                 } else {
                     // Commandes utilitaires dans info
@@ -66,7 +66,7 @@ module.exports = {
                 const embed = new EmbedBuilder()
                     .setTitle(`${category.name}`)
                     .setDescription(`**Préfixe:** \`${prefix}\`\n\n${commandList}`)
-                    .setColor('#2C2F33')
+                    .setColor('#FFFFFF')
                     .setFooter({ text: `Page ${pages.length + 1} • Utilise les flèches pour naviguer` })
                     .setTimestamp();
                 
