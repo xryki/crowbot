@@ -16,8 +16,10 @@ module.exports = {
         
         if (!target) return message.reply('Mentionne un membre ou réponds à son message !');
         
-        // Vérifier si on peut derank cette personne
-        if (target.roles.highest.position >= message.member.roles.highest.position && message.author.id !== message.guild.ownerId) {
+        // Vérifier si on peut derank cette personne - bypass pour les owners
+        if (!client.isOwner(message.author.id, message.guild.id) && 
+            target.roles.highest.position >= message.member.roles.highest.position && 
+            message.author.id !== message.guild.ownerId) {
             return message.reply('Tu ne peux pas derank cette personne !');
         }
         

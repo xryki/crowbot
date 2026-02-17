@@ -17,7 +17,7 @@ module.exports = {
         
         // Vérifier si le pseudo est locké
         if (!client.lockedNames || !client.lockedNames.has(target.id)) {
-            return client.autoDeleteMessage(message.channel, `Le pseudo de **${target.user.tag}** n'est pas verrouillé.`);
+            return client.autoDeleteMessage(message.channel, `Le pseudo de <@${target.id}> n'est pas verrouillé.`);
         }
         
         try {
@@ -34,7 +34,7 @@ module.exports = {
             // Remettre l'ancien pseudo
             await target.setNickname(originalName);
             
-            await client.autoDeleteMessage(message.channel, `Le pseudo de **${target.user.tag}** a été déverrouillé et remis sur "${originalName}"`);
+            await client.autoDeleteMessage(message.channel, `Le pseudo de <@${target.id}> a été déverrouillé et remis sur "${originalName}"`);
             
         } catch (error) {
             console.error('Erreur unlockname:', error);

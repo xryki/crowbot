@@ -15,7 +15,7 @@ module.exports = {
             roleName = args.join(' ').toLowerCase(); // En réponse, tout est le nom du rôle
         } else {
             target = message.mentions.members.first();
-            roleName = args.slice(1).join(' ').toLowerCase(); // En mention, le premier arg est la cible
+            roleName = args.slice().join(' ').toLowerCase(); // En mention, le premier arg est la cible
         }
         
         if (!target) return message.reply('Mentionne quelqu\'un ou réponds à son message !');
@@ -30,7 +30,7 @@ module.exports = {
         
         try {
             await target.roles.remove(role);
-            message.reply(`Rôle **${role.name}** retiré de ${target.user.username}`);
+            message.reply(`Rôle ${role.name} retiré de ${target.user.username}`);
             
             // Envoyer les logs
             await client.sendLog(message.guild, 'DelRole', message.member, target, `Rôle: ${role.name}`);

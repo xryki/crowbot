@@ -7,7 +7,7 @@ class GiveawayHandler {
         this.participants = new Map();
     }
 
-    // Parser la durée (ex: 1h, 30m, 3j)
+    // Parser la durée (ex: h, m, j)
     parseDuration(durationStr) {
         const match = durationStr.match(/^(\d+)([hmsj])$/);
         if (!match) return null;
@@ -43,7 +43,7 @@ class GiveawayHandler {
         const timeLeft = this.formatTime(giveawayData.endTime - Date.now());
         
         const embed = new EmbedBuilder()
-            .setColor('#5865F2') // Bleu Discord
+            .setColor('F') // Bleu Discord
             .setTitle(`${giveawayData.title}`)
             .setDescription(`${giveawayData.description}`)
             .addFields(
@@ -105,7 +105,7 @@ class GiveawayHandler {
         try {
             const duration = this.parseDuration(giveawayData.duration);
             if (!duration) {
-                return await interaction.reply({ content: 'Durée invalide ! Utilise le format: 1h, 30m, 3j', ephemeral: true });
+                return await interaction.reply({ content: 'Durée invalide ! Utilise le format: h, m, j', ephemeral: true });
             }
 
             const winners = parseInt(giveawayData.winners);
@@ -239,7 +239,7 @@ class GiveawayHandler {
 
             if (participants.size === 0) {
                 await message.edit({ 
-                    content: `**${giveaway.title}** - Personne n'a participé à ce giveaway`,
+                    content: `${giveaway.title} - Personne n'a participé à ce giveaway`,
                     components: [] 
                 });
             } else {
@@ -288,7 +288,7 @@ class GiveawayHandler {
 
             // Créer l'embed de modification
             const embed = new EmbedBuilder()
-                .setColor('#5865F2')
+                .setColor('F')
                 .setTitle('Modifier le Giveaway')
                 .setDescription('Choisis ce que tu veux modifier en répondant à ce message :')
                 .addFields(
@@ -303,9 +303,9 @@ class GiveawayHandler {
                         '• `description [nouvelle description]`\n' +
                         '• `time [durée supplémentaire]`\n' +
                         '• `winners [nombre]`\n\n' +
-                        '**Modifications multiples :**\n' +
-                        '`title Nouveau titre | description Nouvelle description | time 30m`\n' +
-                        '`title Nitro | winners 3 | time 1h`', 
+                        'Modifications multiples :\n' +
+                        '`title Nouveau titre | description Nouvelle description | time m`\n' +
+                        '`title Nitro | winners  | time h`', 
                         inline: false 
                     }
                 )
@@ -451,7 +451,7 @@ class GiveawayHandler {
 
         if (command === 'time') {
             if (!this.parseDuration(value)) {
-                return { success: false, error: 'Durée invalide (ex: 1h, 30m, 3j)' };
+                return { success: false, error: 'Durée invalide (ex: h, m, j)' };
             }
         }
 
@@ -484,7 +484,7 @@ class GiveawayHandler {
 
             // Envoyer les nouveaux gagnants
             await channel.send({
-                content: `Nouveaux gagnants pour **${giveaway.title}** : ${selectedWinners.map(w => `<@${w}>`).join(', ')} !`
+                content: `Nouveaux gagnants pour ${giveaway.title} : ${selectedWinners.map(w => `<@${w}>`).join(', ')} !`
             });
 
         } catch (error) {

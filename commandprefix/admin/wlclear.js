@@ -3,6 +3,11 @@ module.exports = {
     description: 'Supprime toute la whitelist',
     ownerOnly: true,
     async execute(message, args, client) {
+        // Vérifier si l'utilisateur est un owner
+        if (!client.isOwner(message.author.id, message.guild.id)) {
+            return message.reply('Commande réservée aux owners du bot.');
+        }
+        
         try {
             client.whitelist = [];
             

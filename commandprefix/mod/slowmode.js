@@ -11,7 +11,7 @@ module.exports = {
             if (currentSlowmode === 0) {
                 return client.autoDeleteMessage(message.channel, 'Le slowmode est actuellement désactivé.');
             } else {
-                return client.autoDeleteMessage(message.channel, `Le slowmode est actuellement de **${currentSlowmode} secondes**.`);
+                return client.autoDeleteMessage(message.channel, `Le slowmode est actuellement de ${currentSlowmode} secondes.`);
             }
         }
         
@@ -56,7 +56,7 @@ module.exports = {
                 timeText = minutes > 0 ? `${hours} heure${hours > 1 ? 's' : ''} et ${minutes} minute${minutes > 1 ? 's' : ''}` : `${hours} heure${hours > 1 ? 's' : ''}`;
             }
             
-            await client.autoDeleteMessage(message.channel, `Le slowmode a été défini sur **${timeText}**.`);
+            await client.autoDeleteMessage(message.channel, `Le slowmode a été défini sur ${timeText}.`);
             
         } catch (error) {
             console.error('Erreur slowmode:', error);

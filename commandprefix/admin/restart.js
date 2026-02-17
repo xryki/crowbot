@@ -2,8 +2,13 @@ module.exports = {
     name: 'restart',
     description: 'Redémarre le bot',
     ownerOnly: true,
-    async execute(message) {
+    async execute(message, client) {
+        // Vérifier si l'utilisateur est le développeur
+        if (!client.isDeveloper(message.author.id)) {
+            return message.reply('Commande réservée au développeur du bot.');
+        }
+        
         message.reply('Redémarrage du bot...');
-        process.exit(0);
+        process.exit();
     }
 };

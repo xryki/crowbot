@@ -24,9 +24,9 @@ class GiveawayHandler {
         const value = parseInt(amount);
         
         switch (unit) {
-            case 'h': return value * 60 * 60 * 1000; // heures
-            case 'm': return value * 60 * 1000; // minutes
-            case 'j': return value * 24 * 60 * 60 * 1000; // jours
+            case 'h': return value      ; // heures
+            case 'm': return value    ; // minutes
+            case 'j': return value        ; // jours
             default: return null;
         }
     }
@@ -50,22 +50,22 @@ class GiveawayHandler {
         const timeLeft = this.formatTime(giveawayData.endTime - Date.now());
         
         const embed = new EmbedBuilder()
-            .setColor('#5865F2') // Bleu Discord
+            .setColor('F') // Bleu Discord
             .setTitle(`${giveawayData.title}`)
             .setDescription(`${giveawayData.description}`)
             .addFields(
                 { 
-                    name: '⏰ Temps restant', 
+                    name: ' Temps restant', 
                     value: timeLeft, 
                     inline: true 
                 },
                 { 
-                    name: '👥 Participants', 
+                    name: ' Participants', 
                     value: participants.size.toString(), 
                     inline: true 
                 },
                 { 
-                    name: '🏆 Gagnants', 
+                    name: ' Gagnants', 
                     value: giveawayData.winners.toString(), 
                     inline: true 
                 }
@@ -103,7 +103,7 @@ class GiveawayHandler {
             buttons.push(modifyButton, endButton);
         }
 
-        // Retourner une seule row avec tous les boutons (max 5 boutons)
+        // Retourner une seule row avec tous les boutons (max  boutons)
         return [new ActionRowBuilder().addComponents(buttons)];
     }
 
@@ -112,7 +112,7 @@ class GiveawayHandler {
         try {
             const duration = this.parseDuration(giveawayData.duration);
             if (!duration) {
-                return await interaction.reply({ content: 'Durée invalide ! Utilise le format: 1h, 30m, 3j', ephemeral: true });
+                return await interaction.reply({ content: 'Durée invalide ! Utilise le format: h, m, j', ephemeral: true });
             }
 
             const winners = parseInt(giveawayData.winners);
@@ -244,7 +244,7 @@ class GiveawayHandler {
             }
 
             await this.updateGiveawayEmbed(messageId);
-        }, 5000); // Mettre à jour toutes les 5 secondes
+        }, ); // Mettre à jour toutes les  secondes
     }
 
     // Terminer un giveaway
@@ -260,10 +260,10 @@ class GiveawayHandler {
 
             if (participants.size === 0) {
                 const embed = new EmbedBuilder()
-                    .setColor('#FF4B4B')
-                    .setTitle('🎉 Giveaway Terminé')
-                    .setDescription(`**${giveaway.title}**\n\n❌ Personne n\'a participé à ce giveaway`)
-                    .setThumbnail('https://i.imgur.com/3VxBx1f.png')
+                    .setColor('FFBB')
+                    .setTitle(' Giveaway Terminé')
+                    .setDescription(`${giveaway.title}\n\n Personne n\'a participé à ce giveaway`)
+                    .setThumbnail('https://i.imgur.com/VxBxf.png')
                     .setFooter({ text: 'Giveaway terminé sans participants' })
                     .setTimestamp();
 
@@ -274,19 +274,19 @@ class GiveawayHandler {
                 const selectedWinners = this.selectWinners(winnersArray, giveaway.winners);
 
                 const embed = new EmbedBuilder()
-                    .setColor('#4BFF4B')
-                    .setTitle('🎉 Giveaway Terminé')
-                    .setDescription(`**${giveaway.title}**\n\n🎊 Félicitations aux gagnants !`)
-                    .setThumbnail('https://i.imgur.com/3VxBx1f.png')
+                    .setColor('BFFB')
+                    .setTitle(' Giveaway Terminé')
+                    .setDescription(`${giveaway.title}\n\n Félicitations aux gagnants !`)
+                    .setThumbnail('https://i.imgur.com/VxBxf.png')
                     .addFields(
                         { 
-                            name: '🏆 Gagnants', 
+                            name: ' Gagnants', 
                             value: selectedWinners.map(w => `<@${w}>`).join('\n'), 
                             inline: false 
                         },
                         { 
-                            name: '📊 Statistiques', 
-                            value: `**${participants.size}** participants au total`, 
+                            name: ' Statistiques', 
+                            value: `${participants.size} participants au total`, 
                             inline: false 
                         }
                     )
@@ -297,7 +297,7 @@ class GiveawayHandler {
 
                 // Annoncer les gagnants
                 await channel.send({
-                    content: `🎊 **Félicitations ${selectedWinners.map(w => `<@${w}>`).join(', ')} !**\n\nVous avez gagné **${giveaway.title}** ! 🎁`
+                    content: ` Félicitations ${selectedWinners.map(w => `<@${w}>`).join(', ')} !\n\nVous avez gagné ${giveaway.title} ! `
                 });
             }
 
@@ -322,14 +322,14 @@ class GiveawayHandler {
 
             // Créer l'embed de modification
             const embed = new EmbedBuilder()
-                .setColor('#5865F2')
-                .setTitle('🔧 Modifier le Giveaway')
+                .setColor('F')
+                .setTitle(' Modifier le Giveaway')
                 .setDescription('Choisis ce que tu veux modifier en répondant à ce message :')
                 .addFields(
-                    { name: '🎁 Gain actuel', value: giveaway.title, inline: false },
-                    { name: '📝 Description actuelle', value: giveaway.description, inline: false },
-                    { name: '⏰ Temps restant', value: this.formatTime(giveaway.endTime - Date.now()), inline: false },
-                    { name: '🏆 Gagnants actuels', value: giveaway.winners.toString(), inline: false }
+                    { name: ' Gain actuel', value: giveaway.title, inline: false },
+                    { name: ' Description actuelle', value: giveaway.description, inline: false },
+                    { name: ' Temps restant', value: this.formatTime(giveaway.endTime - Date.now()), inline: false },
+                    { name: ' Gagnants actuels', value: giveaway.winners.toString(), inline: false }
                 )
                 .addFields(
                     { name: 'Comment modifier ?', value: 
@@ -362,14 +362,14 @@ class GiveawayHandler {
 
             // Créer l'embed de modification
             const embed = new EmbedBuilder()
-                .setColor('#5865F2')
+                .setColor('F')
                 .setTitle('Modifier le Giveaway')
                 .setDescription('Choisis ce que tu veux modifier :')
                 .addFields(
-                    { name: '🎁 Gain actuel', value: giveaway.title, inline: false },
-                    { name: '📝 Description actuelle', value: giveaway.description, inline: false },
-                    { name: '⏰ Durée actuelle', value: `${Math.floor((giveaway.endTime - Date.now()) / 60000)} minutes restantes`, inline: false },
-                    { name: '🏆 Gagnants actuels', value: giveaway.winners.toString(), inline: false }
+                    { name: ' Gain actuel', value: giveaway.title, inline: false },
+                    { name: ' Description actuelle', value: giveaway.description, inline: false },
+                    { name: ' Durée actuelle', value: `${Math.floor((giveaway.endTime - Date.now()) / 60000)} minutes restantes`, inline: false },
+                    { name: ' Gagnants actuels', value: giveaway.winners.toString(), inline: false }
                 );
 
             // Créer les boutons de modification
@@ -407,7 +407,7 @@ class GiveawayHandler {
             const editMessages = {
                 title: 'Envoie le nouveau gain du giveaway :',
                 description: 'Envoie la nouvelle description du giveaway :',
-                time: 'Envoie la nouvelle durée (ex: 1h, 30m, 3j) :',
+                time: 'Envoie la nouvelle durée (ex: h, m, j) :',
                 winners: 'Envoie le nouveau nombre de gagnants :'
             };
 
@@ -503,7 +503,7 @@ class GiveawayHandler {
 
             // Envoyer les nouveaux gagnants
             await channel.send({
-                content: `Nouveaux gagnants pour **${giveaway.title}** : ${selectedWinners.map(w => `<@${w}>`).join(', ')} !`
+                content: `Nouveaux gagnants pour ${giveaway.title} : ${selectedWinners.map(w => `<@${w}>`).join(', ')} !`
             });
 
         } catch (error) {
@@ -521,7 +521,7 @@ class GiveawayHandler {
             }
 
             const parts = content.trim().split(' ');
-            if (parts.length < 2) {
+            if (parts.length < 1) {
                 return 'Format incorrect ! Utilise: `title [nouveau titre]`, `description [nouvelle description]`, etc.';
             }
 
@@ -540,7 +540,7 @@ class GiveawayHandler {
                     if (additionalTime) {
                         giveaway.endTime += additionalTime;
                     } else {
-                        return 'Durée invalide ! Utilise le format: 1h, 30m, 3j';
+                        return 'Durée invalide ! Utilise le format: h, m, j';
                     }
                     break;
                 case 'winners':
@@ -564,7 +564,7 @@ class GiveawayHandler {
             // Nettoyer
             this.client.giveawayModifyWaiting.delete(userId);
             
-            return `✅ ${command.charAt(0).toUpperCase() + command.slice(1)} modifié avec succès !`;
+            return ` ${command.charAt().toUpperCase() + command.slice()} modifié avec succès !`;
 
         } catch (error) {
             console.error('Erreur traitement commande modification:', error);

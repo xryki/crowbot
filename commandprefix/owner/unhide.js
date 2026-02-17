@@ -3,6 +3,11 @@ module.exports = {
     description: 'Rend un salon public (rétablit les permissions)',
     ownerOnly: true,
     async execute(message, args, client) {
+        // Vérifier si l'utilisateur est un owner
+        if (!client.isOwner(message.author.id, message.guild.id)) {
+            return message.reply('Commande réservée aux owners du bot.');
+        }
+        
         const guild = message.guild;
         const channel = message.mentions.channels.first() || message.channel;
         
@@ -17,7 +22,7 @@ module.exports = {
                 await channel.permissionOverwrites.delete(id);
             }
 
-            await message.reply(`Le salon **${channel.name}** est maintenant public.`);
+            await message.reply(`Le salon ${channel.name} est maintenant public.`);
 
         } catch (error) {
             console.error('Erreur lors de l\'unhide du salon:', error);

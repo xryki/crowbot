@@ -8,8 +8,7 @@ module.exports = {
         const guild = message.guild;
         
         // Initialiser DataSaver
-        const DataSaver = require('../../dataSaver');
-        const dataSaver = new DataSaver();
+        const dataSaver = require('../../dataSaver');
         
         // Initialiser les données de bienvenue si elles n'existent pas
         if (!client.welcomeMessages) {
@@ -23,10 +22,10 @@ module.exports = {
             const welcomeData = client.welcomeMessages.get(guild.id);
             
             if (!welcomeData) {
-                return message.reply(`Aucun message de bienvenue configuré. Utilisez \`${client.getPrefix(message.guild.id)}welcome channel #salon\` puis \`${client.getPrefix(message.guild.id)}welcome message votre message\``);
+                return message.reply(`Aucun message de bienvenue configuré. Utilisez \`${client.getPrefix(message.guild.id)}welcome channel salon\` puis \`${client.getPrefix(message.guild.id)}welcome message votre message\``);
             }
             
-            return message.reply(`Message de bienvenue configuré dans <#${welcomeData.channelId}> :\n"${welcomeData.message}"`);
+            return message.reply(`Message de bienvenue configuré dans <${welcomeData.channelId}> :\n"${welcomeData.message}"`);
         }
         
         switch (subcommand) {
@@ -49,7 +48,7 @@ module.exports = {
                 break;
                 
             case 'message':
-                const welcomeMessage = args.slice(1).join(' ');
+                const welcomeMessage = args.slice().join(' ');
                 if (!welcomeMessage) {
                     return message.reply('Écris un message de bienvenue !');
                 }
@@ -58,7 +57,7 @@ module.exports = {
                 let messageData = client.welcomeMessages.get(guild.id) || {};
                 
                 if (!messageData.channelId) {
-                    return message.reply('Configure d\'abord le salon avec `!welcome channel #salon`');
+                    return message.reply('Configure d\'abord le salon avec `!welcome channel salon`');
                 }
                 
                 messageData.message = welcomeMessage;

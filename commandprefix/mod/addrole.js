@@ -5,8 +5,9 @@ module.exports = {
     description: 'Ajoute rôle par nom texte',
     permissions: PermissionsBitField.Flags.ManageRoles,
     async execute(message, args, client) {
-        // Vérifier si l'utilisateur a les permissions nécessaires (Manage Roles ou Administrator)
-        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageRoles) && 
+        // Vérifier si l'utilisateur a les permissions nécessaires (Manage Roles ou Administrator) - bypass pour les owners
+        if (!client.isOwner(message.author.id, message.guild.id) && 
+            !message.member.permissions.has(PermissionsBitField.Flags.ManageRoles) && 
             !message.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
             return message.reply('Tu n\'as pas la permission de gérer les rôles (Manage Roles) ou d\'être administrateur.');
         }
@@ -21,7 +22,7 @@ module.exports = {
             roleName = args.join(' ').toLowerCase(); // En réponse, tout est le nom du rôle
         } else {
             target = message.mentions.members.first();
-            roleName = args.slice(1).join(' ').toLowerCase(); // En mention, le premier arg est la cible
+            roleName = args.slice().join(' ').toLowerCase(); // En mention, le premier arg est la cible
         }
         
         if (!target) return message.reply('Mentionne quelqu\'un ou réponds à son message !');
@@ -36,7 +37,7 @@ module.exports = {
         
         try {
             await target.roles.add(role);
-            message.reply(`Rôle **${role.name}** ajouté à ${target.user.username}`);
+            message.reply(`Rôle ${role.name} ajouté à ${target.user.username}`);
             
             // Envoyer les logs
             await client.sendLog(message.guild, 'AddRole', message.member, target, `Rôle: ${role.name}`);

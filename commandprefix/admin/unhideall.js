@@ -3,7 +3,7 @@ module.exports = {
     description: 'Montre tous les salons du serveur',
     ownerOnly: true,
     async execute(message, args, client) {
-        // Vérifier si l'utilisateur est owner (global ou serveur)
+        // Vérifier si l'utilisateur est un owner
         if (!client.isOwner(message.author.id, message.guild.id)) {
             return message.reply('Commande réservée aux owners du bot.');
         }
@@ -12,7 +12,7 @@ module.exports = {
         
         try {
             // Récupérer tous les salons du serveur
-            const channels = guild.channels.cache.filter(channel => channel.type === 0); // 0 = GUILD_TEXT
+            const channels = guild.channels.cache.filter(channel => channel.type === 0); //  = GUILD_TEXT
             
             if (channels.size === 0) {
                 return message.reply('Aucun salon textuel à montrer.');
@@ -35,7 +35,7 @@ module.exports = {
                 }
             }
             
-            await message.reply(`**${shownCount}** salons montrés avec succès${errorCount > 0 ? ` (${errorCount} erreurs)` : ''}.`);
+            await message.reply(`${shownCount} salons montrés avec succès${errorCount > 0 ? ` (${errorCount} erreurs)` : ''}.`);
             
         } catch (error) {
             console.error('Erreur dans la commande unhideall:', error);

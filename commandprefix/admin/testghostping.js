@@ -3,6 +3,11 @@ module.exports = {
     description: 'Teste le système de ghost ping',
     ownerOnly: true,
     async execute(message, args, client) {
+        // Vérifier si l'utilisateur est un owner
+        if (!client.isOwner(message.author.id, message.guild.id)) {
+            return message.reply('Commande réservée aux owners du bot.');
+        }
+        
         try {
             // Simuler un nouveau membre qui rejoint
             const mockMember = {
@@ -24,7 +29,7 @@ module.exports = {
             }
             
             if (ghostPingChannels.length === 0) {
-                return message.reply('Aucun salon configuré pour les ghost pings. Utilise `+ghostpinguser add #salon` d\'abord.');
+                return message.reply('Aucun salon configuré pour les ghost pings. Utilise `+ghostpinguser add salon` d\'abord.');
             }
             
             await message.reply(`Test de ghost ping dans ${ghostPingChannels.length} salon(s)...`);
@@ -38,10 +43,10 @@ module.exports = {
                         console.log(`TEST: Envoi du ghost ping pour ${mockMember.user.tag} dans ${ghostPingChannel.name}`);
                         
                         // Envoyer juste la mention de l'utilisateur
-                        const pingMessage = await ghostPingChannel.send(`${mockMember}`);
+                        const pingMessage = await ghostPingChannel.send(`<@${mockMember.user.id}>`);
                         console.log(`TEST: Message envoyé dans ${ghostPingChannel.name}, ID: ${pingMessage.id}`);
                         
-                        // Supprimer immédiatement (0.5 secondes)
+                        // Supprimer immédiatement (. secondes)
                         setTimeout(async () => {
                             try {
                                 await pingMessage.delete();
@@ -49,7 +54,7 @@ module.exports = {
                             } catch (error) {
                                 console.log(`TEST: Message déjà supprimé dans ${ghostPingChannel.name}`);
                             }
-                        }, 500);
+                        }, );
                         
                     } catch (error) {
                         console.error(`TEST: Erreur ghost ping dans ${ghostPingChannel.name}:`, error);

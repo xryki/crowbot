@@ -7,8 +7,8 @@ module.exports = {
     category: 'admin',
     permissions: [PermissionFlagsBits.Administrator],
     async execute(message, args, client) {
-        // Vérifier si l'utilisateur a les permissions
-        if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
+        // Vérifier si l'utilisateur a les permissions - bypass pour les owners
+        if (!client.isOwner(message.author.id, message.guild.id) && !message.member.permissions.has(PermissionFlagsBits.Administrator)) {
             return message.reply('Tu n\'as pas la permission d\'utiliser cette commande.');
         }
 
@@ -55,14 +55,14 @@ module.exports = {
 
         // Créer l'embed de configuration
         const embed = new EmbedBuilder()
-            .setColor('#FFFFFF')
+            .setColor('FFFFFF')
             .setTitle('Configuration du Giveaway')
             .setDescription('Réponds à ce message avec les informations suivantes:')
             .addFields(
                 { name: '1. Titre', value: 'Ex: Nitro Classic, Role VIP', inline: false },
                 { name: '2. Description', value: 'Décris ce que les gens peuvent gagner', inline: false },
-                { name: '3. Durée', value: 'Format: 1h, 30m, 3j (heures, minutes, jours)', inline: false },
-                { name: '4. Nombre de gagnants', value: 'Ex: 1, 2, 3...', inline: false }
+                { name: '3. Durée', value: 'Format: h, m, j (heures, minutes, jours)', inline: false },
+                { name: '4. Nombre de gagnants', value: 'Ex: 1, 2, ...', inline: false }
             )
             .setFooter({ text: 'Format: titre | description | durée | gagnants' });
 

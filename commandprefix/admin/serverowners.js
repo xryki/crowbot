@@ -2,13 +2,12 @@ const { PermissionsBitField, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     name: 'serverowners',
-    description: 'Gère les owners du bot par serveur (Principal Owner uniquement)',
+    description: 'Gère les owners du bot par serveur (Développeur uniquement)',
     skipLogging: true,
     async execute(message, args, client) {
-        // Vérifier si c'est le principal owner
-        const PRINCIPAL_OWNER = '1422102360246980792';
-        if (message.author.id !== PRINCIPAL_OWNER) {
-            return message.reply('Cette commande est réservée au Principal Owner du bot.');
+        // Vérifier si c'est le développeur
+        if (!client.isDeveloper(message.author.id)) {
+            return message.reply('Cette commande est réservée au Développeur du bot.');
         }
         const guild = message.guild;
         
@@ -27,7 +26,7 @@ module.exports = {
                 const embed = new EmbedBuilder()
                     .setTitle('Owners du Serveur')
                     .setDescription(`Aucun owner serveur configuré.\nUtilisez \`${client.getPrefix(guild.id)}serverowners add @utilisateur\` pour en ajouter.`)
-                    .setColor('#FFFFFF')
+                    .setColor('FFFFFF')
                     .setTimestamp();
                 
                 return message.reply({ embeds: [embed] });
@@ -35,8 +34,8 @@ module.exports = {
             
             const embed = new EmbedBuilder()
                 .setTitle('Owners du Serveur')
-                .setColor('#FFFFFF')
-                .setThumbnail(guild.iconURL({ dynamic: true, size: 256 }))
+                .setColor('FFFFFF')
+                .setThumbnail(guild.iconURL({ dynamic: true, size: 512 }))
                 .setFooter({ text: `Serveur: ${guild.name}` })
                 .setTimestamp();
             
@@ -46,13 +45,13 @@ module.exports = {
                 const member = guild.members.cache.get(ownerId);
                 
                 if (member) {
-                    ownerList += `**${i + 1}.** ${member.user.tag}\n> ID: \`${ownerId}\`\n\n`;
+                    ownerList += `${i + 1}. ${member.user.tag}\n> ID: \`${ownerId}\`\n\n`;
                 } else {
-                    ownerList += `**${i + 1}.** Utilisateur inconnu\n> ID: \`${ownerId}\`\n\n`;
+                    ownerList += `${i + 1}. Utilisateur inconnu\n> ID: \`${ownerId}\`\n\n`;
                 }
             }
             
-            embed.setDescription(`**${serverOwners.length} owner(s) configuré(s) :**\n\n${ownerList}`);
+            embed.setDescription(`${serverOwners.length} owner(s) configuré(s) :\n\n${ownerList}`);
             
             return message.reply({ embeds: [embed] });
         }
@@ -111,8 +110,8 @@ module.exports = {
                 break;
                 
             case 'clear':
-                if (!client.owners.includes(message.author.id)) {
-                    return message.reply('Seul le propriétaire principal du bot peut utiliser cette commande.');
+                if (!client.isDeveloper(message.author.id)) {
+                    return message.reply('Seul le Développeur du bot peut utiliser cette commande.');
                 }
                 
                 client.serverOwners.delete(guild.id);
@@ -130,16 +129,21 @@ module.exports = {
                 const member = message.mentions.members.first() || message.member;
                 const serverOwnerList = client.serverOwners.get(guild.id) || [];
                 const isServerOwner = serverOwnerList.includes(member.id);
-                const isMainOwner = client.owners.includes(member.id);
+                const isGlobalOwner = client.owners.includes(member.id);
                 
                 const checkEmbed = new EmbedBuilder()
                     .setTitle(`Permissions de ${member.user.tag}`)
-                    .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 256 }))
-                    .setColor(isMainOwner ? 0xFF0000 : isServerOwner ? 0x00FF00 : 0x808080)
+                    .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 512 }))
+                    .setColor(client.isDeveloper(member.id) ? xFF : isGlobalOwner ? xFFA : isServerOwner ? xFF : x)
                     .addFields(
                         { 
-                            name: 'Owner Principal', 
-                            value: isMainOwner ? 'Oui' : 'Non', 
+                            name: 'Développeur', 
+                            value: client.isDeveloper(member.id) ? 'Oui' : 'Non', 
+                            inline: true 
+                        },
+                        { 
+                            name: 'Owner Global', 
+                            value: isGlobalOwner ? 'Oui' : 'Non', 
                             inline: true 
                         },
                         { 
@@ -149,7 +153,7 @@ module.exports = {
                         },
                         { 
                             name: 'Niveau d\'accès', 
-                            value: isMainOwner ? 'Contrôle total' : isServerOwner ? 'Administration serveur' : 'Utilisateur normal', 
+                            value: client.isDeveloper(member.id) ? 'Contrôle total' : isGlobalOwner ? 'Owner Global' : isServerOwner ? 'Administration serveur' : 'Utilisateur normal', 
                             inline: false 
                         }
                     )
@@ -160,7 +164,7 @@ module.exports = {
                 break;
                 
             default:
-                await message.reply(`Usage: \`${client.getPrefix(guild.id)}serverowners [add|remove|clear|check]\``);
+                await message.reply(`Usage: \`${client.getPrefix(message.guild.id)}serverowners [add|remove|clear|check]\``);
         }
     }
 };

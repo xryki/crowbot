@@ -28,8 +28,8 @@ module.exports = {
         };
         
         try {
-            // Attendre seulement 1 seconde au lieu de 3
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Attendre seulement  seconde au lieu de 
+            await new Promise(resolve => setTimeout(resolve, 100));
             
             // Supprimer le salon
             await channel.delete('Renew - Recréation du salon');
@@ -76,14 +76,14 @@ module.exports = {
                 }
                 
                 // Vérification finale que les permissions sont correctes
-                await new Promise(resolve => setTimeout(resolve, 500));
+                await new Promise(resolve => setTimeout(resolve, 100));
                 const finalPermissions = newChannel.permissionOverwrites.cache;
                 console.log(`Permissions finales sur ${newChannel.name}: ${finalPermissions.size} overwrites`);
             } else {
                 console.log(`Aucune permission à appliquer sur ${newChannel.name}`);
             }
             
-            // Message de confirmation rapide avec ping qui s'auto-supprime après 1.5 secondes
+            // Message de confirmation rapide avec ping qui s'auto-supprime après . secondes
             try {
                 const confirmationMessage = await newChannel.send(`Salon recréé avec succès ! ${message.author.toString()}`);
                 setTimeout(async () => {
@@ -92,7 +92,7 @@ module.exports = {
                     } catch (error) {
                         // Ignorer si déjà supprimé
                     }
-                }, 1500);
+                }, );
             } catch (error) {
                 console.error('Erreur message confirmation:', error);
             }

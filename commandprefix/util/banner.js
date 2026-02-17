@@ -2,9 +2,9 @@ const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     name: 'banner',
-    description: 'Affiche vos bannières profil principal et serveur',
+    description: 'Affiche les bannières profil principal et serveur d\'un utilisateur',
     async execute(message, args, client) {
-        const user = message.author; // Toujours l'auteur du message
+        const user = message.mentions.users.first() || message.author;
         
         // Récupérer les données complètes de l'utilisateur pour Nitro
         const fetchedUser = await client.users.fetch(user.id, { force: true });
@@ -12,11 +12,11 @@ module.exports = {
         
         const embed = new EmbedBuilder()
             .setTitle(`Bannières de ${fetchedUser.username}`)
-            .setColor('#FFFFFF')
-            .setDescription(`Voici les bannières de **${fetchedUser.username}** :`);
+            .setColor('FFFFFF')
+            .setDescription(`Voici les bannières de ${fetchedUser.username} :`);
         
         // Bannière principale du profil (Nitro)
-        const mainBanner = fetchedUser.bannerURL({ dynamic: true, size: 2048 });
+        const mainBanner = fetchedUser.bannerURL({ dynamic: true, size: 512 });
         if (mainBanner) {
             embed.addFields({ 
                 name: 'Bannière principale (Nitro)', 
@@ -33,7 +33,7 @@ module.exports = {
         }
         
         // Bannière du serveur pour cet utilisateur
-        const serverBanner = member && member.bannerURL({ dynamic: true, size: 2048 });
+        const serverBanner = member && member.bannerURL({ dynamic: true, size: 512 });
         if (serverBanner) {
             embed.addFields({ 
                 name: 'Bannière du serveur', 

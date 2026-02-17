@@ -1,0 +1,65 @@
+Hunter.json
+Nom: Hunter
+ID: 2026-02-15T10:52:29.175Z
+Date: 15/02/2026 11:52:29
+Serveur: pvneps#HUNTER 2k26
+Membres: 123
+Salons: 27
+Rôles: 31
+Émojis: 4
+Autocollants: 1
+
+mizuiro.json
+Nom: mizuiro
+ID: 2026-02-14T12:59:45.952Z
+Date: 14/02/2026 13:59:45
+Serveur: 🎋’ Mizuiro
+Membres: 125
+Salons: 79
+Rôles: 47
+Émojis: 57
+Autocollants: 9
+
+morose.json
+Nom: morose
+ID: 2026-02-14T12:49:01.372Z
+Date: 14/02/2026 13:49:01
+Serveur: morose
+Membres: 47
+Salons: 38
+Émojis: 0
+Autocollants: 10
+
+pvinami.json
+Nom: pvinami
+ID: 2026-02-12T18:25:22.793Z
+Date: 12/02/2026 19:25:22
+Serveur: ᴾⱽ Inami
+Membres: 170
+Salons: 69
+Rôles: 73
+Émojis: 47
+Autocollants: 32
+
+pvpassion.json
+Nom: pvpassion
+ID: 2026-02-12T13:56:06.322Z
+Date: 12/02/2026 14:56:06
+Serveur: pv passion
+Membres: 3
+Salons: 52
+Rôles: 44
+Émojis: 0
+Autocollants: 0
+
+pvpop.json
+Nom: pvpop
+ID: 2026-02-12T13:18:48.063Z
+Date: 12/02/2026 14:18:48
+Serveur: pv pop 杰
+Membres: 1883
+Salons: 79
+Rôles: 93
+Émojis: 67
+Autocollants: 28
+

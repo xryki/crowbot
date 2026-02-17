@@ -1,4 +1,4 @@
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
 const fs = require('fs');
 
 module.exports = {
@@ -6,7 +6,7 @@ module.exports = {
     description: 'Restaure une sauvegarde de serveur',
     ownerOnly: true,
     async execute(message, args, client) {
-        // Vérifier si l'utilisateur est owner (global ou serveur)
+        // Vérifier si l'utilisateur est un owner
         if (!client.isOwner(message.author.id, message.guild.id)) {
             return message.reply('Commande réservée aux owners du bot.');
         }
@@ -14,7 +14,7 @@ module.exports = {
         const guild = message.guild;
         
         if (!args[0]) {
-            // Lister les sauvegardes disponibles
+            // Lister les sauvegardes disponibles avec pagination
             const backupDir = './backups';
             if (!fs.existsSync(backupDir)) {
                 return message.reply('Aucune sauvegarde trouvée.');
@@ -25,47 +25,141 @@ module.exports = {
                 return message.reply('Aucune sauvegarde trouvée.');
             }
 
-            let response = '';
-            
-            for (const file of files) {
+            // Trier les fichiers par date de modification (plus récent en premier)
+            const filesWithData = files.map(file => {
                 const filePath = `${backupDir}/${file}`;
                 const stats = fs.statSync(filePath);
-                const backupData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-                
-                response += `**${file}**\n`;
-                response += `Nom: ${backupData.customName || backupData.serverInfo.name}\n`;
-                response += `ID: ${backupData.timestamp}\n`;
-                response += `Date: ${new Date(backupData.timestamp).toLocaleString('fr-FR')}\n`;
-                response += `Serveur: ${backupData.serverInfo.name}\n`;
-                response += `Membres: ${backupData.serverInfo.memberCount}\n`;
-                response += `Salons: ${backupData.channels.length}\n`;
-                if (backupData.roles) response += `Rôles: ${backupData.roles.length}\n`;
-                if (backupData.emojis) response += `Émojis: ${backupData.emojis.length}\n`;
-                if (backupData.stickers) response += `Autocollants: ${backupData.stickers.length}\n`;
-                response += '\n';
-            }
+                const backupData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+                return {
+                    file,
+                    filePath,
+                    stats,
+                    backupData
+                };
+            }).sort((a, b) => b.stats.mtime - a.stats.mtime);
 
-            const embed = new EmbedBuilder()
-                .setTitle('Sauvegardes disponibles')
-                .setDescription(response)
-                .setColor('#FFFFFF')
-                .setTimestamp()
-                .setFooter({ text: `Pour restaurer: ${client.getPrefix(guild.id)}restore <fichier> ou ${client.getPrefix(guild.id)}restore <timestamp>` });
-            
-            if (response.length > 2000) {
-                // Si trop long, envoyer en fichier
-                fs.writeFileSync('./backups_list.txt', response);
-                await message.reply({
-                    embeds: [new EmbedBuilder()
-                        .setTitle('Sauvegardes disponibles')
-                        .setDescription('Liste trop longue, voir fichier attaché')
-                        .setColor('#FFFFFF')
-                        .setTimestamp()],
-                    files: ['./backups_list.txt']
+            const itemsPerPage = 5;
+            let currentPage = 0;
+            const totalPages = Math.ceil(filesWithData.length / itemsPerPage);
+
+            const generateEmbed = (page) => {
+                const start = page * itemsPerPage;
+                const end = start + itemsPerPage;
+                const pageFiles = filesWithData.slice(start, end);
+
+                let description = '';
+                pageFiles.forEach((item, index) => {
+                    const globalIndex = start + index + 1;
+                    description += `**${globalIndex}. ${item.backupData.customName || item.backupData.serverInfo.name}**\n`;
+                    description += `Fichier: \`${item.file}\`\n`;
+                    description += `ID: \`${item.backupData.timestamp}\`\n`;
+                    description += `Date: ${new Date(item.backupData.timestamp).toLocaleString('fr-FR')}\n`;
+                    description += `Serveur: ${item.backupData.serverInfo.name}\n`;
+                    description += `Membres: ${item.backupData.serverInfo.memberCount}\n`;
+                    description += `Salons: ${item.backupData.channels.length}\n`;
+                    if (item.backupData.roles) description += `Rôles: ${item.backupData.roles.length}\n`;
+                    if (item.backupData.emojis) description += `Émojis: ${item.backupData.emojis.length}\n`;
+                    if (item.backupData.stickers) description += `Autocollants: ${item.backupData.stickers.length}\n`;
+                    description += '\n';
                 });
-            } else {
-                await message.reply({ embeds: [embed] });
-            }
+
+                const embed = new EmbedBuilder()
+                    .setTitle('Sauvegardes disponibles')
+                    .setDescription(description)
+                    .setColor('#0099FF')
+                    .setFooter({ 
+                        text: `Page ${page + 1}/${totalPages} | Total: ${filesWithData.length} sauvegardes` +
+                               `\nPour restaurer: ${client.getPrefix(guild.id)}restore <fichier> ou ${client.getPrefix(guild.id)}restore <timestamp>`
+                    })
+                    .setTimestamp();
+
+                return embed;
+            };
+
+            const generateButtons = (page) => {
+                const row = new ActionRowBuilder();
+                
+                // Bouton précédent
+                const prevButton = new ButtonBuilder()
+                    .setCustomId('prev')
+                    .setLabel('◀️ Précédent')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(page === 0);
+                
+                // Bouton suivant
+                const nextButton = new ButtonBuilder()
+                    .setCustomId('next')
+                    .setLabel('Suivant ▶️')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(page >= totalPages - 1);
+                
+                // Boutons de navigation rapide
+                const firstButton = new ButtonBuilder()
+                    .setCustomId('first')
+                    .setLabel('⏮️')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(page === 0);
+                
+                const lastButton = new ButtonBuilder()
+                    .setCustomId('last')
+                    .setLabel('⏭️')
+                    .setStyle(ButtonStyle.Secondary)
+                    .setDisabled(page >= totalPages - 1);
+                
+                row.addComponents(firstButton, prevButton, nextButton, lastButton);
+                
+                return row;
+            };
+
+            // Envoyer le premier message
+            const embedMessage = await message.reply({
+                embeds: [generateEmbed(currentPage)],
+                components: [generateButtons(currentPage)]
+            });
+
+            // Créer un collector pour les boutons
+            const collector = embedMessage.createMessageComponentCollector({
+                componentType: ComponentType.Button,
+                time: 300000 // 5 minutes
+            });
+
+            collector.on('collect', async (interaction) => {
+                if (interaction.user.id !== message.author.id) {
+                    await interaction.reply({ 
+                        content: 'Seul l\'auteur de la commande peut utiliser ces boutons.', 
+                        ephemeral: true 
+                    });
+                    return;
+                }
+
+                switch (interaction.customId) {
+                    case 'prev':
+                        currentPage = Math.max(0, currentPage - 1);
+                        break;
+                    case 'next':
+                        currentPage = Math.min(totalPages - 1, currentPage + 1);
+                        break;
+                    case 'first':
+                        currentPage = 0;
+                        break;
+                    case 'last':
+                        currentPage = totalPages - 1;
+                        break;
+                }
+
+                await interaction.update({
+                    embeds: [generateEmbed(currentPage)],
+                    components: [generateButtons(currentPage)]
+                });
+            });
+
+            collector.on('end', () => {
+                // Désactiver les boutons à la fin du collector
+                embedMessage.edit({
+                    components: []
+                }).catch(() => {});
+            });
+
             return;
         }
 
@@ -85,7 +179,7 @@ module.exports = {
             const files = fs.readdirSync(backupDir).filter(file => file.endsWith('.json'));
             for (const file of files) {
                 const filePath = `${backupDir}/${file}`;
-                const backupData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+                const backupData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
                 if (backupData.timestamp === backupIdentifier) {
                     backupFile = filePath;
                     break;
@@ -98,7 +192,7 @@ module.exports = {
         }
 
         try {
-            const backup = JSON.parse(fs.readFileSync(backupFile, 'utf8'));
+            const backup = JSON.parse(fs.readFileSync(backupFile, 'utf-8'));
             
             // Créer un salon temporaire pour les messages de restauration
             let restoreChannel;
@@ -117,10 +211,22 @@ module.exports = {
                 return message.reply('Impossible de créer un salon pour la restauration.');
             }
             
-            await restoreChannel.send('Restauration en cours...\n\nAttention: Cette action va modifier le serveur !');
+            const startEmbed = new EmbedBuilder()
+                .setTitle('🔄 Restauration en cours')
+                .setDescription('Attention: Cette action va modifier le serveur !')
+                .setColor('#FFA500')
+                .setTimestamp();
+            
+            await restoreChannel.send({ embeds: [startEmbed] });
             
             // Demander confirmation
-            await restoreChannel.send('Êtes-vous sûr de vouloir continuer ? Répondez `oui` pour confirmer.');
+            const confirmEmbed = new EmbedBuilder()
+                .setTitle('⚠️ Confirmation requise')
+                .setDescription('Êtes-vous sûr de vouloir continuer ? Répondez `oui` pour confirmer.')
+                .setColor('#FF0000')
+                .setTimestamp();
+            
+            await restoreChannel.send({ embeds: [confirmEmbed] });
             
             const confirmation = await restoreChannel.awaitMessages({
                 max: 1,
@@ -133,11 +239,20 @@ module.exports = {
 
             if (!confirmation.includes('oui')) {
                 await restoreChannel.delete('Restauration annulée');
-                return message.reply('Restauration annulée.');
+                const cancelEmbed = new EmbedBuilder()
+                    .setTitle('❌ Restauration annulée')
+                    .setColor('#FF0000')
+                    .setTimestamp();
+                return message.reply({ embeds: [cancelEmbed] });
             }
 
             // Supprimer tous les salons existants
-            await restoreChannel.send('Suppression des salons existants...');
+            const deleteChannelsEmbed = new EmbedBuilder()
+                .setTitle('🗑️ Suppression des salons existants...')
+                .setColor('#FFA500')
+                .setTimestamp();
+            
+            await restoreChannel.send({ embeds: [deleteChannelsEmbed] });
             
             const channelsToDelete = guild.channels.cache.filter(ch => ch.id !== restoreChannel.id);
             for (const channel of channelsToDelete.values()) {
@@ -149,7 +264,12 @@ module.exports = {
             }
 
             // Supprimer tous les rôles existants (sauf @everyone)
-            await restoreChannel.send('Suppression des rôles existants...');
+            const deleteRolesEmbed = new EmbedBuilder()
+                .setTitle('🗑️ Suppression des rôles existants...')
+                .setColor('#FFA500')
+                .setTimestamp();
+            
+            await restoreChannel.send({ embeds: [deleteRolesEmbed] });
             
             const rolesToDelete = guild.roles.cache.filter(role => role.name !== '@everyone' && role.managed !== true && role.id !== guild.id);
             let deletedCount = 0;
@@ -165,10 +285,21 @@ module.exports = {
                 }
             }
             
-            await restoreChannel.send(`Rôles supprimés: ${deletedCount} | Erreurs: ${errorCount}`);
+            const rolesCountEmbed = new EmbedBuilder()
+                .setTitle('📊 Suppression des rôles terminée')
+                .setDescription(`Rôles supprimés: ${deletedCount} | Erreurs: ${errorCount}`)
+                .setColor('#00FF00')
+                .setTimestamp();
+            
+            await restoreChannel.send({ embeds: [rolesCountEmbed] });
 
             // Restaurer le nom, l'icône et la bannière du serveur
-            await restoreChannel.send('Application du nom, icône et bannière...');
+            const serverInfoEmbed = new EmbedBuilder()
+                .setTitle('⚙️ Application du nom, icône et bannière...')
+                .setColor('#FFA500')
+                .setTimestamp();
+            
+            await restoreChannel.send({ embeds: [serverInfoEmbed] });
             
             try {
                 await guild.setName(backup.serverInfo.name);
@@ -184,7 +315,12 @@ module.exports = {
 
             // Restaurer les rôles si disponibles
             if (backup.roles) {
-                await restoreChannel.send('Création des rôles en cours...');
+                const createRolesEmbed = new EmbedBuilder()
+                    .setTitle('🎭 Création des rôles en cours...')
+                    .setColor('#FFA500')
+                    .setTimestamp();
+                
+                await restoreChannel.send({ embeds: [createRolesEmbed] });
                 
                 for (const roleData of backup.roles) {
                     try {
@@ -205,10 +341,15 @@ module.exports = {
             }
 
             // Restaurer les salons
-            await restoreChannel.send('Création des salons en cours...');
+            const createChannelsEmbed = new EmbedBuilder()
+                .setTitle('📝 Création des salons en cours...')
+                .setColor('#FFA500')
+                .setTimestamp();
+            
+            await restoreChannel.send({ embeds: [createChannelsEmbed] });
             
             // Créer les catégories d'abord
-            const categories = backup.channels.filter(ch => ch.type === 4);
+            const categories = backup.channels.filter(ch => ch.type === 0);
             const categoryMap = new Map();
             
             for (const categoryData of categories) {
@@ -226,7 +367,7 @@ module.exports = {
 
             // Créer les autres salons
             for (const channelData of backup.channels) {
-                if (channelData.type === 4) continue; // Catégories déjà créées
+                if (channelData.type === 0) continue; // Catégories déjà créées
                 
                 try {
                     const channelOptions = {
@@ -264,7 +405,13 @@ module.exports = {
                 }
             }
 
-            await restoreChannel.send(`Sauvegarde de **${backup.serverInfo.name}** a été restaurée sur **${guild.name}**`);
+            const completeEmbed = new EmbedBuilder()
+                .setTitle('✅ Restauration terminée')
+                .setDescription(`Sauvegarde de ${backup.serverInfo.name} a été restaurée sur ${guild.name}`)
+                .setColor('#00FF00')
+                .setTimestamp();
+            
+            await restoreChannel.send({ embeds: [completeEmbed] });
             
             // Rendre le salon visible à la fin
             setTimeout(async () => {
@@ -274,12 +421,18 @@ module.exports = {
                 } catch (error) {
                     console.error('Erreur modification salon final:', error);
                 }
-            }, 2000);
+            }, );
 
         } catch (error) {
             console.error('Erreur lors de la restauration:', error);
             try {
-                await message.channel.send('Une erreur est survenue lors de la restauration.');
+                const errorEmbed = new EmbedBuilder()
+                    .setTitle('❌ Erreur lors de la restauration')
+                    .setDescription('Une erreur est survenue lors de la restauration.')
+                    .setColor('#FF0000')
+                    .setTimestamp();
+                
+                await message.channel.send({ embeds: [errorEmbed] });
             } catch (e) {
                 console.error('Impossible d\'envoyer le message d\'erreur:', e);
             }

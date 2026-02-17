@@ -2,7 +2,7 @@ const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     name: 'pic',
-    description: 'Affiche les avatars principal et du serveur',
+    description: 'Affiche les avatars principal et du serveur d\'un utilisateur',
     async execute(message, args, client) {
         const user = message.mentions.users.first() || message.author;
         
@@ -12,13 +12,13 @@ module.exports = {
         
         const embed = new EmbedBuilder()
             .setTitle(`Avatars de ${fetchedUser.username}`)
-            .setColor('#FFFFFF')
-            .setDescription(`Voici les avatars de **${fetchedUser.username}** :`)
-            .setThumbnail(fetchedUser.displayAvatarURL({ dynamic: true, size: 256 }))
+            .setColor('FFFFFF')
+            .setDescription(`Voici les avatars de ${fetchedUser.username} :`)
+            .setThumbnail(fetchedUser.displayAvatarURL({ dynamic: true, size: 512 }))
             .addFields(
                 {
                     name: 'Avatar principal',
-                    value: `[Télécharger en pleine taille](${fetchedUser.displayAvatarURL({ dynamic: true, size: 2048 })})`,
+                    value: `[Télécharger en pleine taille](${fetchedUser.displayAvatarURL({ dynamic: true, size: 512 })})`,
                     inline: false
                 }
             )
@@ -30,7 +30,7 @@ module.exports = {
             embed.addFields(
                 {
                     name: 'Avatar serveur',
-                    value: `[Télécharger en pleine taille](${member.displayAvatarURL({ dynamic: true, size: 2048 })})`,
+                    value: `[Télécharger en pleine taille](${member.displayAvatarURL({ dynamic: true, size: 512 })})`,
                     inline: false
                 }
             );

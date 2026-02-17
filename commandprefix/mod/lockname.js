@@ -15,12 +15,19 @@ module.exports = {
             return client.autoDeleteMessage(message.channel, 'Veuillez mentionner un utilisateur valide.');
         }
         
-        // Vérifier si on peut modifier le pseudo (hiérarchie)
-        if (target.roles.highest.position >= message.member.roles.highest.position && message.author.id !== message.guild.ownerId) {
+        // Debug
+        console.log(`[DEBUG] Target ID: ${target.id}`);
+        console.log(`[DEBUG] Target tag: ${target.user.tag}`);
+        console.log(`[DEBUG] Target username: ${target.user.username}`);
+        
+        // Vérifier si on peut modifier le pseudo (hiérarchie) - bypass pour les owners
+        if (!client.isOwner(message.author.id, message.guild.id) && 
+            target.roles.highest.position >= message.member.roles.highest.position && 
+            message.author.id !== message.guild.ownerId) {
             return client.autoDeleteMessage(message.channel, 'Vous ne pouvez pas modifier le pseudo de cet utilisateur.');
         }
         
-        // Obtenir le nouveau pseudo (ou utiliser l'actuel)
+        // Obtenir le nouveau pseudo (enlever la mention de l'utilisateur)
         const newNickname = args.slice(1).join(' ') || target.user.username;
         
         try {
@@ -29,15 +36,16 @@ module.exports = {
             
             if (!client.lockedNames.has(target.id)) {
                 client.lockedNames.set(target.id, {
-                    originalName: target.nickname || target.user.username,
+                    originalName: target.nickname || target.user.username, // Pseudo actuel ou username de base
                     lockedName: newNickname,
                     moderatorId: message.author.id,
                     timestamp: Date.now()
                 });
             } else {
-                // Mettre à jour le pseudo locké
+                // Mettre à jour le pseudo locké mais garder l'originalName original
+                const existingData = client.lockedNames.get(target.id);
                 client.lockedNames.set(target.id, {
-                    ...client.lockedNames.get(target.id),
+                    originalName: existingData.originalName, // Garder le vrai pseudo d'origine
                     lockedName: newNickname,
                     moderatorId: message.author.id,
                     timestamp: Date.now()
@@ -50,7 +58,7 @@ module.exports = {
             // Sauvegarder automatiquement
             client.saveData();
             
-            await client.autoDeleteMessage(message.channel, `Le pseudo de **${target.user.tag}** a été verrouillé sur "${newNickname}"`);
+            await client.autoDeleteMessage(message.channel, `Le pseudo de <@${target.id}> a été verrouillé sur "${newNickname}"`);
             
         } catch (error) {
             console.error('Erreur lockname:', error);

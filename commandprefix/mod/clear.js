@@ -2,26 +2,97 @@ const { PermissionsBitField } = require('discord.js');
 
 module.exports = {
     name: 'clear',
-    description: 'Supprime X messages (1-100) ou les messages d\'un utilisateur spécifique',
+    description: 'Supprime X messages (-) ou les messages d\'un utilisateur sur  jours',
     permissions: PermissionsBitField.Flags.ManageMessages,
-    async execute(message, args) {
-        // Limite maximale que vous gérez
-        const MAX_MESSAGES = 100; // Modifiez cette valeur comme vous voulez
-        
-        if (args.length < 1) {
-            // Mode: +clear (sans argument) - clear automatique avec la limite par défaut
+
+    async execute(message, args, client) {
+        const prefix = client.getPrefix(message.guild.id);
+        const MAX_MESSAGES = 100;
+
+        // --- MODE CLEAR UTILISATEUR ---
+        const userMention = args[0]?.match(/^<@!?(\d+)>$/);
+
+        if (userMention) {
+            const userId = userMention[1];
+            const amount = parseInt(args[1]) || MAX_MESSAGES;
+
+            if (amount < 1 || amount > MAX_MESSAGES) {
+                return message.reply(`Utilisation: \`${prefix}clear <utilisateur> <1-${MAX_MESSAGES}>\``);
+            }
+
             try {
-                const msgs = await message.channel.bulkDelete(MAX_MESSAGES, true);
+                let fetched;
+                let allMessages = [];
+                let lastId = null;
+
+                //  On récupère les messages par paquets de 100 jusqu'à remonter 14 jours ou atteindre le montant demandé
+                const fourteenDaysAgo = Date.now() - (14 * 24 * 60 * 60 * 1000);
+                let collectedCount = 0;
+
+                do {
+                    fetched = await message.channel.messages.fetch({
+                        limit: Math.min(100, amount - collectedCount),
+                        before: lastId || undefined
+                    });
+
+                    const filtered = fetched.filter(msg => msg.createdTimestamp >= fourteenDaysAgo);
+                    const userFiltered = filtered.filter(msg => msg.author.id === userId);
+                    
+                    allMessages.push(...userFiltered.values());
+                    collectedCount += userFiltered.size;
+
+                    lastId = fetched.last()?.id;
+
+                } while (fetched.size === 100 && collectedCount < amount);
+
+                if (allMessages.length === 0) {
+                    return message.reply("Aucun message de cet utilisateur dans les 14 derniers jours.");
+                }
+
+                // Prendre les X plus récents
+                const toDelete = allMessages.slice(0, amount);
+
+                await message.channel.bulkDelete(toDelete, true);
+
+                const user = await message.client.users.fetch(userId).catch(() => null);
+                const userName = user ? user.username : "Utilisateur inconnu";
+
+                // Ne pas supprimer le message de l'auteur si c'est un clear utilisateur
+                if (message.author.id !== userId) {
+                    message.channel.send(`${toDelete.length} messages de ${userName} supprimés (sur 14 jours).`)
+                        .then(m => setTimeout(() => m.delete(), 5000));
+                } else {
+                    message.channel.send(`${toDelete.length} messages de ${userName} supprimés (sur 14 jours).`)
+                        .then(m => setTimeout(() => m.delete(), 5000));
+                }
+
+            } catch (error) {
+                console.error("Erreur clear utilisateur:", error);
+
+                if (error.code === 50001) {
+                    message.reply("Impossible de supprimer des messages de plus de 14 jours.");
+                } else {
+                    message.reply("Erreur lors de la suppression des messages.");
+                }
+            }
+
+            return;
+        }
+
+        // --- MODE CLEAR NORMAL ---
+        const amount = parseInt(args[0]);
+        
+        // Si pas d'argument, clear automatique de 50 messages
+        if (!amount) {
+            try {
+                const msgs = await message.channel.bulkDelete(50, true);
                 message.channel.send(`${msgs.size} messages supprimés automatiquement.`)
-                    .then(m => setTimeout(() => m.delete(), 3000));
+                    .then(m => setTimeout(() => m.delete(), 5000));
             } catch (error) {
                 console.error('Erreur clear auto:', error);
                 
-                // Gérer les erreurs spécifiques de Discord
-                if (error.code === 50034) { // Messages trop anciens
+                if (error.code === 50001) {
                     message.reply('Impossible de supprimer des messages de plus de 14 jours.');
-                } else if (error.code === 10008) { // Message inconnu
-                    message.reply('Certains messages sont introuvables (peut-être déjà supprimés).');
                 } else {
                     message.reply('Erreur lors de la suppression automatique des messages.');
                 }
@@ -29,76 +100,21 @@ module.exports = {
             return;
         }
         
-        // Vérifier si le premier argument est une mention d'utilisateur
-        const userMention = args[0].match(/^<@!?(\d+)>$/);
-        
-        if (userMention) {
-            // Mode: +clear <utilisateur> <nombre>
-            const userId = userMention[1];
-            const amount = parseInt(args[1]) || MAX_MESSAGES; // Si pas de nombre, utilise la limite par défaut
-            
-            if (amount < 1 || amount > MAX_MESSAGES) {
-                return message.reply(`Utilisation: \`+clear <utilisateur> <1-${MAX_MESSAGES}>\``);
-            }
-            
-            try {
-                // Récupérer les messages du salon
-                const messages = await message.channel.messages.fetch({ limit: 100 });
-                
-                // Filtrer les messages de l'utilisateur spécifié
-                const userMessages = messages.filter(msg => msg.author.id === userId);
-                
-                // Prendre les X derniers messages de cet utilisateur
-                const messagesToDelete = userMessages.first(amount);
-                
-                if (messagesToDelete.size === 0) {
-                    return message.reply('Aucun message trouvé de cet utilisateur dans les 100 derniers messages.');
-                }
-                
-                // Supprimer les messages
-                await message.channel.bulkDelete(messagesToDelete, true);
-                
-                const user = await message.client.users.fetch(userId).catch(() => null);
-                const userName = user ? user.username : 'Utilisateur inconnu';
-                
-                message.channel.send(`${messagesToDelete.size} messages de ${userName} supprimés.`)
-                    .then(m => setTimeout(() => m.delete(), 3000));
-                    
-            } catch (error) {
-                console.error('Erreur clear utilisateur:', error);
-                
-                // Gérer les erreurs spécifiques de Discord
-                if (error.code === 50034) { // Messages trop anciens
-                    message.reply('Impossible de supprimer des messages de plus de 14 jours.');
-                } else if (error.code === 10008) { // Message inconnu
-                    message.reply('Certains messages sont introuvables (peut-être déjà supprimés).');
-                } else {
-                    message.reply('Erreur lors de la suppression des messages de cet utilisateur.');
-                }
-            }
-            
-        } else {
-            // Mode: +clear <nombre> (fonctionnalité originale)
-            const amount = parseInt(args[0]);
-            if (amount < 1 || amount > MAX_MESSAGES) {
-                return message.reply(`Utilisation: \`+clear <1-${MAX_MESSAGES}>\``);
-            }
-            
-            try {
-                const msgs = await message.channel.bulkDelete(amount, true);
-                message.channel.send(`${msgs.size} messages supprimés.`)
-                    .then(m => setTimeout(() => m.delete(), 3000));
-            } catch (error) {
-                console.error('Erreur clear normal:', error);
-                
-                // Gérer les erreurs spécifiques de Discord
-                if (error.code === 50034) { // Messages trop anciens
-                    message.reply('Impossible de supprimer des messages de plus de 14 jours.');
-                } else if (error.code === 10008) { // Message inconnu
-                    message.reply('Certains messages sont introuvables (peut-être déjà supprimés).');
-                } else {
-                    message.reply('Erreur lors de la suppression des messages.');
-                }
+        if (amount < 1 || amount > MAX_MESSAGES) {
+            return message.reply(`Utilisation: \`${prefix}clear <1-${MAX_MESSAGES}>\``);
+        }
+
+        try {
+            const msgs = await message.channel.bulkDelete(amount, true);
+            message.channel.send(`${msgs.size} messages supprimés.`)
+                .then(m => setTimeout(() => m.delete(), 5000));
+        } catch (error) {
+            console.error("Erreur clear normal:", error);
+
+            if (error.code === 50001) {
+                message.reply("Impossible de supprimer des messages de plus de 14 jours.");
+            } else {
+                message.reply("Erreur lors de la suppression des messages.");
             }
         }
     }

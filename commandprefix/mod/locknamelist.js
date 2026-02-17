@@ -1,4 +1,4 @@
-const { PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { PermissionsBitField, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 module.exports = {
     name: 'locknamelist',
@@ -6,66 +6,36 @@ module.exports = {
     permissions: PermissionsBitField.Flags.ManageNicknames,
     async execute(message, args, client) {
         try {
-            // Vérifier si des pseudos sont lockés sur ce serveur
+            // Vérifier si des pseudos sont lockés
             if (!client.lockedNames || client.lockedNames.size === 0) {
-                return message.reply('pas de pseudo lock ici');
+                return message.reply('Aucun pseudo verrouillé.');
             }
             
-            // Créer un tableau avec les données des utilisateurs présents sur ce serveur
-            const lockedUsers = [];
-            
-            for (const [userId, lockData] of client.lockedNames.entries()) {
-                try {
-                    // Vérifier si l'utilisateur est sur ce serveur
-                    const member = message.guild.members.cache.get(userId);
-                    if (!member) {
-                        continue; // Ignorer les utilisateurs qui ne sont pas sur ce serveur
-                    }
-                    
-                    lockedUsers.push({
-                        user: member.user,
-                        lockData: lockData
-                    });
-                } catch (error) {
-                    console.error(`Erreur traitement utilisateur ${userId}:`, error);
-                }
-            }
-            
-            // Trier par date de lock (plus récent d'abord)
-            lockedUsers.sort((a, b) => b.lockData.timestamp - a.lockData.timestamp);
-            
-            // Vérifier s'il y a des utilisateurs lockés sur ce serveur
-            if (lockedUsers.length === 0) {
-                return message.reply('pas de pseudo lock ici');
-            }
-            
-            // Créer les pages (10 utilisateurs par page)
+            // Créer la liste des IDs
+            const lockedIds = Array.from(client.lockedNames.keys());
             const itemsPerPage = 10;
-            const pages = [];
             
-            for (let i = 0; i < lockedUsers.length; i += itemsPerPage) {
-                const pageUsers = lockedUsers.slice(i, i + itemsPerPage);
+            // Créer les pages
+            const pages = [];
+            for (let i = 0; i < lockedIds.length; i += itemsPerPage) {
+                const pageIds = lockedIds.slice(i, i + itemsPerPage);
                 
-                const description = pageUsers.map((item, index) => {
-                    const date = new Date(item.lockData.timestamp).toLocaleDateString('fr-FR');
-                    const moderator = client.users.cache.get(item.lockData.moderatorId);
-                    const moderatorTag = moderator ? moderator.tag : `ID: ${item.lockData.moderatorId}`;
-                    
-                    return `**${i + index + 1}.** ${item.user.tag} (${item.user.id})
-**Pseudo locké:** \`${item.lockData.lockedName}\`
-**Pseudo original:** \`${item.lockData.originalName}\`
-**Lock par:** ${moderatorTag}
-**Date:** ${date}`;
-                }).join('\n\n');
+                const description = pageIds.map((userId, index) => {
+                    const lockData = client.lockedNames.get(userId);
+                    const user = client.users.cache.get(userId);
+                    const userTag = user ? user.tag : `Utilisateur inconnu (${userId})`;
+                    return `${i + index + 1}. **${userTag}** → "${lockData.lockedName}"`;
+                }).join('\n');
                 
-                const embed = new EmbedBuilder()
-                    .setTitle(`Liste des pseudos verrouillés - ${message.guild.name}`)
-                    .setDescription(description)
-                    .setColor('#FFFFFF')
-                    .setFooter({ 
-                        text: `Page ${Math.floor(i / itemsPerPage) + 1}/${Math.ceil(lockedUsers.length / itemsPerPage)} • Total: ${lockedUsers.length} utilisateur(s)` 
-                    })
-                    .setTimestamp();
+                const embed = {
+                    color: 0x3498db,
+                    title: 'Utilisateurs avec pseudo verrouillé',
+                    description: description,
+                    footer: {
+                        text: `Page ${Math.floor(i / itemsPerPage) + 1}/${Math.ceil(lockedIds.length / itemsPerPage)} • Total: ${lockedIds.length} utilisateur(s)`
+                    },
+                    timestamp: new Date().toISOString()
+                };
                 
                 pages.push(embed);
             }
@@ -86,9 +56,9 @@ module.exports = {
                         .setDisabled(true),
                     new ButtonBuilder()
                         .setCustomId('next')
-                        .setLabel('▶')
+                        .setLabel('◀')
                         .setStyle(ButtonStyle.Secondary)
-                        .setDisabled(pages.length === 1),
+                        .setDisabled(pages.length === 0),
                     new ButtonBuilder()
                         .setCustomId('stop')
                         .setLabel('X')
@@ -132,7 +102,7 @@ module.exports = {
                             .setDisabled(currentPage === 0),
                         new ButtonBuilder()
                             .setCustomId('next')
-                            .setLabel('▶')
+                            .setLabel('\u25b6')
                             .setStyle(ButtonStyle.Secondary)
                             .setDisabled(currentPage === pages.length - 1),
                         new ButtonBuilder()
@@ -153,7 +123,7 @@ module.exports = {
             
         } catch (error) {
             console.error('Erreur dans la commande locknamelist:', error);
-            return message.reply('Une erreur est survenue lors de l\'affichage de la liste des pseudos verrouillés.');
+            return message.reply('Une erreur est survenue.');
         }
     }
 };

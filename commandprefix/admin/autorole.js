@@ -22,7 +22,7 @@ module.exports = {
                 return message.reply('Le rôle configuré n\'existe plus.');
             }
             
-            return message.reply(`Rôle  actuel: **${role.name}**`);
+            return message.reply(`Rôle  actuel: ${role.name}`);
         }
         
         const role = message.mentions.roles.first();
@@ -34,6 +34,6 @@ module.exports = {
         // Sauvegarder automatiquement
         client.saveData();
         
-        message.reply(`Rôle auto configuré: **${role.name}**`);
+        message.reply(`Rôle auto configuré: ${role.name}`);
     }
 };

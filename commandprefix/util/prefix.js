@@ -11,8 +11,8 @@ module.exports = {
             return client.autoDeleteMessage(message.channel, `Prefix actuel: \`${currentPrefix}\``);
         }
         
-        if (args[0].length > 5) {
-            return client.autoDeleteMessage(message.channel, 'Le prefix ne peut pas dépasser 5 caractères.');
+        if (args[0].length > 10) {
+            return client.autoDeleteMessage(message.channel, 'Le prefix ne peut pas dépasser 10 caractères.');
         }
         
         client.prefixes[message.guild.id] = args[0];

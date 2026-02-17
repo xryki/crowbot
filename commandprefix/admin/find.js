@@ -33,13 +33,13 @@ module.exports = {
         
         // Créer un embed pour afficher les informations
         const embed = {
-            color: 0x000000,
+            color: x,
             title: `Utilisateur trouvé`,
-            description: `**${targetUser.user.tag}** est dans un salon vocal`,
+            description: `${targetUser.user.tag} est dans un salon vocal`,
             fields: [
                 {
                     name: ' Salon vocal',
-                    value: `**${voiceChannel.name}**`,
+                    value: `${voiceChannel.name}`,
                     inline: true
                 },
                 {

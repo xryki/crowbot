@@ -5,6 +5,11 @@ module.exports = {
     description: 'Retire utilisateur de la blacklist',
     ownerOnly: true,
     async execute(message, args, client) {
+        // Vérifier si l'utilisateur est un owner
+        if (!client.isOwner(message.author.id, message.guild.id)) {
+            return message.reply('Commande réservée aux owners du bot.');
+        }
+        
         client.blacklist = client.blacklist || [];
         const target = message.mentions.users.first();
         

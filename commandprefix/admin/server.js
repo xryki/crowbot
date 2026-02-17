@@ -5,10 +5,15 @@ module.exports = {
     description: 'Informations complètes du serveur',
     ownerOnly: true,
     async execute(message, args, client) {
+        // Vérifier si l'utilisateur est un owner
+        if (!client.isOwner(message.author.id, message.guild.id)) {
+            return message.reply('Commande réservée aux owners du bot.');
+        }
+        
         const guild = message.guild;
         const embed = new EmbedBuilder()
             .setTitle(guild.name)
-            .setThumbnail(guild.iconURL({ dynamic: true, size: 256 }))
+            .setThumbnail(guild.iconURL({ dynamic: true, size: 512 }))
             .addFields(
                 { name: 'Membres', value: `${guild.memberCount}`, inline: true },
                 { name: 'Channels', value: `${guild.channels.cache.size}`, inline: true },
@@ -18,15 +23,15 @@ module.exports = {
                 { name: 'Créé le', value: `<t:${Math.floor(guild.createdTimestamp / 1000)}:R>`, inline: true }
             )
             .setFooter({ text: `Owner: ${guild.ownerId}` })
-            .setColor('#0099ff');
+            .setColor('0099FF');
         
         // Ajouter les informations sur la photo de profil et la bannière
         const iconField = guild.iconURL() 
-            ? `[Voir l'icone](${guild.iconURL({ dynamic: true, size: 1024 })})` 
+            ? `[Voir l'icone](${guild.iconURL({ dynamic: true, size: 512 })})` 
             : 'Aucune icone';
         
         const bannerField = guild.bannerURL() 
-            ? `[Voir la bannière](${guild.bannerURL({ dynamic: true, size: 1024 })})` 
+            ? `[Voir la bannière](${guild.bannerURL({ dynamic: true, size: 512 })})` 
             : 'Aucune bannière';
         
         embed.addFields(

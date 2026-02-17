@@ -28,9 +28,9 @@ module.exports = {
         const getPanelKey = (index, defaultKey = 'support') => {
             const raw = args[index];
             if (!raw) return defaultKey;
-            if (/^<#[0-9]+>$/.test(raw)) return defaultKey;
-            if (/^<@&[0-9]+>$/.test(raw)) return defaultKey;
-            if (/^[0-9]+$/.test(raw)) return defaultKey;
+            if (/^<[-]+>$/.test(raw)) return defaultKey;
+            if (/^<@&[-]+>$/.test(raw)) return defaultKey;
+            if (/^[-]+$/.test(raw)) return defaultKey;
             return raw.toLowerCase();
         };
         
@@ -49,18 +49,18 @@ module.exports = {
                 const lines = panelKeys.map(key => {
                     const panel = ticketData.panels[key];
                     const channelId = panel?.channelId;
-                    return channelId ? `${key}: <#${channelId}>` : `${key}: non configuré`;
+                    return channelId ? `${key}: <${channelId}>` : `${key}: non configuré`;
                 });
                 return message.reply(`Panels de tickets configurés :\n${lines.join('\n')}`);
             }
 
-            return message.reply(`Système de tickets configuré dans <#${ticketData.channelId}>`);
+            return message.reply(`Système de tickets configuré dans <${ticketData.channelId}>`);
         }
         
         switch (subcommand) {
             case 'setup':
                 {
-                const panelKey = getPanelKey(1);
+                const panelKey = getPanelKey();
                 const channel = message.mentions.channels.first();
                 if (!channel) {
                     return message.reply('Mentionne un salon pour les tickets !');
@@ -69,7 +69,7 @@ module.exports = {
                 const ticketEmbed = new EmbedBuilder()
                     .setTitle(panelKey === 'recrutement' ? 'Recrutement - Tickets' : 'Support - Tickets')
                     .setDescription('Cliquez sur le bouton ci-dessous pour créer un ticket.')
-                    .setColor('#FFFFFF')
+                    .setColor('FFFFFF')
                     .setTimestamp();
 
                 const row = new ActionRowBuilder().addComponents(
@@ -102,14 +102,14 @@ module.exports = {
                 
             case 'category':
                 {
-                const panelKey = getPanelKey(1);
-                const argIndex = panelKey === 'support' ? 1 : 2;
+                const panelKey = getPanelKey();
+                const argIndex = panelKey === 'support' ? 1 : 0;
 
                 let category = message.mentions.channels.first();
                 if (!category && args[argIndex] && /^\d+$/.test(args[argIndex])) {
                     category = guild.channels.cache.get(args[argIndex]) || await guild.channels.fetch(args[argIndex]).catch(() => null);
                 }
-                if (!category || category.type !== 4) {
+                if (!category || category.type !== 0) {
                     return message.reply('Mentionne une catégorie de salon ou donne son ID !');
                 }
 
@@ -130,7 +130,7 @@ module.exports = {
                 
             case 'addrole':
                 {
-                const panelKey = getPanelKey(1);
+                const panelKey = getPanelKey();
                 const roleToAdd = message.mentions.roles.first();
                 if (!roleToAdd) {
                     return message.reply('Mentionne un rôle à ajouter comme support !');
@@ -158,7 +158,7 @@ module.exports = {
                 
             case 'removerole':
                 {
-                const panelKey = getPanelKey(1);
+                const panelKey = getPanelKey();
                 const roleToRemove = message.mentions.roles.first();
                 if (!roleToRemove) {
                     return message.reply('Mentionne un rôle à retirer du support !');
@@ -187,8 +187,8 @@ module.exports = {
                 
             case 'transcript':
                 {
-                const panelKey = getPanelKey(1);
-                const argIndex = panelKey === 'support' ? 1 : 2;
+                const panelKey = getPanelKey();
+                const argIndex = panelKey === 'support' ? 1 : 0;
 
                 let transcriptChannel = message.mentions.channels.first();
                 if (!transcriptChannel && args[argIndex] && /^\d+$/.test(args[argIndex])) {

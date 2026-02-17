@@ -3,6 +3,11 @@ module.exports = {
     description: 'Met un salon en privé (cache les permissions)',
     ownerOnly: true,
     async execute(message, args, client) {
+        // Vérifier si l'utilisateur est un owner
+        if (!client.isOwner(message.author.id, message.guild.id)) {
+            return message.reply('Commande réservée aux owners du bot.');
+        }
+        
         const guild = message.guild;
         const channel = message.mentions.channels.first() || message.channel;
         
@@ -37,7 +42,7 @@ module.exports = {
                 AddReactions: false
             });
 
-            await message.reply(`Le salon **${channel.name}** est maintenant privé.`);
+            await message.reply(`Le salon ${channel.name} est maintenant privé.`);
 
         } catch (error) {
             console.error('Erreur lors du hide du salon:', error);

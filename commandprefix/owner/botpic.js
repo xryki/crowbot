@@ -5,7 +5,7 @@ module.exports = {
     description: 'Affiche ou modifie l\'avatar du bot',
     permissions: PermissionsBitField.Flags.Administrator,
     async execute(message, args, client) {
-        // Vérifier si l'utilisateur est owner (global ou serveur)
+        // Vérifier si l'utilisateur est un owner
         if (!client.isOwner(message.author.id, message.guild.id)) {
             return message.reply('Commande réservée aux owners du bot.');
         }
@@ -33,8 +33,8 @@ module.exports = {
         if (!args[0]) {
             const embed = new EmbedBuilder()
                 .setTitle(`Avatar de ${bot.username}`)
-                .setColor('#0099ff')
-                .setDescription(`Voici l'avatar actuel du bot **${bot.username}** :`)
+                .setColor('FFFFFF')
+                .setDescription(`Voici l'avatar actuel du bot ${bot.username} :`)
                 .setFooter({ text: `Demandé par ${message.author.username}` })
                 .setTimestamp();
             
@@ -42,18 +42,18 @@ module.exports = {
                 embed.setImage(bot.avatarURL({ dynamic: true, size: 1024 }));
                 embed.addFields({
                     name: 'Lien direct',
-                    value: `[Télécharger l'avatar](${bot.avatarURL({ dynamic: true, size: 2048 })})`,
+                    value: `[Telecharger l\'avatar](${bot.avatarURL({ dynamic: true, size: 1024 })})`,
                     inline: false
                 });
                 embed.addFields({
-                    name: '💡 Comment changer l\'avatar ?',
+                    name: ' Comment changer l\'avatar ?',
                     value: `• Envoyez une image avec: \`${client.getPrefix(message.guild.id)}botpic\`\n• Ou utilisez: \`${client.getPrefix(message.guild.id)}botpic <image_url>\``,
                     inline: false
                 });
             } else {
-                embed.setDescription(`Le bot **${bot.username}** utilise l'avatar par défaut.`);
+                embed.setDescription(`Le bot ${bot.username} utilise l'avatar par défaut.`);
                 embed.addFields({
-                    name: '💡 Comment ajouter un avatar ?',
+                    name: ' Comment ajouter un avatar ?',
                     value: `• Envoyez une image avec: \`${client.getPrefix(message.guild.id)}botpic\`\n• Ou utilisez: \`${client.getPrefix(message.guild.id)}botpic <image_url>\``,
                     inline: false
                 });

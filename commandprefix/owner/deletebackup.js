@@ -5,7 +5,7 @@ module.exports = {
     description: 'Supprime une sauvegarde spécifique',
     ownerOnly: true,
     async execute(message, args, client) {
-        // Vérifier si l'utilisateur est owner (global ou serveur)
+        // Vérifier si l'utilisateur est un owner
         if (!client.isOwner(message.author.id, message.guild.id)) {
             return message.reply('Commande réservée aux owners du bot.');
         }
@@ -28,9 +28,9 @@ module.exports = {
             
             for (const file of files) {
                 const filePath = `${backupDir}/${file}`;
-                const backupData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+                const backupData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
                 
-                response += `**${file}**\n`;
+                response += `${file}\n`;
                 response += `Nom: ${backupData.customName || backupData.serverInfo.name}\n`;
                 response += `ID: ${backupData.timestamp}\n`;
                 response += `Date: ${new Date(backupData.timestamp).toLocaleString('fr-FR')}\n`;
@@ -67,7 +67,7 @@ module.exports = {
             const files = fs.readdirSync(backupDir).filter(file => file.endsWith('.json'));
             for (const file of files) {
                 const filePath = `${backupDir}/${file}`;
-                const backupData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+                const backupData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
                 if (backupData.timestamp === backupIdentifier) {
                     backupFile = filePath;
                     break;
@@ -81,14 +81,14 @@ module.exports = {
 
         try {
             // Récupérer les infos de la backup pour l'afficher
-            const backupData = JSON.parse(fs.readFileSync(backupFile, 'utf8'));
+            const backupData = JSON.parse(fs.readFileSync(backupFile, 'utf-8'));
             
             // Demander confirmation
-            await message.reply(`Êtes-vous sûr de vouloir supprimer cette sauvegarde ?\n\n**Nom**: ${backupData.customName || backupData.serverInfo.name}\n**Serveur**: ${backupData.serverInfo.name}\n**Date**: ${new Date(backupData.timestamp).toLocaleString('fr-FR')}\n\nRépondez \`oui\` pour confirmer.`);
+            await message.reply(`Êtes-vous sûr de vouloir supprimer cette sauvegarde ?\n\nNom: ${backupData.customName || backupData.serverInfo.name}\nServeur: ${backupData.serverInfo.name}\nDate: ${new Date(backupData.timestamp).toLocaleString('fr-FR')}\n\nRépondez \`oui\` pour confirmer.`);
             
             const confirmation = await message.channel.awaitMessages({
                 max: 1,
-                time: 30000,
+                time: 60000,
                 errors: ['time']
             }).then(collected => {
                 const msg = collected.first();
@@ -102,7 +102,7 @@ module.exports = {
             // Supprimer le fichier
             fs.unlinkSync(backupFile);
             
-            await message.reply(`La sauvegarde **${backupData.customName || backupData.serverInfo.name}** a été supprimée avec succès.`);
+            await message.reply(`La sauvegarde ${backupData.customName || backupData.serverInfo.name} a été supprimée avec succès.`);
 
         } catch (error) {
             console.error('Erreur lors de la suppression:', error);

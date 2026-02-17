@@ -16,7 +16,7 @@ module.exports = {
             return message.reply('Je n\'ai pas la permission de gérer les emojis du serveur.');
         }
         
-        // Mode 1: Réponse à un message avec emoji
+        // Mode : Réponse à un message avec emoji
         if (message.reference) {
             console.log('[CREATE] Mode réponse activé');
             try {
@@ -41,7 +41,7 @@ module.exports = {
                     const emojiUrl = `https://cdn.discordapp.com/emojis/${emojiId}.${extension}`;
                     
                     emojisToCreate.push({
-                        name: emojiName.replace(/[^a-zA-Z0-9_]/g, '_').substring(0, 32),
+                        name: emojiName.replace(/[^a-zA-Z-_]/g, '_').substring(0, 32),
                         url: emojiUrl,
                         id: emojiId,
                         animated: isAnimated
@@ -52,7 +52,7 @@ module.exports = {
                 const reactionEmojis = referencedMessage.reactions.cache
                     .filter(reaction => reaction.emoji.id)
                     .map(reaction => ({
-                        name: reaction.emoji.name.replace(/[^a-zA-Z0-9_]/g, '_').substring(0, 32),
+                        name: reaction.emoji.name.replace(/[^a-zA-Z-_]/g, '_').substring(0, 32),
                         url: reaction.emoji.url,
                         id: reaction.emoji.id,
                         animated: reaction.emoji.animated
@@ -79,11 +79,11 @@ module.exports = {
             }
         }
         
-        // Mode 2: Arguments directs avec emojis
+        // Mode : Arguments directs avec emojis
         console.log('[CREATE] Mode arguments directs');
         if (args.length === 0) {
             console.log('[CREATE] Aucun argument fourni');
-            return message.reply(`Usage: \`${client.getPrefix(message.guild.id)}create <emoji>\` ou \`${client.getPrefix(message.guild.id)}create <emoji1> <emoji2> <emoji3>\` ou en répondant à un message contenant des emojis.`);
+            return message.reply(`Usage: \`${client.getPrefix(message.guild.id)}create <emoji>\` ou \`${client.getPrefix(message.guild.id)}create <emoji> <emoji> <emoji>\` ou en répondant à un message contenant des emojis.`);
         }
         
         // Parser les emojis des arguments
@@ -106,7 +106,7 @@ module.exports = {
             const emojiUrl = `https://cdn.discordapp.com/emojis/${emojiId}.${extension}`;
             
             emojisToCreate.push({
-                name: emojiName.replace(/[^a-zA-Z0-9_]/g, '_').substring(0, 32),
+                name: emojiName.replace(/[^a-zA-Z-_]/g, '_').substring(0, 32),
                 url: emojiUrl,
                 id: emojiId,
                 animated: isAnimated
@@ -175,8 +175,8 @@ async function processEmojisSequentially(emojisToCreate, guild, message) {
             const buffer = Buffer.from(response.data);
             console.log(`[PROCESS] Buffer reçu: ${buffer.length} bytes`);
             
-            // Vérifier la taille (max 256KB)
-            if (buffer.length > 256 * 1024) {
+            // Verifier la taille (max 256 KB)
+            if (buffer.length > 262144) {
                 console.log(`[PROCESS] Emoji ${emojiData.name} trop volumineux`);
                 results.failed.push({
                     name: emojiData.name,

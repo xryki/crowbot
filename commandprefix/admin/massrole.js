@@ -5,13 +5,13 @@ module.exports = {
     description: 'Ajoute un rôle à tous les membres du serveur',
     permissions: PermissionsBitField.Flags.ManageRoles,
     async execute(message, args, client) {
-        // Vérifier si l'utilisateur a la permission de gérer les rôles
-        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
+        // Vérifier si l'utilisateur a la permission de gérer les rôles - bypass pour les owners
+        if (!client.isOwner(message.author.id, message.guild.id) && !message.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
             return message.reply('Vous n\'avez pas la permission de gérer les rôles.');
         }
         
         if (!args[0]) {
-            return message.reply('Veuillez spécifier un rôle à ajouter.\n**Usage:** `!massrole <@rôle> ou <nom du rôle>`');
+            return message.reply('Veuillez spécifier un rôle à ajouter.\nUsage: `!massrole <@rôle> ou <nom du rôle>`');
         }
         
         let role = null;
@@ -39,7 +39,7 @@ module.exports = {
         
         try {
             // Commencer l'ajout automatique
-            await message.reply(`Ajout du rôle **${role.name}** à ${message.guild.memberCount} membres en cours...`);
+            await message.reply(`Ajout du rôle ${role.name} à ${message.guild.memberCount} membres en cours...`);
             
             let successCount = 0;
             let errorCount = 0;
@@ -76,7 +76,7 @@ module.exports = {
             }
             
             // Envoyer le résultat
-            const resultMessage = `**Mass role terminé !**\n` +
+            const resultMessage = `Mass role terminé !\n` +
                 `${successCount} membres ont reçu le rôle\n` +
                 `${skippedCount} membres l'avaient déjà\n` +
                 `${errorCount} erreurs`;

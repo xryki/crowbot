@@ -5,6 +5,11 @@ module.exports = {
     description: 'Affiche ou modifie la bannière du serveur',
     ownerOnly: true,
     async execute(message, args, client) {
+        // Vérifier si l'utilisateur est un owner
+        if (!client.isOwner(message.author.id, message.guild.id)) {
+            return message.reply('Commande réservée aux owners du bot.');
+        }
+        
         const guild = message.guild;
         
         // Si il y a une pièce jointe (image/gif), l'utiliser directement
@@ -28,27 +33,27 @@ module.exports = {
         if (!args[0]) {
             const embed = new EmbedBuilder()
                 .setTitle(`Bannière de ${guild.name}`)
-                .setColor('#FFFFFF')
-                .setDescription(`Voici la bannière actuelle du serveur **${guild.name}** :`)
+                .setColor('FFFFFF')
+                .setDescription(`Voici la bannière actuelle du serveur ${guild.name} :`)
                 .setFooter({ text: `Demandé par ${message.author.username}` })
                 .setTimestamp();
             
             if (guild.bannerURL()) {
-                embed.setImage(guild.bannerURL({ dynamic: true, size: 1024 }));
+                embed.setImage(guild.bannerURL({ dynamic: true, size: 512 }));
                 embed.addFields({
                     name: 'Lien direct',
-                    value: `[Télécharger la bannière](${guild.bannerURL({ dynamic: true, size: 2048 })})`,
+                    value: `[Télécharger la bannière](${guild.bannerURL({ dynamic: true, size: 512 })})`,
                     inline: false
                 });
                 embed.addFields({
-                    name: '💡 Comment changer la bannière ?',
+                    name: ' Comment changer la bannière ?',
                     value: `• Envoyez une image avec: \`${client.getPrefix(message.guild.id)}serverbanner\`\n• Ou utilisez: \`${client.getPrefix(message.guild.id)}serverbanner <image_url>\``,
                     inline: false
                 });
             } else {
-                embed.setDescription(`Le serveur **${guild.name}** n'a pas de bannière.`);
+                embed.setDescription(`Le serveur ${guild.name} n'a pas de bannière.`);
                 embed.addFields({
-                    name: '💡 Comment ajouter une bannière ?',
+                    name: ' Comment ajouter une bannière ?',
                     value: `• Envoyez une image avec: \`${client.getPrefix(message.guild.id)}serverbanner\`\n• Ou utilisez: \`${client.getPrefix(message.guild.id)}serverbanner <image_url>\``,
                     inline: false
                 });

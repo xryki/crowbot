@@ -15,7 +15,7 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setTitle(`Serveurs du bot (${servers.length})`)
-            .setColor('#FFFFFF')
+            .setColor('FFFFFF')
             .setTimestamp();
 
         // Diviser en pages si trop de serveurs
@@ -25,22 +25,22 @@ module.exports = {
         for (let i = 0; i < servers.length; i += pageSize) {
             const page = servers.slice(i, i + pageSize);
             const description = page.map(server => 
-                `**${server.name}** (\`${server.id}\`)\n` +
+                `${server.name} (\`${server.id}\`)\n` +
                 `${server.members} membres | Owner: <@${server.owner}>\n` +
-                `Créé: <t:${Math.floor(server.createdAt / 1000)}:R>\n`
+                `Cre: <t:${Math.floor(server.createdAt / 1000)}:R>\n`
             ).join('\n');
 
             pages.push(new EmbedBuilder()
                 .setTitle(`Serveurs du bot (${i + 1}-${Math.min(i + pageSize, servers.length)}/${servers.length})`)
                 .setDescription(description)
-                .setColor('#FFFFFF')
+                .setColor('FFFFFF')
                 .setTimestamp()
             );
         }
 
         // Envoyer la première page
-        if (pages.length === 1) {
-            await message.reply({ embeds: [pages[0]] });
+        if (pages.length === 0) {
+            await message.reply({ embeds: [embed] });
         } else {
             // Système de pagination simple
             let currentPage = 0;
@@ -48,25 +48,25 @@ module.exports = {
                 embeds: [pages[currentPage]],
                 components: [
                     {
-                        type: 1,
+                        type: 1, // Action Row
                         components: [
                             {
-                                type: 2,
-                                style: 1,
-                                label: '◀',
+                                type: 2, // Button
+                                style: 1, // Primary
+                                label: '\u25c0',
                                 customId: 'prev_page',
                                 disabled: currentPage === 0
                             },
                             {
-                                type: 2,
-                                style: 2,
+                                type: 2, // Button
+                                style: 2, // Secondary
                                 label: `${currentPage + 1}/${pages.length}`,
                                 customId: 'page_counter',
                                 disabled: true
                             },
                             {
-                                type: 2,
-                                style: 1,
+                                type: 2, // Button
+                                style: 1, // Primary
                                 label: '▶',
                                 customId: 'next_page',
                                 disabled: currentPage === pages.length - 1
@@ -77,7 +77,7 @@ module.exports = {
             });
 
             const collector = msg.createMessageComponentCollector({ 
-                time: 60000 // 1 minute
+                time: 60000 //  minute
             });
 
             collector.on('collect', async (interaction) => {
@@ -96,25 +96,25 @@ module.exports = {
                     embeds: [pages[currentPage]],
                     components: [
                         {
-                            type: 1,
+                            type: 1, // Action Row
                             components: [
                                 {
-                                    type: 2,
-                                    style: 1,
+                                    type: 2, // Button
+                                    style: 1, // Primary
                                     label: '◀',
                                     customId: 'prev_page',
                                     disabled: currentPage === 0
                                 },
                                 {
-                                    type: 2,
-                                    style: 2,
+                                    type: 2, // Button
+                                    style: 2, // Secondary
                                     label: `${currentPage + 1}/${pages.length}`,
                                     customId: 'page_counter',
                                     disabled: true
                                 },
                                 {
-                                    type: 2,
-                                    style: 1,
+                                    type: 2, // Button
+                                    style: 1, // Primary
                                     label: '▶',
                                     customId: 'next_page',
                                     disabled: currentPage === pages.length - 1

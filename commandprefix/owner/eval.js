@@ -4,7 +4,12 @@ module.exports = {
     name: 'eval',
     description: 'Exécute du code JavaScript',
     ownerOnly: true,
-    async execute(message, args) {
+    async execute(message, args, client) {
+        // Vérifier si l'utilisateur est un owner
+        if (!client.isOwner(message.author.id, message.guild.id)) {
+            return message.reply('Commande réservée aux owners du bot.');
+        }
+        
         const code = args.join(' ');
         if (!code) return message.reply('Code requis !');
         
@@ -13,12 +18,12 @@ module.exports = {
             
             // Convertit en string si pas string
             if (typeof evaled !== 'string') {
-                evaled = require('util').inspect(evaled, { depth: 0 });
+                evaled = require('util').inspect(evaled, { depth: 2 });
             }
             
             const embed = new EmbedBuilder()
                 .setTitle('Eval Result')
-                .setColor('#FFFFFF')
+                .setColor('FFFFFF')
                 .addFields(
                     { name: 'Input', value: `\`\`\`js\n${code}\n\`\`\``, inline: false },
                     { name: 'Output', value: `\`\`\`js\n${evaled}\n\`\`\``, inline: false }
@@ -28,7 +33,7 @@ module.exports = {
         } catch (error) {
             const embed = new EmbedBuilder()
                 .setTitle('Eval Error')
-                .setColor('#FFFFFF')
+                .setColor('FFFFFF')
                 .addFields({ name: 'Erreur', value: `\`\`\`${error.message}\n\`\`\`` });
             message.reply({ embeds: [embed] });
         }

@@ -25,7 +25,7 @@ class DataSaver {
         try {
             const filePath = `${this.dataPath}/${filename}.json`;
             if (fs.existsSync(filePath)) {
-                return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+                return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
             }
         } catch (error) {
             console.error(`Erreur chargement ${filename}:`, error);
@@ -41,13 +41,22 @@ class DataSaver {
         this.saveData('config', client.config || {});
         this.saveData('owners', client.owners || []);
         
-        // Sauvegarder la configuration anti-raid
+        // Sauvegarder la configuration anti-raid (global)
         if (client.antiraid) {
             this.saveData('antiraid', client.antiraid);
         }
         
+        // Sauvegarder la configuration anti-raid par serveur
+        if (client.serverAntiraid && client.serverAntiraid instanceof Map) {
+            const serverAntiraidData = {};
+            for (const [guildId, antiraidConfig] of client.serverAntiraid) {
+                serverAntiraidData[guildId] = antiraidConfig;
+            }
+            this.saveData('serverAntiraid', serverAntiraidData);
+        }
+        
         // Sauvegarder les messages de bienvenue
-        if (client.welcomeMessages) {
+        if (client.welcomeMessages && client.welcomeMessages instanceof Map) {
             const welcomeData = {};
             for (const [guildId, welcomeConfig] of client.welcomeMessages) {
                 welcomeData[guildId] = welcomeConfig;
@@ -56,16 +65,16 @@ class DataSaver {
         }
         
         // Sauvegarder les tickets
-        if (client.tickets) {
-            const ticketData = {};
+        if (client.tickets && client.tickets instanceof Map) {
+            const ticketsData = {};
             for (const [guildId, ticketConfig] of client.tickets) {
-                ticketData[guildId] = ticketConfig;
+                ticketsData[guildId] = ticketConfig;
             }
-            this.saveData('tickets', ticketData);
+            this.saveData('tickets', ticketsData);
         }
         
-        // Sauvegarder les configurations de boost
-        if (client.boostConfig) {
+        // Sauvegarder la configuration boost
+        if (client.boostConfig && client.boostConfig instanceof Map) {
             const boostData = {};
             for (const [guildId, boostConfig] of client.boostConfig) {
                 boostData[guildId] = boostConfig;
@@ -74,7 +83,7 @@ class DataSaver {
         }
         
         // Sauvegarder les owners par serveur
-        if (client.serverOwners) {
+        if (client.serverOwners && client.serverOwners instanceof Map) {
             const serverOwnersData = {};
             for (const [guildId, owners] of client.serverOwners) {
                 serverOwnersData[guildId] = owners;
@@ -122,7 +131,7 @@ class DataSaver {
         client.owners = this.loadData('owners', []);
         client.snipes = new Map(); // Reset les snipes au démarrage
         
-        // Charger la configuration anti-raid
+        // Charger la configuration anti-raid (global)
         client.antiraid = this.loadData('antiraid', {
             enabled: false,
             antiLink: {
@@ -133,14 +142,14 @@ class DataSaver {
             antiSpam: {
                 enabled: false,
                 maxMessages: 5,
-                timeWindow: 5000,
+                timeWindow: 10000,
                 action: 'mute',
                 whitelist: []
             },
             antiToken: {
                 enabled: true,
-                maxAccountAge: 7 * 24 * 60 * 60 * 1000,
-                action: 'kick',
+                maxAccountAge: 604800000,        // 7 jours en ms
+                action: 'kick', // kick, ban
                 whitelist: []
             },
             antiWebhook: {
@@ -167,53 +176,38 @@ class DataSaver {
                 action: 'delete'
             },
             antiBan: {
-                enabled: false,
-                maxBans: 3,
-                timeWindow: 10000
+                enabled: true,
+                maxBans: 5, // Nombre de bans en X secondes
+                timeWindow: 10000, // 10 secondes
+                action: 'lockdown', // lockdown, notify
+                whitelist: [] // Modérateurs autorisés
             },
-            globalWhitelist: [],
-            logChannel: null
+            globalWhitelist: [], // Whitelist globale pour toutes les protections
+            logChannel: null // Salon pour les logs anti-raid
         });
         
+        // Charger la configuration anti-raid par serveur
+        const serverAntiraidData = this.loadData('serverAntiraid', {});
+        client.serverAntiraid = new Map(Object.entries(serverAntiraidData));
+        
         // Charger les messages de bienvenue
-        const welcomeData = this.loadData('welcomeMessages', {});
-        client.welcomeMessages = new Map();
-        for (const [guildId, welcomeConfig] of Object.entries(welcomeData)) {
-            client.welcomeMessages.set(guildId, welcomeConfig);
-        }
+        const welcomeMessagesData = this.loadData('welcomeMessages', {});
+        client.welcomeMessages = new Map(Object.entries(welcomeMessagesData));
         
         // Charger les tickets
-        const ticketData = this.loadData('tickets', {});
-        client.tickets = new Map();
-        for (const [guildId, ticketConfig] of Object.entries(ticketData)) {
-            client.tickets.set(guildId, ticketConfig);
-        }
+        const ticketsData = this.loadData('tickets', {});
+        client.tickets = new Map(Object.entries(ticketsData));
         
-        // Charger les configurations de boost
-        const boostData = this.loadData('boostConfig', {});
-        // client.boostConfig = new Map(); // Déjà initialisé dans index.js
-        for (const [guildId, boostConfig] of Object.entries(boostData)) {
-            client.boostConfig.set(guildId, boostConfig);
-        }
-        
-        client.ticketData = new Map(); // Sera chargé après
-        
-        // Charger les tickets actifs par serveur
-        const ticketDataActive = this.loadData('ticketDataActive', {});
-        for (const [channelId, ticketInfo] of Object.entries(ticketDataActive)) {
-            client.ticketData.set(channelId, ticketInfo);
-        }
+        // Charger la configuration boost
+        const boostConfigData = this.loadData('boostConfig', {});
+        client.boostConfig = new Map(Object.entries(boostConfigData));
         
         // Charger les owners par serveur
         const serverOwnersData = this.loadData('serverOwners', {});
-        client.serverOwners = new Map();
-        for (const [guildId, owners] of Object.entries(serverOwnersData)) {
-            client.serverOwners.set(guildId, owners);
-        }
+        client.serverOwners = new Map(Object.entries(serverOwnersData));
         
         // Charger la configuration ghost ping
-        const ghostPingConfigData = this.loadData('ghostPingConfig', {});
-        client.ghostPingConfig = ghostPingConfigData;
+        client.ghostPingConfig = this.loadData('ghostPingConfig', {});
         
         // Charger la configuration autorole
         client.autorole = this.loadData('autorole', {});
@@ -225,7 +219,13 @@ class DataSaver {
             client.lockedNames.set(userId, lockData);
         }
         
+        // Charger les tickets actifs
+        const ticketDataActive = this.loadData('ticketDataActive', {});
+        client.ticketData = new Map();
+        for (const [channelId, ticketInfo] of Object.entries(ticketDataActive)) {
+            client.ticketData.set(channelId, ticketInfo);
+        }
     }
 }
 
-module.exports = DataSaver;
+module.exports = new DataSaver();

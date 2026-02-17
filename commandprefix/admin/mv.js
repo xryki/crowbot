@@ -42,7 +42,7 @@ module.exports = {
 
         try {
             await targetUser.voice.setChannel(targetChannel);
-            message.reply(` ${targetUser.user.tag} a été déplacé vers **${targetChannel.name}**`);
+            message.reply(` ${targetUser.user.tag} a été déplacé vers ${targetChannel.name}`);
         } catch (error) {
             console.error('Erreur lors du déplacement:', error);
             message.reply(' Impossible de déplacer cet utilisateur. Vérifiez que j\'ai les permissions nécessaires.');

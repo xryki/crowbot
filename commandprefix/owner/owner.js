@@ -2,21 +2,19 @@ const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     name: 'owner',
-    description: 'Gère les owners du bot (Principal Owner uniquement)',
+    description: 'Gère les owners du bot (Développeur uniquement)',
     skipLogging: true,
     async execute(message, args, client) {
-        const PRINCIPAL_OWNER = '1422102360246980792'; // ID du principal owner
-        
-        // Vérifier si c'est le principal owner
-        if (message.author.id !== PRINCIPAL_OWNER) {
-            return message.reply('Cette commande est réservée au Principal Owner du bot.');
+        // Vérifier si c'est le développeur
+        if (!client.isDeveloper(message.author.id)) {
+            return message.reply('Cette commande est réservée au Développeur du bot.');
         }
         
         // Si pas d'arguments, afficher la liste des owners
         if (!args[0]) {
             const embed = new EmbedBuilder()
                 .setTitle('Liste des Owners du Bot')
-                .setColor('#FFFFFF')
+                .setColor('FFFFFF')
                 .setDescription('Voici la liste complète des owners du bot :')
                 .setTimestamp();
             
@@ -27,11 +25,11 @@ module.exports = {
                 for (const ownerId of globalOwners) {
                     try {
                         const user = await client.users.fetch(ownerId);
-                        const isPrincipal = ownerId === PRINCIPAL_OWNER;
-                        ownerList.push(`${isPrincipal ? '[PRINCIPAL]' : '[OWNER]'} • ${user.tag} (${ownerId})`);
+                        const isDeveloper = client.isDeveloper(ownerId);
+                        ownerList.push(`${isDeveloper ? '[DÉVELOPPEUR]' : '[OWNER]'} • <@${user.id}> (**${user.tag}**)`);
                     } catch (error) {
-                        const isPrincipal = ownerId === PRINCIPAL_OWNER;
-                        ownerList.push(`${isPrincipal ? '[PRINCIPAL]' : '[OWNER]'} • Utilisateur inconnu (${ownerId})`);
+                        const isDeveloper = client.isDeveloper(ownerId);
+                        ownerList.push(`${isDeveloper ? '[DÉVELOPPEUR]' : '[OWNER]'} • Utilisateur inconnu (${ownerId})`);
                     }
                 }
                 
@@ -49,7 +47,7 @@ module.exports = {
                 for (const ownerId of serverOwners) {
                     try {
                         const user = await client.users.fetch(ownerId);
-                        serverOwnerList.push(`• ${user.tag} (${ownerId})`);
+                        serverOwnerList.push(`• <@${user.id}> (**${user.tag}**)`);
                     } catch (error) {
                         serverOwnerList.push(`• Utilisateur inconnu (${ownerId})`);
                     }
@@ -65,8 +63,8 @@ module.exports = {
             // Ajouter des informations
             embed.addFields(
                 {
-                    name: 'Principal Owner',
-                    value: `<@${PRINCIPAL_OWNER}>`,
+                    name: 'Développeur',
+                    value: `<@!${client.ownerId}>`,
                     inline: true
                 },
                 {
@@ -87,9 +85,9 @@ module.exports = {
                 return message.reply('Utilisateur introuvable. Mentionnez un utilisateur ou donnez son ID.');
             }
             
-            // Empêcher de retirer le principal owner
-            if (targetUser.id === PRINCIPAL_OWNER) {
-                return message.reply('Vous ne pouvez pas retirer le Principal Owner du bot.');
+            // Empêcher de retirer le développeur
+            if (targetUser.id === '') {
+                return message.reply('Vous ne pouvez pas retirer le Développeur du bot.');
             }
             
             // Vérifier si l'utilisateur est owner
@@ -104,20 +102,14 @@ module.exports = {
             // Sauvegarder automatiquement
             client.saveData();
             
-            return message.reply(`${targetUser.tag} n'est plus owner du bot (${targetUser.id})`);
+            return message.reply(`<@${targetUser.id}> n'est plus owner du bot (**${targetUser.tag}**)`);
         }
         
         // Sinon, c'est pour ajouter un owner
         const targetUser = message.mentions.users.first() || await client.users.fetch(args[0]).catch(() => null);
         
         if (!targetUser) {
-            const embed = new EmbedBuilder()
-                .setTitle('Utilisation incorrecte')
-                .setColor('#FFFFFF')
-                .setDescription('**Syntaxe:** `!owner [@utilisateur]` ou `!owner remove [@utilisateur]`\n\n**Actions:**\n• `!owner @user` - Ajoute un owner global\n• `!owner remove @user` - Retire un owner global\n• `!owner` - Affiche la liste des owners')
-                .setTimestamp();
-            
-            return message.reply({ embeds: [embed] });
+            return message.reply('Veuillez mentionner un utilisateur valide.');
         }
         
         // Vérifier si l'utilisateur n'est pas déjà owner
@@ -131,6 +123,6 @@ module.exports = {
         // Sauvegarder automatiquement
         client.saveData();
         
-        return message.reply(`${targetUser.tag} est maintenant owner du bot (${targetUser.id})`);
+        return message.reply(`<@${targetUser.id}> est maintenant owner du bot (**${targetUser.tag}**)`);
     }
 };

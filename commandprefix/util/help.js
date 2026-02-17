@@ -24,15 +24,15 @@ module.exports = {
                 if (['owners', 'ownerlist', 'setowner', 'serverowners'].includes(cmd.name)) return;
                 
                 // Déterminer la catégorie
-                if (['8ball', 'coinflip'].includes(cmd.name)) {
+                if (['ball', 'coinflip'].includes(cmd.name)) {
                     categories.fun.commands.push(cmd);
                 } else if (['botinfo', 'server', 'user', 'profile', 'pic', 'banner', 'help', 'helpall', 'ping', 'prefix', 'snipe'].includes(cmd.name)) {
                     categories.info.commands.push(cmd);
-                } else if (['ban', 'kick', 'mute', 'unmute', 'clear', 'lock', 'unlock', 'addrole', 'delrole', 'nick', 'unban', 'derank', 'renew', 'say', 'lockname', 'unlockname', 'unlocknameall', 'locknamelist', 'slowmode', 'unmuteall', 'cmute', 'cunmute'].includes(cmd.name)) {
+                } else if (['ban', 'kick', 'mute', 'unmute', 'clear', 'lock', 'unlock', 'addrole', 'delrole', 'nick', 'unban', 'derank', 'renew', 'say', 'lockname', 'unlockname', 'unlocknameall', 'locknamelist', 'slowmode', 'unmuteall', 'cmute', 'cunmute', 'giveaway'].includes(cmd.name)) {
                     categories.mod.commands.push(cmd);
                 } else if (['autorole', 'setup', 'bl', 'unbl', 'wl', 'unwl', 'wls', 'wlclear', 'blclear', 'logs', 'antiraid', 'welcome', 'ticket', 'massrole', 'gw', 'serverpic', 'serverbanner', 'testghostping', 'ghostping', 'ghostpinguser', 'hideall', 'unhideall', 'mv', 'find'].includes(cmd.name)) {
                     categories.admin.commands.push(cmd);
-                } else if (['eval', 'owner', 'restart', 'boostmsg', 'unbanall', 'invite', 'backup', 'restore', 'deletebackup', 'hide', 'unhide', 'botpic', 'botbanner'].includes(cmd.name)) {
+                } else if (['eval', 'owner', 'restart', 'boostmsg', 'unbanall', 'invite', 'backup', 'restore', 'deletebackup', 'hide', 'unhide', 'botpic', 'botbanner', 'createrole', 'deleterole'].includes(cmd.name)) {
                     categories.owner.commands.push(cmd);
                 } else {
                     // Commandes utilitaires dans info
@@ -59,14 +59,14 @@ module.exports = {
                 
                 const commandList = availableCommands.map(cmd => {
                     const cmdText = cmd.usage ? `\`${prefix}${cmd.name} ${cmd.usage}\`` : `\`${prefix}${cmd.name}\``;
-                    const description = cmd.description ? ` - *${cmd.description}*` : '';
+                    const description = cmd.description ? ` - ${cmd.description}` : '';
                     return `${cmdText}${description}`;
                 }).join('\n');
                 
                 const embed = new EmbedBuilder()
                     .setTitle(`${category.name}`)
-                    .setDescription(`**Préfixe:** \`${prefix}\`\n\n${commandList}`)
-                    .setColor('#FFFFFF')
+                    .setDescription(`Préfixe: \`${prefix}\`\n\n${commandList}`)
+                    .setColor('FFFFFF')
                     .setFooter({ text: `Page ${pages.length + 1} • Utilise les flèches pour naviguer` })
                     .setTimestamp();
                 
@@ -103,7 +103,7 @@ module.exports = {
             });
             
             const collector = msg.createMessageComponentCollector({ 
-                time: 60000 
+                time: 900000
             });
             
             collector.on('collect', async (interaction) => {
@@ -114,7 +114,16 @@ module.exports = {
                     });
                 }
                 
-                await interaction.deferUpdate();
+                try {
+                    await interaction.deferUpdate();
+                } catch (error) {
+                    // L'interaction a expiré ou n'est plus valide
+                    if (error.code === 40062) {
+                        collector.stop();
+                        return;
+                    }
+                    throw error;
+                }
                 
                 if (interaction.customId === 'prev') {
                     currentPage = Math.max(0, currentPage - 1);
@@ -143,10 +152,16 @@ module.exports = {
                             .setStyle(ButtonStyle.Danger)
                     );
                 
-                await msg.edit({ 
-                    embeds: [pages[currentPage]], 
-                    components: [newRow] 
-                });
+                try {
+                    await msg.edit({ 
+                        embeds: [pages[currentPage]], 
+                        components: [newRow] 
+                    });
+                } catch (error) {
+                    // Le message a été supprimé ou n'est plus accessible
+                    collector.stop();
+                    return;
+                }
             });
             
             collector.on('end', () => {

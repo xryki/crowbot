@@ -5,6 +5,11 @@ module.exports = {
     description: 'Affiche ou modifie l\'icône du serveur',
     ownerOnly: true,
     async execute(message, args, client) {
+        // Vérifier si l'utilisateur est un owner
+        if (!client.isOwner(message.author.id, message.guild.id)) {
+            return message.reply('Commande réservée aux owners du bot.');
+        }
+        
         const guild = message.guild;
         
         // Si il y a une pièce jointe (image/gif), l'utiliser directement
@@ -28,27 +33,27 @@ module.exports = {
         if (!args[0]) {
             const embed = new EmbedBuilder()
                 .setTitle(`Icône de ${guild.name}`)
-                .setColor('#FFFFFF')
-                .setDescription(`Voici l'icône actuelle du serveur **${guild.name}** :`)
+                .setColor('FFFFFF')
+                .setDescription(`Voici l'icône actuelle du serveur ${guild.name} :`)
                 .setFooter({ text: `Demandé par ${message.author.username}` })
                 .setTimestamp();
             
             if (guild.iconURL()) {
-                embed.setImage(guild.iconURL({ dynamic: true, size: 1024 }));
+                embed.setImage(guild.iconURL({ dynamic: true, size: 512 }));
                 embed.addFields({
                     name: 'Lien direct',
-                    value: `[Télécharger l'icône](${guild.iconURL({ dynamic: true, size: 2048 })})`,
+                    value: `[Télécharger l'icône](${guild.iconURL({ dynamic: true, size: 512 })})`,
                     inline: false
                 });
                 embed.addFields({
-                    name: '💡 Comment changer l\'icône ?',
+                    name: ' Comment changer l\'icône ?',
                     value: `• Envoyez une image avec: \`${client.getPrefix(message.guild.id)}serverpic\`\n• Ou utilisez: \`${client.getPrefix(message.guild.id)}serverpic <image_url>\``,
                     inline: false
                 });
             } else {
-                embed.setDescription(`Le serveur **${guild.name}** n'a pas d'icône.`);
+                embed.setDescription(`Le serveur ${guild.name} n'a pas d'icône.`);
                 embed.addFields({
-                    name: '💡 Comment ajouter une icône ?',
+                    name: ' Comment ajouter une icône ?',
                     value: `• Envoyez une image avec: \`${client.getPrefix(message.guild.id)}serverpic\`\n• Ou utilisez: \`${client.getPrefix(message.guild.id)}serverpic <image_url>\``,
                     inline: false
                 });

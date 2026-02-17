@@ -14,14 +14,15 @@ module.exports = {
             return message.reply('Ce n\'est pas un ticket valide.');
         }
         
-        // Vérifier les permissions (staff ou créateur du ticket)
+        // Vérifier les permissions (staff ou créateur du ticket) - bypass pour les owners
         const member = await guild.members.fetch(message.author.id);
         const isTicketCreator = ticketData.userId === message.author.id;
+        const isOwner = client.isOwner(message.author.id, message.guild.id);
         const hasStaffRole = client.tickets?.get(guild.id)?.supportRoleId ? 
             member.roles.cache.has(client.tickets.get(guild.id).supportRoleId) : 
             member.permissions.has('ManageChannels');
         
-        if (!isTicketCreator && !hasStaffRole) {
+        if (!isTicketCreator && !hasStaffRole && !isOwner) {
             return message.reply('Vous n\'avez pas la permission de fermer ce ticket.');
         }
         
@@ -29,9 +30,9 @@ module.exports = {
         const confirmEmbed = new EmbedBuilder()
             .setTitle('Fermeture du ticket')
             .setDescription('Êtes-vous sûr de vouloir fermer ce ticket ?')
-            .setColor('#FFFFFF')
+            .setColor('FFFFFF')
             .addFields(
-                { name: 'Ticket', value: `#${channel.name}`, inline: true },
+                { name: 'Ticket', value: `${channel.name}`, inline: true },
                 { name: 'Créé par', value: `<@${ticketData.userId}>`, inline: true }
             );
         
@@ -56,7 +57,7 @@ module.exports = {
         
         const collector = confirmMessage.createMessageComponentCollector({ 
             filter, 
-            time: 30000 // 30 secondes
+            time: 60000 //  secondes
         });
         
         collector.on('collect', async (interaction) => {
@@ -86,15 +87,15 @@ module.exports = {
                         const transcriptChannel = guild.channels.cache.get(ticketConfig.transcriptChannelId);
                         if (transcriptChannel) {
                             const transcriptEmbed = new EmbedBuilder()
-                                .setTitle(`Transcript - Ticket #${channel.name}`)
+                                .setTitle(`Transcript - Ticket ${channel.name}`)
                                 .setDescription(`Transcript du ticket fermé par ${message.author}`)
-                                .setColor('#FFFFFF')
+                                .setColor('FFFFFF')
                                 .setTimestamp();
                             
                             await transcriptChannel.send({
                                 embeds: [transcriptEmbed],
                                 files: [{
-                                    attachment: Buffer.from(transcript, 'utf-8'),
+                                    attachment: Buffer.from(transcript, 'utf-'),
                                     name: `transcript-${channel.name}.txt`
                                 }]
                             });
@@ -108,7 +109,7 @@ module.exports = {
                             const dmEmbed = new EmbedBuilder()
                                 .setTitle('Ticket Fermé - Transcript')
                                 .setDescription(`Votre ticket "${channel.name}" a été fermé par ${message.author.tag}`)
-                                .setColor('#FFFFFF')
+                                .setColor('FFFFFF')
                                 .addFields(
                                     { name: 'Raison du ticket', value: ticketData.reason, inline: false },
                                     { name: 'Durée', value: `<t:${Math.floor(ticketData.createdAt / 1000)}:R>`, inline: false }
@@ -118,7 +119,7 @@ module.exports = {
                             await creator.send({
                                 embeds: [dmEmbed],
                                 files: [{
-                                    attachment: Buffer.from(transcript, 'utf-8'),
+                                    attachment: Buffer.from(transcript, 'utf-'),
                                     name: `transcript-${channel.name}.txt`
                                 }]
                             });
@@ -142,7 +143,7 @@ module.exports = {
                     } catch (error) {
                         console.error('Erreur suppression canal ticket:', error);
                     }
-                }, 3000);
+                }, );
                 
             } else if (interaction.customId === 'cancel_close_cmd') {
                 await interaction.update({ content: 'Fermeture annulée.', components: [] });

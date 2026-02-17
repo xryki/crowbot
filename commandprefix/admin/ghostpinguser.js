@@ -3,6 +3,11 @@ module.exports = {
     description: 'Configure les salons pour les ghost pings automatiques',
     ownerOnly: true,
     async execute(message, args, client) {
+        // Vérifier si l'utilisateur est un owner
+        if (!client.isOwner(message.author.id, message.guild.id)) {
+            return message.reply('Commande réservée aux owners du bot.');
+        }
+        
         const subcommand = args[0]?.toLowerCase();
         
         if (!subcommand) {
@@ -20,11 +25,11 @@ module.exports = {
             if (currentChannels.length > 0) {
                 const channelNames = currentChannels.map(channelId => {
                     const channel = message.guild.channels.cache.get(channelId);
-                    return channel ? channel.toString() : `#${channelId} (introuvable)`;
+                    return channel ? channel.toString() : `${channelId} (introuvable)`;
                 }).join(', ');
                 return message.reply(`Salons actuels pour les ghost pings: ${channelNames}`);
             } else {
-                return message.reply('Aucun salon configuré. Usage: `+ghostpinguser add #salon` ou `+ghostpinguser remove #salon`');
+                return message.reply('Aucun salon configuré. Usage: `+ghostpinguser add salon` ou `+ghostpinguser remove salon`');
             }
         }
         
@@ -108,7 +113,7 @@ module.exports = {
             await message.reply('Tous les salons de ghost pings ont été retirés pour ce serveur.');
             
         } else {
-            return message.reply('Usage: `+ghostpinguser add #salon` | `+ghostpinguser remove #salon` | `+ghostpinguser clear`');
+            return message.reply('Usage: `+ghostpinguser add salon` | `+ghostpinguser remove salon` | `+ghostpinguser clear`');
         }
     }
 };

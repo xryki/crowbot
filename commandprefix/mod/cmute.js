@@ -5,8 +5,8 @@ module.exports = {
     description: 'Rend muet un utilisateur dans le salon textuel actuel uniquement',
     permissions: PermissionsBitField.Flags.ManageChannels,
     async execute(message, args, client) {
-        // Vérifier si l'utilisateur a la permission de gérer les salons
-        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
+        // Vérifier si l'utilisateur a la permission de gérer les salons - bypass pour les owners
+        if (!client.isOwner(message.author.id, message.guild.id) && !message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
             return message.reply('Vous n\'avez pas la permission de rendre muet les membres.');
         }
         

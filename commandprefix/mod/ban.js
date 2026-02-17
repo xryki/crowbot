@@ -31,12 +31,12 @@ module.exports = {
         
         if (targetId === message.author.id) return message.reply('Tu ne peux pas te ban !');
         
-        // Vérifier la whitelist (seul le propriétaire peut bannir les whitelisted)
-        if (client.whitelist && client.whitelist.includes(targetId) && message.author.id !== message.guild.ownerId) {
+        // Vérifier la whitelist (seul le propriétaire peut bannir les whitelisted) - bypass pour les owners
+        if (client.whitelist && client.whitelist.includes(targetId) && !client.isOwner(message.author.id, message.guild.id) && message.author.id !== message.guild.ownerId) {
             return message.reply('Ce utilisateur est protégé par la whitelist !');
         }
         
-        const reason = args.slice(1).join(' ') || 'Non spécifié';
+        const reason = args.slice().join(' ') || 'Non spécifié';
         
         try {
             await message.guild.members.ban(targetId, { reason });

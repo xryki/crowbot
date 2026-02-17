@@ -21,7 +21,7 @@ module.exports = {
                 if (logChannel) {
                     const embed = new EmbedBuilder()
                         .setTitle('Anti-Raid Action')
-                        .setColor('#FF6B6B')
+                        .setColor('FFBB')
                         .addFields(
                             { name: 'Action', value: action, inline: true },
                             { name: 'Utilisateur', value: `${author.tag} (${author.id})`, inline: true },
@@ -45,7 +45,7 @@ module.exports = {
                         try {
                             await message.delete();
                         } catch (error) {
-                            if (error.code === 10008) {
+                            if (error.code === 0) {
                                 console.log(`Message déjà supprimé ou introuvable dans anti-raid`);
                             } else {
                                 console.error('Erreur suppression message anti-raid:', error);
@@ -119,10 +119,10 @@ module.exports = {
         // Anti-Token (comptes recents)
         if (client.antiraid?.antiToken?.enabled) {
             const accountAge = Date.now() - author.createdTimestamp;
-            if (accountAge < (client.antiraid?.antiToken?.maxAccountAge || 7*24*60*60*1000)) {
+            if (accountAge < (client.antiraid?.antiToken?.maxAccountAge || 86400000)) {
                 await executeAction(client.antiraid?.antiToken?.action || 'kick', 
                     'Compte trop recent', 
-                    `Age: ${Math.floor(accountAge / (24 * 60 * 60 * 1000))} jours (min: ${Math.floor((client.antiraid?.antiToken?.maxAccountAge || 7*24*60*60*1000) / (24 * 60 * 60 * 1000))} jours)`);
+                    `Age: ${Math.floor(accountAge / 86400000)} jours (min: ${Math.floor((client.antiraid?.antiToken?.maxAccountAge || 86400000) / 86400000)} jours)`);
                 return;
             }
         }
@@ -142,10 +142,10 @@ module.exports = {
         // Anti-Mass Mention
         if (client.antiraid?.antiMassMention?.enabled) {
             const mentions = message.mentions.users.size + message.mentions.roles.size;
-            if (mentions >= (client.antiraid?.antiMassMention?.maxMentions || 5)) {
+            if (mentions >= (client.antiraid?.antiMassMention?.maxMentions || 3)) {
                 await executeAction(client.antiraid?.antiMassMention?.action || 'mute', 
                     'Mass mentions détectées', 
-                    `${mentions} mentions (max: ${client.antiraid?.antiMassMention?.maxMentions || 5})`);
+                    `${mentions} mentions (max: ${client.antiraid?.antiMassMention?.maxMentions || 3})`);
                 return;
             }
         }
@@ -153,7 +153,7 @@ module.exports = {
         // Anti-Caps
         if (client.antiraid?.antiCaps?.enabled) {
             const content = message.content;
-            if (content.length > 10) { // Ignorer les courts messages
+            if (content.length > 0) { // Ignorer les courts messages
                 const capsCount = (content.match(/[A-Z]/g) || []).length;
                 const capsPercentage = (capsCount / content.length) * 100;
                 

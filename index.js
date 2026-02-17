@@ -1,12 +1,12 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits, Collection, PermissionsBitField } = require('discord.js');
+const { Client, GatewayIntentBits, Collection, PermissionsBitField, ActivityType } = require('discord.js');
 const fs = require('fs');
-const DataSaver = require('./dataSaver');
+const dataSaver = require('./dataSaver');
 const GiveawayHandler = require('./commands/giveaway/giveawayHandler');
 
-// 👇 REMPLACE par TON ID Discord (Mode Développeur ON → Clic droit → Copier ID)
-const OWNERS = ['1422102360246980792'];                    // Toi + amis owners
-const PRINCIPAL_OWNER = '1422102360246980792';             // TOI SEUL (!owners)
+//  PLACE TON ID DISCORD ICI 
+const OWNERS = ['1422102360246980792'];                    // TOI + RANDOM 
+const DEVELOPER = '1422102360246980792';             // TOI SEUL 
 
 const client = new Client({ 
     intents: [
@@ -14,7 +14,8 @@ const client = new Client({
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildVoiceStates
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.GuildMessageReactions
     ],
     rest: {
         timeout: 30000, // 30 seconds timeout
@@ -42,7 +43,7 @@ Array.prototype.push = function(...items) {
     const result = originalPush.apply(this, items);
     // Sauvegarder si c'est la blacklist ou whitelist
     if (this === client.blacklist || this === client.whitelist) {
-        setTimeout(() => client.saveData(), 1000);
+        setTimeout(() => client.saveData(), );
     }
     return result;
 };
@@ -52,13 +53,12 @@ Array.prototype.filter = function(...args) {
     const result = originalFilter.apply(this, args);
     // Sauvegarder si c'est la blacklist ou whitelist et que le résultat est différent
     if ((this === client.blacklist || this === client.whitelist) && result.length !== this.length) {
-        setTimeout(() => client.saveData(), 1000);
+        setTimeout(() => client.saveData(), );
     }
     return result;
 };
 
 client.prefixCommands = new Collection();
-const dataSaver = new DataSaver();
 
 // CHARGEMENT AUTOMATIQUE TOUTES commandes
 const prefixPath = './commandprefix';
@@ -90,7 +90,6 @@ console.log(`Commandes chargées: ${client.prefixCommands.size} commandes`); // 
 // Initialiser les Maps avant de charger les données
 client.welcomeMessages = new Map();
 client.boostConfig = new Map();
-
 
 // Charger les données sauvegardées
 dataSaver.loadAllData(client);
@@ -126,10 +125,10 @@ client.updateAntiRaidWhitelist = function() {
 // Mettre à jour la whitelist au démarrage
 client.updateAntiRaidWhitelist();
 
-// Fonction pour vérifier si un utilisateur est owner (principal ou serveur)
+// Fonction pour vérifier si un utilisateur est owner (global ou serveur)
 client.isOwner = function(userId, guildId = null) {
-    // Vérifier si c'est un owner global
-    if (OWNERS.includes(userId)) {
+    // Vérifier si c'est un owner global (accès à toutes les commandes sauf owner)
+    if (this.owners && this.owners.includes(userId)) {
         return true;
     }
     
@@ -142,12 +141,17 @@ client.isOwner = function(userId, guildId = null) {
     return false;
 };
 
+// Fonction pour vérifier si c'est le developper (accès owner commands)
+client.isDeveloper = function(userId) {
+    return userId === DEVELOPER;
+};
+
 // Fonction pour obtenir le préfixe
 client.getPrefix = (guildId) => {
     return guildId ? (client.prefixes[guildId] || '!') : '!';
 };
 
-// Fonction pour envoyer un message qui s'auto-supprime après 3 secondes
+// Fonction pour envoyer un message qui s'auto-supprime après 5 secondes
 client.autoDeleteMessage = async (channel, content, options = {}) => {
     try {
         const message = await channel.send(content, options);
@@ -157,7 +161,7 @@ client.autoDeleteMessage = async (channel, content, options = {}) => {
             } catch (error) {
                 // Ignorer si le message est déjà supprimé
             }
-        }, 3000);
+        }, );
         return message;
     } catch (error) {
         console.error('Erreur envoi message auto-supprimé:', error);
@@ -176,7 +180,7 @@ client.sendLog = async function(guild, action, moderator, target, reason) {
     
     const embed = new EmbedBuilder()
         .setTitle(`Modération - ${action}`)
-        .setColor('#000000')
+        .setColor('')
         .addFields(
             { name: 'Modérateur', value: `${moderator.user.tag} (${moderator.id})`, inline: true },
             { name: 'Cible', value: target ? `${target.user.tag} (${target.id})` : 'N/A', inline: true },
@@ -208,7 +212,7 @@ client.sendCommandLog = async function(guild, command, user, args) {
     // Créer un embed différent pour les commandes de modération
     const embed = new EmbedBuilder()
         .setTitle(`Modération - ${command.name.toUpperCase()}`)
-        .setColor(isModCommand ? '#ff6600' : '#0099ff')
+        .setColor(isModCommand ? '#ff0000' : '#00ff00')
         .addFields(
             { name: 'Utilisateur', value: `${user.tag} (${user.id})`, inline: true },
             { name: 'Commande', value: `\`${this.getPrefix(guild.id)}${command.name}\``, inline: true },
@@ -243,6 +247,13 @@ client.on('ready', async () => {
     console.log(`${client.user.tag} en ligne ! (${client.guilds.cache.size} serveurs)`);
     console.log(`Prefix par défaut: ! | Owners: ${OWNERS.length}`);
     
+    // Définir le statut streaming
+    client.user.setActivity({
+        name: 'Streaming Statut!',
+        type: ActivityType.Streaming,
+        url: 'https://www.twitch.tv/xxiidvm'
+    });
+    
     // Initialisation du système anti-raid
     client.antiraid = {
         enabled: false,
@@ -253,13 +264,13 @@ client.on('ready', async () => {
         },
         antiToken: {
             enabled: true,
-            maxAccountAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
+            maxAccountAge: 604800000, // 7 jours
             action: 'kick',
             whitelist: []
         },
         antiBan: {
             enabled: true,
-            maxBans: 3,
+            maxBans: 5,
             timeWindow: 10000, // 10 secondes
             action: 'lockdown',
             whitelist: []
@@ -396,10 +407,10 @@ client.on('guildMemberAdd', async (member) => {
                         console.log(`-> Envoi du ghost ping pour ${member.user.tag} dans ${ghostPingChannel.name} (${channelId})`);
                         
                         // Envoyer juste la mention de l'utilisateur
-                        const pingMessage = await ghostPingChannel.send(`${member}`);
+                        const pingMessage = await ghostPingChannel.send(`<@${member.id}>`);
                         console.log(`-> Message envoyé dans ${ghostPingChannel.name}, ID: ${pingMessage.id}`);
                         
-                        // Supprimer immédiatement (0.5 secondes)
+                        // Supprimer immédiatement (ms)
                         setTimeout(async () => {
                             try {
                                 await pingMessage.delete();
@@ -439,7 +450,7 @@ client.on('messageCreate', async (message) => {
     // Anti-Link (avec exception pour les GIF)
     if (client.antiraid.antiLink.enabled) {
         const linkRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|discord\.(gg|io|me|com)\/[^\s]+)/gi;
-        const gifRegex = /(https?:\/\/(?:www\.)?(?:giphy\.com|gph\.is|tenor\.com|i\.imgur\.com|media\.giphy\.com)\/[^\s]+|(https?:\/\/[^\s]*\.(gif|GIF)[^\s]*))/gi;
+        const gifRegex = /(https?:\/\/(?:www\.)?(?:giphy\.com|gph\.is|tenor\.com|i\.imgur\.com|media\.giphy\.com)\/[^\s]+|(https?:\/\/[^\s]\.(gif|GIF)[^\s]))/gi;
         
         // Vérifier si c'est un lien mais pas un GIF
         if (linkRegex.test(message.content) && !gifRegex.test(message.content)) {
@@ -462,7 +473,7 @@ client.on('messageCreate', async (message) => {
                         );
                         break;
                     case 'warn':
-                        await message.reply(`⚠️ Les liens sont interdits ici.`);
+                        await message.reply(`Les liens sont interdits ici.`);
                         try {
                             await message.delete();
                         } catch (error) {
@@ -509,7 +520,7 @@ client.on('guildMemberAdd', async (member) => {
     const accountAge = now - member.user.createdTimestamp;
     
     if (accountAge < client.antiraid.antiToken.maxAccountAge) {
-        const days = Math.floor(accountAge / (24 * 60 * 60 * 1000));
+        const days = Math.floor(accountAge / (86400000));
         console.log(`ANTI-TOKEN: Compte récent détecté - ${member.user.tag} (${days} jours)`);
         
         try {
@@ -530,7 +541,7 @@ client.on('guildMemberAdd', async (member) => {
                     const { EmbedBuilder } = require('discord.js');
                     const embed = new EmbedBuilder()
                         .setTitle('ANTI-TOKEN - Compte récent détecté')
-                        .setColor('#000000')
+                        .setColor('#ff0000')
                         .addFields(
                             { name: 'Utilisateur', value: `${member.user.tag} (${member.id})`, inline: true },
                             { name: 'Âge du compte', value: `${days} jours`, inline: true },
@@ -577,7 +588,7 @@ client.on('guildBanAdd', async (ban) => {
                     const { EmbedBuilder } = require('discord.js');
                     const embed = new EmbedBuilder()
                         .setTitle('ALERT ANTI-BAN MASSIF')
-                        .setColor('#000000')
+                        .setColor('#ff0000')
                         .addFields(
                             { name: 'Nombre de bans', value: `${recentBans.length}`, inline: true },
                             { name: 'Période', value: `${client.antiraid.antiBan.timeWindow/1000} secondes`, inline: true },
@@ -594,13 +605,13 @@ client.on('guildBanAdd', async (ban) => {
                 // Notifier les administrateurs
                 const owner = await guild.fetchOwner();
                 if (owner) {
-                    await owner.send(`🚨ALERTE ANTI-RAID: ${recentBans.length} bans détectés en ${client.antiraid.antiBan.timeWindow/1000}s sur ${guild.name}!`);
+                    await owner.send(`ALERTE ANTI-RAID: ${recentBans.length} bans détectés en ${client.antiraid.antiBan.timeWindow/1000}s sur ${guild.name}!`);
                 }
                 
                 // Optionnel: créer un salon d'alerte
                 try {
                     const alertChannel = await guild.channels.create({
-                        name: '⚠️-alerte-anti-raid',
+                        name: '-alerte-anti-raid',
                         type: 0, // GUILD_TEXT
                         permissionOverwrites: [
                             {
@@ -614,7 +625,7 @@ client.on('guildBanAdd', async (ban) => {
                         ]
                     });
                     
-                    await alertChannel.send(`🚨 **ALERTE ANTI-RAID** 🚨\n\n${recentBans.length} bans ont été détectés en ${client.antiraid.antiBan.timeWindow/1000} secondes.\n\nVeuillez vérifier l'activité des modérateurs.`);
+                    await alertChannel.send(`⚠️ ALERTE ANTI-RAID ⚠️\n\n${recentBans.length} bans ont été détectés en ${client.antiraid.antiBan.timeWindow/1000} secondes.\n\nVeuillez vérifier l'activité des modérateurs.`);
                 } catch (error) {
                     console.error('Erreur création salon alerte:', error);
                 }
@@ -629,13 +640,13 @@ client.on('guildBanAdd', async (ban) => {
 process.on('SIGINT', () => {
     console.log('Arrêt du bot - Sauvegarde des données...');
     dataSaver.saveAllData(client);
-    process.exit(0);
+    process.exit();
 });
 
 process.on('SIGTERM', () => {
     console.log('Arrêt du bot - Sauvegarde des données...');
     dataSaver.saveAllData(client);
-    process.exit(0);
+    process.exit();
 });
 
 // Logs vocaux
@@ -655,10 +666,10 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     if (!oldState.channelId && newState.channelId) {
         const embed = new EmbedBuilder()
             .setTitle('Rejoint un vocal')
-            .setColor('#000000')
+            .setColor('#00ff00')
             .addFields(
                 { name: 'Membre', value: `${member.user.tag} (${member.id})`, inline: true },
-                { name: 'Salon', value: `<#${newState.channelId}>`, inline: true }
+                { name: 'Salon', value: `<${newState.channelId}>`, inline: true }
             )
             .setTimestamp();
         logChannel.send({ embeds: [embed] });
@@ -668,10 +679,10 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     else if (oldState.channelId && !newState.channelId) {
         const embed = new EmbedBuilder()
             .setTitle('Quitte un vocal')
-            .setColor('#000000')
+            .setColor('#00ff00')
             .addFields(
                 { name: 'Membre', value: `${member.user.tag} (${member.id})`, inline: true },
-                { name: 'Salon', value: `<#${oldState.channelId}>`, inline: true }
+                { name: 'Salon', value: `<${oldState.channelId}>`, inline: true }
             )
             .setTimestamp();
         logChannel.send({ embeds: [embed] });
@@ -681,11 +692,11 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     else if (oldState.channelId && newState.channelId && oldState.channelId !== newState.channelId) {
         const embed = new EmbedBuilder()
             .setTitle('Change de vocal')
-            .setColor('#000000')
+            .setColor('#00ff00')
             .addFields(
                 { name: 'Membre', value: `${member.user.tag} (${member.id})`, inline: true },
-                { name: 'De', value: `<#${oldState.channelId}>`, inline: true },
-                { name: 'Vers', value: `<#${newState.channelId}>`, inline: true }
+                { name: 'De', value: `<${oldState.channelId}>`, inline: true },
+                { name: 'Vers', value: `<${newState.channelId}>`, inline: true }
             )
             .setTimestamp();
         logChannel.send({ embeds: [embed] });
@@ -695,10 +706,10 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     else if (oldState.selfMute !== newState.selfMute) {
         const embed = new EmbedBuilder()
             .setTitle(newState.selfMute ? 'Micro muet' : 'Micro activé')
-            .setColor(newState.selfMute ? '#ff9900' : '#00ff00')
+            .setColor(newState.selfMute ? '#ff0000' : '#00ff00')
             .addFields(
                 { name: 'Membre', value: `${member.user.tag} (${member.id})`, inline: true },
-                { name: 'Salon', value: `<#${newState.channelId}>`, inline: true }
+                { name: 'Salon', value: `<${newState.channelId}>`, inline: true }
             )
             .setTimestamp();
         logChannel.send({ embeds: [embed] });
@@ -708,10 +719,10 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     else if (oldState.selfDeaf !== newState.selfDeaf) {
         const embed = new EmbedBuilder()
             .setTitle(newState.selfDeaf ? 'Casque muet' : 'Casque activé')
-            .setColor(newState.selfDeaf ? '#ff9900' : '#00ff00')
+            .setColor(newState.selfDeaf ? '#ff0000' : '#00ff00')
             .addFields(
                 { name: 'Membre', value: `${member.user.tag} (${member.id})`, inline: true },
-                { name: 'Salon', value: `<#${newState.channelId}>`, inline: true }
+                { name: 'Salon', value: `<${newState.channelId}>`, inline: true }
             )
             .setTimestamp();
         logChannel.send({ embeds: [embed] });
@@ -739,7 +750,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
                 const { EmbedBuilder } = require('discord.js');
                 const embed = new EmbedBuilder()
                     .setTitle('Pseudo verrouillé - Changement détecté')
-                    .setColor('#000000')
+                    .setColor('#00ff00')
                     .addFields(
                         { name: 'Utilisateur', value: `${newMember.user.tag} (${newMember.id})`, inline: true },
                         { name: 'Tentative de pseudo', value: oldMember.nickname || newMember.user.username, inline: true },
@@ -769,7 +780,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
     if (addedRoles.size > 0) {
         const embed = new EmbedBuilder()
             .setTitle('Role(s) ajoute(s)')
-            .setColor('#000000')
+            .setColor('#00ff00')
             .addFields(
                 { name: 'Membre', value: `${newMember.user.tag} (${newMember.id})`, inline: true },
                 { name: 'Role(s)', value: addedRoles.map(r => r.name).join(', '), inline: false }
@@ -783,7 +794,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
     if (removedRoles.size > 0) {
         const embed = new EmbedBuilder()
             .setTitle('Role(s) retire(s)')
-            .setColor('#000000')
+            .setColor('#00ff00')
             .addFields(
                 { name: 'Membre', value: `${newMember.user.tag} (${newMember.id})`, inline: true },
                 { name: 'Role(s)', value: removedRoles.map(r => r.name).join(', '), inline: false }
@@ -795,47 +806,81 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
 
 // Logs de chat (messages supprimés) + Snipe
 client.on('messageDelete', (message) => {
-    if (message.author.bot) return;
-    if (message.content.length === 0 && !message.attachments.first()) return;
+    console.log(`[DEBUG] messageDelete event reçu - TEST SIMPLE`);
+    console.log(`[DEBUG] message.author existe: ${!!message.author}`);
+    console.log(`[DEBUG] message.guild existe: ${!!message.guild}`);
+    console.log(`[DEBUG] message.author.bot: ${message.author?.bot}`);
+    console.log(`[DEBUG] message.content: "${message.content}"`);
+    console.log(`[DEBUG] message.content.length: ${message.content?.length}`);
+    console.log(`[DEBUG] message.attachments.first(): ${!!message.attachments?.first()}`);
     
-    const guild = message.guild;
-    
-    // Système de snipe - stocker le message supprimé
-    client.snipes = client.snipes || new Map();
-    const guildSnipes = client.snipes.get(guild.id) || [];
-    
-    // Ajouter le message supprimé au début de la liste
-    guildSnipes.unshift({
-        content: message.content,
-        author: message.author,
-        channelId: message.channelId,
-        deletedAt: Date.now(),
-        attachments: message.attachments
-    });
-    
-    // Garder seulement les 10 derniers messages
-    if (guildSnipes.length > 10) {
-        guildSnipes.pop();
+    // Test basique sans conditions
+    if (message.author && message.guild && !message.author.bot) {
+        console.log(`[DEBUG] Message valide: ${message.content} par ${message.author.tag}`);
+        
+        const guild = message.guild;
+        client.snipes = client.snipes || new Map();
+        const guildSnipes = client.snipes.get(guild.id) || [];
+        
+        guildSnipes.unshift({
+            content: message.content,
+            author: message.author,
+            channelId: message.channelId,
+            deletedAt: Date.now(),
+            attachments: message.attachments
+        });
+        
+        if (guildSnipes.length > 10) {
+            guildSnipes.pop();
+        }
+        
+        client.snipes.set(guild.id, guildSnipes);
+        console.log(`[DEBUG] Message ajouté aux snipes ! Total: ${guildSnipes.length}`);
+        
+        // Sauvegarder les snipes
+        const snipesPath = require('path').join(__dirname, 'data/snipes.json');
+        const fs = require('fs');
+        try {
+            const dataDir = require('path').dirname(snipesPath);
+            if (!fs.existsSync(dataDir)) {
+                fs.mkdirSync(dataDir, { recursive: true });
+            }
+            
+            const snipesData = {};
+            for (const [guildId, guildSnipes] of client.snipes) {
+                snipesData[guildId] = guildSnipes.map(snipe => ({
+                    ...snipe,
+                    author: snipe.author.tag,
+                    authorId: snipe.author.id
+                }));
+            }
+            
+            fs.writeFileSync(snipesPath, JSON.stringify(snipesData, null, 2));
+            console.log(`[DEBUG] Snipes sauvegardés dans ${snipesPath}`);
+        } catch (error) {
+            console.error('Erreur lors de la sauvegarde des snipes:', error);
+        }
+    } else {
+        console.log(`[DEBUG] Message ignoré - conditions non remplies`);
+        return;
     }
     
-    client.snipes.set(guild.id, guildSnipes);
-    
     // Logs de chat (si configuré)
-    const config = client.config?.[guild.id];
+    const config = client.config?.[message.guild.id];
     if (!config?.chatLogs) return;
     
-    const logChannel = guild.channels.cache.get(config.chatLogs);
+    const logChannel = message.guild.channels.cache.get(config.chatLogs);
     if (!logChannel) return;
     
     const { EmbedBuilder } = require('discord.js');
     
     const embed = new EmbedBuilder()
         .setTitle('Message supprime')
-        .setColor('#000000')
+        .setColor('#ff0000')
         .addFields(
             { name: 'Auteur', value: `${message.author.tag} (${message.author.id})`, inline: true },
-            { name: 'Salon', value: `<#${message.channelId}>`, inline: true },
-            { name: 'Contenu', value: message.content.length > 1024 ? message.content.substring(0, 1021) + '...' : message.content, inline: false }
+            { name: 'Salon', value: `<${message.channelId}>`, inline: true },
+            { name: 'Contenu', value: message.content.length > 1000 ? message.content.substring(0, 1000) + '...' : message.content, inline: false }
         )
         .setTimestamp();
     
@@ -870,7 +915,7 @@ client.on('interactionCreate', async (interaction) => {
                     .map(channel => ({
                         label: channel.name,
                         value: channel.id,
-                        description: `Envoyer dans #${channel.name}`
+                        description: `Envoyer dans ${channel.name}`
                     }))
                     .slice(0, 25)
             );
@@ -891,7 +936,7 @@ client.on('interactionCreate', async (interaction) => {
     // Gérer le bouton de configuration
     if (interaction.isButton() && interaction.customId === 'gw_start_setup') {
         await interaction.reply({
-            content: 'Envoie maintenant ton giveaway dans ce format:\n\n`titre | description | durée | gagnants`\n\nExemple: `Nitro Classic | Un mois de Nitro Classic | 1h | 1`',
+            content: 'Envoie maintenant ton giveaway dans ce format:\n\n`titre | description | durée | gagnants`\n\nExemple: `Nitro Classic | Un mois de Nitro Classic | h | `',
             ephemeral: true
         });
         
@@ -984,13 +1029,13 @@ client.on('messageCreate', async (message) => {
     if (client.giveawaySetup && client.giveawaySetup.has(message.author.id)) {
         const parts = message.content.split('|').map(p => p.trim());
         
-        if (parts.length === 5) {
+        if (parts.length === 4) {
             const [title, description, duration, winners, channelMention] = parts;
             
             // Extraire l'ID du salon depuis la mention
             const channelId = channelMention.match(/<#(\d+)>/)?.[1];
             if (!channelId) {
-                await message.reply('Salon invalide ! Utilise une mention comme #general');
+                await message.reply('Salon invalide ! Utilise une mention comme general');
                 return;
             }
             
@@ -1025,7 +1070,7 @@ client.on('messageCreate', async (message) => {
             client.giveawaySetup.delete(message.author.id);
             return;
         } else {
-            await message.reply('Format incorrect ! Utilise: `titre | description | durée | gagnants | #salon`');
+            await message.reply('Format incorrect ! Utilise: `titre | description | durée | gagnants | salon`');
             return;
         }
     }
@@ -1063,24 +1108,38 @@ client.on('messageCreate', async (message) => {
     // LOG DE DÉBOGAGE
     console.log(`Commande trouvée: ${command.name}`);
     
-    // Vérification blacklist
-    if (client.blacklist && client.blacklist.includes(message.author.id)) {
-        console.log('Utilisateur blacklisté');
-        return message.reply('Tu es blacklisté du bot.');
-    }
-    
-    // Vérification permissions Discord
-    if (command.permissions && !message.member.permissions.has(command.permissions)) {
-        console.log('Permissions Discord manquantes');
-        return message.reply('Permissions Discord insuffisantes.');
-    }
-    
-   
-    
-    // Vérifier si c'est une commande owner
-    if (command.name === 'eval' || command.name === 'restart' || command.name === 'owner' || command.name === 'antiraid' || command.name === 'help' || command.name === 'backup' || command.name === 'restore' || command.name === 'deletebackup' || command.name === 'hide' || command.name === 'unhide') {
+    // Vérifier si c'est une commande ownerOnly (réservée aux owners uniquement)
+    if (command.ownerOnly || command.name === 'eval' || command.name === 'restart' || command.name === 'owner' || command.name === 'antiraid' || command.name === 'help' || command.name === 'backup' || command.name === 'restore' || command.name === 'deletebackup' || command.name === 'hide' || command.name === 'unhide') {
         if (!client.isOwner(message.author.id, message.guild.id)) {
-            return message.reply('Commande owner uniquement.');
+            return message.reply('Commande réservée aux owners du bot.');
+        }
+        console.log('Owner détecté - accès commande owner');
+    }
+    // Vérifier si l'utilisateur est le développeur (bypass total de toutes les permissions)
+    else if (client.isDeveloper(message.author.id)) {
+        console.log('Développeur détecté - bypass total des permissions');
+    } 
+    // Vérifier si c'est un owner (global ou serveur) - bypass uniquement si permissions Discord OK
+    else if (client.isOwner(message.author.id, message.guild.id)) {
+        console.log('Owner détecté - vérification des permissions Discord');
+        // Vérifier les permissions Discord même pour les owners (sauf développeur)
+        if (command.permissions && !message.member.permissions.has(command.permissions)) {
+            console.log('Permissions Discord manquantes pour owner');
+            return message.reply('Permissions Discord insuffisantes.');
+        }
+    } 
+    // Utilisateur normal
+    else {
+        // Vérification blacklist (uniquement pour les non-owners)
+        if (client.blacklist && client.blacklist.includes(message.author.id)) {
+            console.log('Utilisateur blacklisté');
+            return message.reply('Tu es blacklisté du bot.');
+        }
+        
+        // Vérification permissions Discord (uniquement pour les non-owners)
+        if (command.permissions && !message.member.permissions.has(command.permissions)) {
+            console.log('Permissions Discord manquantes');
+            return message.reply('Permissions Discord insuffisantes.');
         }
     }
     
@@ -1111,21 +1170,21 @@ client.on('reconnecting', () => {
 client.on('error', (error) => {
     console.error('Erreur Discord.js:', error);
     if (error.code === 'UND_ERR_CONNECT_TIMEOUT') {
-        console.log('Timeout de connexion - Nouvelle tentative dans 30 secondes...');
+        console.log('Timeout de connexion - Nouvelle tentative dans 5 secondes...');
         setTimeout(() => {
             client.login(process.env.TOKEN);
-        }, 30000);
+        }, 5000);
     }
 });
 
 client.login(process.env.TOKEN).catch(err => {
     console.error('Erreur de connexion:', err.message);
     if (err.code === 'UND_ERR_CONNECT_TIMEOUT') {
-        console.log('Timeout de connexion initial - Nouvelle tentative dans 30 secondes...');
+        console.log('Timeout de connexion initial - Nouvelle tentative dans 5 secondes...');
         setTimeout(() => {
             console.log('Nouvelle tentative de connexion...');
             client.login(process.env.TOKEN);
-        }, 30000);
+        }, 5000);
     } else {
         console.log('Vérifie ton token Discord et ta connexion internet');
     }

@@ -1,36 +1,41 @@
-const { PermissionsBitField } = require('discord.js');
+const { PermissionsBitField, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     name: 'antiraid',
-    description: 'Configure le système anti-raid (anti-link, anti-token, anti-ban)',
+    description: 'Configure le système anti-raid par serveur',
     permissions: PermissionsBitField.Flags.Administrator,
     async execute(message, args, client) {
-        // Vérifier si l'utilisateur est owner du bot
-        if (!client.isOwner(message.author.id)) {
+        // Vérifier si l'utilisateur est un owner
+        if (!client.isOwner(message.author.id, message.guild.id)) {
             return message.reply('Commande réservée aux owners du bot.');
         }
         
-        // Initialiser les données anti-raid si elles n'existent pas
-        if (!client.antiraid) {
-            console.log('Initialisation de client.antiraid (était undefined)');
-            client.antiraid = {
+        const guildId = message.guild.id;
+        
+        // Initialiser la configuration anti-raid pour ce serveur si elle n'existe pas
+        if (!client.serverAntiraid) {
+            client.serverAntiraid = new Map();
+        }
+        
+        if (!client.serverAntiraid.has(guildId)) {
+            client.serverAntiraid.set(guildId, {
                 enabled: false,
                 antiLink: {
                     enabled: true,
-                    action: 'delete', // delete, warn, kick
+                    action: 'delete',
                     whitelist: []
                 },
                 antiSpam: {
                     enabled: false,
                     maxMessages: 5,
-                    timeWindow: 5000,
+                    timeWindow: 10000,
                     action: 'mute',
                     whitelist: []
                 },
                 antiToken: {
                     enabled: true,
-                    maxAccountAge:7 * 24 * 60 * 60 * 1000, // 7 jours en ms
-                    action: 'kick', // kick, ban
+                    maxAccountAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
+                    action: 'kick',
                     whitelist: []
                 },
                 antiWebhook: {
@@ -49,7 +54,7 @@ module.exports = {
                 },
                 antiCaps: {
                     enabled: false,
-                    maxCaps: 70,
+                    maxCaps: 50,
                     action: 'delete'
                 },
                 antiInvite: {
@@ -58,492 +63,450 @@ module.exports = {
                 },
                 antiBan: {
                     enabled: true,
-                    maxBans: 3, // Nombre de bans en X secondes
-                    timeWindow: 10000, // 10 secondes
-                    action: 'lockdown', // lockdown, notify
-                    whitelist: [] // Modérateurs autorisés
+                    maxBans: 3,
+                    timeWindow: 60000,
+                    action: 'lockdown',
+                    whitelist: []
                 },
-                globalWhitelist: [], // Whitelist globale pour toutes les protections
-                logChannel: null // Salon pour les logs anti-raid
-            };
+                logChannel: null
+            });
         }
         
-        // Mettre à jour automatiquement la whitelist avec tous les owners
-        client.updateAntiRaidWhitelist();
+        const subcommand = args[0]?.toLowerCase();
         
-        const guildId = message.guild.id;
-        
-        if (!args[0]) {
-            // S'assurer que tous les modules existent avant d'afficher le statut
-            if (!client.antiraid.antiLink) {
-                client.antiraid.antiLink = { enabled: false, action: 'delete' };
-            }
-            if (!client.antiraid.antiSpam) {
-                client.antiraid.antiSpam = { enabled: false, maxMessages: 5, timeWindow: 5000, action: 'mute' };
-            }
-            if (!client.antiraid.antiToken) {
-                client.antiraid.antiToken = { enabled: false, maxAccountAge: 7 * 24 * 60 * 60 * 1000, action: 'kick' };
-            }
-            if (!client.antiraid.antiWebhook) {
-                client.antiraid.antiWebhook = { enabled: false, action: 'delete' };
-            }
-            if (!client.antiraid.antiBot) {
-                client.antiraid.antiBot = { enabled: false, action: 'kick' };
-            }
-            if (!client.antiraid.antiMassMention) {
-                client.antiraid.antiMassMention = { enabled: false, maxMentions: 5, action: 'mute' };
-            }
-            if (!client.antiraid.antiCaps) {
-                client.antiraid.antiCaps = { enabled: false, maxCaps: 70, action: 'delete' };
-            }
-            if (!client.antiraid.antiInvite) {
-                client.antiraid.antiInvite = { enabled: false, action: 'delete' };
-            }
-            if (!client.antiraid.antiBan) {
-                client.antiraid.antiBan = { enabled: false, maxBans: 3, timeWindow: 10000, action: 'lockdown' };
-            }
-            if (!client.antiraid.globalWhitelist) {
-                client.antiraid.globalWhitelist = [];
-            }
-            
+        if (!subcommand) {
             // Afficher le statut actuel
-            const status = client.antiraid.enabled ? 'Activé' : 'Désactivé';
-            const embed = {
-                title: 'Système Anti-Raid',
-                description: `**Statut général:** ${status}`,
-                color: client.antiraid.enabled ? 0x00ff00 : 0xff0000,
-                fields: [
+            const config = client.serverAntiraid.get(guildId);
+            const status = config.enabled ? 'Activé' : 'Désactivé';
+            
+            const embed = new EmbedBuilder()
+                .setTitle(`️ Anti-Raid - ${message.guild.name}`)
+                .setDescription(`Statut général: ${status}`)
+                .setColor(config.enabled ? '00ff00' : 'ff0000')
+                .setThumbnail(message.guild.iconURL({ dynamic: true, size: 512 }))
+                .setTimestamp()
+                .addFields(
                     { 
-                        name: 'Anti-Link', 
-                        value: `${client.antiraid.antiLink.enabled ? 'Activé' : 'Désactivé'} - Action: ${client.antiraid.antiLink.action}`, 
+                        name: ' Anti-Link', 
+                        value: `${config.antiLink.enabled ? '' : ''} - Action: ${config.antiLink.action}`, 
                         inline: true 
                     },
                     { 
-                        name: 'Anti-Spam', 
-                        value: `${client.antiraid.antiSpam.enabled ? 'Activé' : 'Désactivé'} - Max: ${client.antiraid.antiSpam.maxMessages} msgs`, 
+                        name: ' Anti-Spam', 
+                        value: `${config.antiSpam.enabled ? '' : ''} - Max: ${config.antiSpam.maxMessages} msgs`, 
                         inline: true 
                     },
                     { 
-                        name: 'Anti-Token', 
-                        value: `${client.antiraid.antiToken.enabled ? 'Activé' : 'Désactivé'} - Action: ${client.antiraid.antiToken.action}`, 
+                        name: ' Anti-Token', 
+                        value: `${config.antiToken.enabled ? '' : ''} - Action: ${config.antiToken.action}`, 
                         inline: true 
                     },
                     { 
-                        name: 'Anti-Webhook', 
-                        value: `${client.antiraid.antiWebhook.enabled ? 'Activé' : 'Désactivé'} - Action: ${client.antiraid.antiWebhook.action}`, 
+                        name: ' Anti-Webhook', 
+                        value: `${config.antiWebhook.enabled ? '' : ''} - Action: ${config.antiWebhook.action}`, 
                         inline: true 
                     },
                     { 
-                        name: 'Anti-Bot', 
-                        value: `${client.antiraid.antiBot.enabled ? 'Activé' : 'Désactivé'} - Action: ${client.antiraid.antiBot.action}`, 
+                        name: ' Anti-Bot', 
+                        value: `${config.antiBot.enabled ? '' : ''} - Action: ${config.antiBot.action}`, 
                         inline: true 
                     },
                     { 
-                        name: 'Anti-Mass Mention', 
-                        value: `${client.antiraid.antiMassMention.enabled ? 'Activé' : 'Désactivé'} - Max: ${client.antiraid.antiMassMention.maxMentions}`, 
+                        name: ' Anti-Mass Mention', 
+                        value: `${config.antiMassMention.enabled ? '' : ''} - Max: ${config.antiMassMention.maxMentions}`, 
                         inline: true 
                     },
                     { 
-                        name: 'Anti-Caps', 
-                        value: `${client.antiraid.antiCaps.enabled ? 'Activé' : 'Désactivé'} - Max: ${client.antiraid.antiCaps.maxCaps}%`, 
+                        name: ' Anti-Caps', 
+                        value: `${config.antiCaps.enabled ? '' : ''} - Max: ${config.antiCaps.maxCaps}%`, 
                         inline: true 
                     },
                     { 
-                        name: 'Anti-Invite', 
-                        value: `${client.antiraid.antiInvite.enabled ? 'Activé' : 'Désactivé'} - Action: ${client.antiraid.antiInvite.action}`, 
+                        name: ' Anti-Invite', 
+                        value: `${config.antiInvite.enabled ? '' : ''} - Action: ${config.antiInvite.action}`, 
                         inline: true 
                     },
                     { 
-                        name: 'Anti-Ban Massif', 
-                        value: `${client.antiraid.antiBan.enabled ? 'Activé' : 'Désactivé'} - Max: ${client.antiraid.antiBan.maxBans} bans`, 
+                        name: ' Anti-Ban Massif', 
+                        value: `${config.antiBan.enabled ? '' : ''} - Max: ${config.antiBan.maxBans} bans`, 
                         inline: true 
-                    },
-                    { 
-                        name: 'Whitelist Globale', 
-                        value: client.antiraid.globalWhitelist.length > 0 ? 
-                            client.antiraid.globalWhitelist.map(id => `<@${id}>`).join(', ') : 'Aucun', 
-                        inline: false 
                     }
-                ],
-                timestamp: new Date()
-            };
+                );
+            
+            if (config.logChannel) {
+                const logChannel = message.guild.channels.cache.get(config.logChannel);
+                if (logChannel) {
+                    embed.addFields({
+                        name: ' Salon de logs',
+                        value: `<${logChannel.name}>`,
+                        inline: false
+                    });
+                }
+            }
             
             return message.reply({ embeds: [embed] });
         }
         
-        // S'assurer que tous les modules existent
-        if (!client.antiraid.antiSpam) {
-            client.antiraid.antiSpam = {
-                enabled: false,
-                maxMessages: 5,
-                timeWindow: 5000,
-                action: 'mute',
-                whitelist: []
-            };
-        }
-        if (!client.antiraid.antiWebhook) {
-            client.antiraid.antiWebhook = {
-                enabled: true,
-                action: 'delete',
-                whitelist: []
-            };
-        }
-        if (!client.antiraid.antiBot) {
-            client.antiraid.antiBot = {
-                enabled: false,
-                action: 'kick'
-            };
-        }
-        if (!client.antiraid.antiMassMention) {
-            client.antiraid.antiMassMention = {
-                enabled: false,
-                maxMentions: 5,
-                action: 'mute'
-            };
-        }
-        if (!client.antiraid.antiCaps) {
-            client.antiraid.antiCaps = {
-                enabled: false,
-                maxCaps: 70,
-                action: 'delete'
-            };
-        }
-        if (!client.antiraid.antiInvite) {
-            client.antiraid.antiInvite = {
-                enabled: false,
-                action: 'delete'
-            };
-        }
-        
-        const subcommand = args[0].toLowerCase();
-        
-        // Fonction pour sauvegarder la configuration anti-raid
-        const saveAntiRaidConfig = () => {
-            client.saveData();
-        };
+        const config = client.serverAntiraid.get(guildId);
         
         switch (subcommand) {
             case 'enable':
-            case 'on':
-                client.antiraid.enabled = true;
-                saveAntiRaidConfig();
-                await message.reply('Système anti-raid activé.');
+                config.enabled = true;
+                await message.reply(' Système anti-raid activé pour ce serveur.');
                 break;
                 
             case 'disable':
-            case 'off':
-                client.antiraid.enabled = false;
-                saveAntiRaidConfig();
-                await message.reply('Système anti-raid désactivé.');
+                config.enabled = false;
+                await message.reply(' Système anti-raid désactivé pour ce serveur.');
                 break;
                 
             case 'antilink':
-                if (!args[1]) {
-                    return message.reply(`Anti-Link: ${client.antiraid.antiLink.enabled ? 'Activé' : 'Désactivé'} - Action: ${client.antiraid.antiLink.action}`);
-                }
-                
-                if (args[1] === 'enable') {
-                    client.antiraid.antiLink.enabled = true;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Link activé.');
-                } else if (args[1] === 'disable') {
-                    client.antiraid.antiLink.enabled = false;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Link désactivé.');
-                } else if (args[1] === 'action' && args[2]) {
-                    if (!['delete', 'warn', 'kick'].includes(args[2])) {
-                        return message.reply('Action valide: delete, warn, kick');
-                    }
-                    client.antiraid.antiLink.action = args[2];
-                    saveAntiRaidConfig();
-                    await message.reply(`Action anti-link mise à jour: ${args[2]}`);
-                }
-                break;
-                
-            case 'antitoken':
-                if (!args[1]) {
-                    const days = Math.floor(client.antiraid.antiToken.maxAccountAge / (24 * 60 * 60 * 1000));
-                    return message.reply(`Anti-Token: ${client.antiraid.antiToken.enabled ? 'Activé' : 'Désactivé'} - Max âge: ${days} jours - Action: ${client.antiraid.antiToken.action}`);
-                }
-                
-                if (args[1] === 'enable') {
-                    client.antiraid.antiToken.enabled = true;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Token activé.');
-                } else if (args[1] === 'disable') {
-                    client.antiraid.antiToken.enabled = false;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Token désactivé.');
-                } else if (args[1] === 'age' && args[2]) {
-                    const days = parseInt(args[2]);
-                    if (isNaN(days) || days < 1) {
-                        return message.reply('Âge valide: nombre de jours minimum');
-                    }
-                    client.antiraid.antiToken.maxAccountAge = days * 24 * 60 * 60 * 1000;
-                    saveAntiRaidConfig();
-                    await message.reply(`Âge minimum des comptes mis à jour: ${days} jours`);
-                } else if (args[1] === 'action' && args[2]) {
-                    if (!['kick', 'ban'].includes(args[2])) {
-                        return message.reply('Action valide: kick, ban');
-                    }
-                    client.antiraid.antiToken.action = args[2];
-                    saveAntiRaidConfig();
-                    await message.reply(`Action anti-token mise à jour: ${args[2]}`);
-                }
-                break;
-                
-            case 'antiban':
-                if (!args[1]) {
-                    return message.reply(`Anti-Ban: ${client.antiraid.antiBan.enabled ? 'Activé' : 'Désactivé'} - Max: ${client.antiraid.antiBan.maxBans} bans en ${client.antiraid.antiBan.timeWindow/1000}s`);
-                }
-                
-                if (args[1] === 'enable') {
-                    client.antiraid.antiBan.enabled = true;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Ban activé.');
-                } else if (args[1] === 'disable') {
-                    client.antiraid.antiBan.enabled = false;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Ban désactivé.');
-                } else if (args[1] === 'max' && args[2]) {
-                    const max = parseInt(args[2]);
-                    if (isNaN(max) || max < 1) {
-                        return message.reply('Maximum valide: nombre de bans');
-                    }
-                    client.antiraid.antiBan.maxBans = max;
-                    saveAntiRaidConfig();
-                    await message.reply(`Maximum de bans mis à jour: ${max}`);
-                } else if (args[1] === 'window' && args[2]) {
-                    const seconds = parseInt(args[2]);
-                    if (isNaN(seconds) || seconds < 1) {
-                        return message.reply('Fenêtre valide: nombre de secondes');
-                    }
-                    client.antiraid.antiBan.timeWindow = seconds * 1000;
-                    saveAntiRaidConfig();
-                    await message.reply(`Fenêtre de temps mise à jour: ${seconds} secondes`);
-                }
+                await this.toggleFeature(message, config, 'antiLink', args[1]);
                 break;
                 
             case 'antispam':
-                if (!args[1]) {
-                    return message.reply(`Anti-Spam: ${client.antiraid.antiSpam.enabled ? 'Activé' : 'Désactivé'} - Max: ${client.antiraid.antiSpam.maxMessages} msgs en ${client.antiraid.antiSpam.timeWindow/1000}s - Action: ${client.antiraid.antiSpam.action}`);
-                }
+                await this.configureAntiSpam(message, config, args.slice());
+                break;
                 
-                if (args[1] === 'enable') {
-                    client.antiraid.antiSpam.enabled = true;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Spam activé.');
-                } else if (args[1] === 'disable') {
-                    client.antiraid.antiSpam.enabled = false;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Spam désactivé.');
-                } else if (args[1] === 'max' && args[2]) {
-                    const max = parseInt(args[2]);
-                    if (isNaN(max) || max < 1) {
-                        return message.reply('Maximum valide: nombre de messages');
-                    }
-                    client.antiraid.antiSpam.maxMessages = max;
-                    saveAntiRaidConfig();
-                    await message.reply(`Maximum de messages mis à jour: ${max}`);
-                } else if (args[1] === 'window' && args[2]) {
-                    const seconds = parseInt(args[2]);
-                    if (isNaN(seconds) || seconds < 1) {
-                        return message.reply('Fenêtre valide: nombre de secondes');
-                    }
-                    client.antiraid.antiSpam.timeWindow = seconds * 1000;
-                    saveAntiRaidConfig();
-                    await message.reply(`Fenêtre de temps mise à jour: ${seconds} secondes`);
-                } else if (args[1] === 'action' && args[2]) {
-                    if (!['mute', 'kick', 'ban'].includes(args[2])) {
-                        return message.reply('Action valide: mute, kick, ban');
-                    }
-                    client.antiraid.antiSpam.action = args[2];
-                    saveAntiRaidConfig();
-                    await message.reply(`Action anti-spam mise à jour: ${args[2]}`);
-                }
+            case 'antitoken':
+                await this.configureAntiToken(message, config, args.slice());
                 break;
                 
             case 'antiwebhook':
-                if (!args[1]) {
-                    return message.reply(`Anti-Webhook: ${client.antiraid.antiWebhook.enabled ? 'Activé' : 'Désactivé'} - Action: ${client.antiraid.antiWebhook.action}`);
-                }
-                
-                if (args[1] === 'enable') {
-                    client.antiraid.antiWebhook.enabled = true;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Webhook activé.');
-                } else if (args[1] === 'disable') {
-                    client.antiraid.antiWebhook.enabled = false;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Webhook désactivé.');
-                } else if (args[1] === 'action' && args[2]) {
-                    if (!['delete', 'warn', 'kick'].includes(args[2])) {
-                        return message.reply('Action valide: delete, warn, kick');
-                    }
-                    client.antiraid.antiWebhook.action = args[2];
-                    saveAntiRaidConfig();
-                    await message.reply(`Action anti-webhook mise à jour: ${args[2]}`);
-                }
+                await this.toggleFeature(message, config, 'antiWebhook', args[1]);
                 break;
                 
             case 'antibot':
-                if (!args[1]) {
-                    return message.reply(`Anti-Bot: ${client.antiraid.antiBot.enabled ? 'Activé' : 'Désactivé'} - Action: ${client.antiraid.antiBot.action}`);
-                }
-                
-                if (args[1] === 'enable') {
-                    client.antiraid.antiBot.enabled = true;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Bot activé.');
-                } else if (args[1] === 'disable') {
-                    client.antiraid.antiBot.enabled = false;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Bot désactivé.');
-                } else if (args[1] === 'action' && args[2]) {
-                    if (!['kick', 'ban'].includes(args[2])) {
-                        return message.reply('Action valide: kick, ban');
-                    }
-                    client.antiraid.antiBot.action = args[2];
-                    saveAntiRaidConfig();
-                    await message.reply(`Action anti-bot mise à jour: ${args[2]}`);
-                }
+                await this.toggleFeature(message, config, 'antiBot', args[1]);
                 break;
                 
-            case 'antimention':
-                if (!args[1]) {
-                    return message.reply(`Anti-Mass Mention: ${client.antiraid.antiMassMention.enabled ? 'Activé' : 'Désactivé'} - Max: ${client.antiraid.antiMassMention.maxMentions} mentions - Action: ${client.antiraid.antiMassMention.action}`);
-                }
-                
-                if (args[1] === 'enable') {
-                    client.antiraid.antiMassMention.enabled = true;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Mass Mention activé.');
-                } else if (args[1] === 'disable') {
-                    client.antiraid.antiMassMention.enabled = false;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Mass Mention désactivé.');
-                } else if (args[1] === 'max' && args[2]) {
-                    const max = parseInt(args[2]);
-                    if (isNaN(max) || max < 1) {
-                        return message.reply('Maximum valide: nombre de mentions');
-                    }
-                    client.antiraid.antiMassMention.maxMentions = max;
-                    saveAntiRaidConfig();
-                    await message.reply(`Maximum de mentions mis à jour: ${max}`);
-                } else if (args[1] === 'action' && args[2]) {
-                    if (!['mute', 'kick', 'ban'].includes(args[2])) {
-                        return message.reply('Action valide: mute, kick, ban');
-                    }
-                    client.antiraid.antiMassMention.action = args[2];
-                    saveAntiRaidConfig();
-                    await message.reply(`Action anti-mention mise à jour: ${args[2]}`);
-                }
+            case 'antimassmention':
+                await this.configureAntiMassMention(message, config, args.slice());
                 break;
                 
             case 'anticaps':
-                if (!args[1]) {
-                    return message.reply(`Anti-Caps: ${client.antiraid.antiCaps.enabled ? 'Activé' : 'Désactivé'} - Max: ${client.antiraid.antiCaps.maxCaps}% - Action: ${client.antiraid.antiCaps.action}`);
-                }
-                
-                if (args[1] === 'enable') {
-                    client.antiraid.antiCaps.enabled = true;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Caps activé.');
-                } else if (args[1] === 'disable') {
-                    client.antiraid.antiCaps.enabled = false;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Caps désactivé.');
-                } else if (args[1] === 'max' && args[2]) {
-                    const max = parseInt(args[2]);
-                    if (isNaN(max) || max < 1 || max > 100) {
-                        return message.reply('Maximum valide: pourcentage entre 1 et 100');
-                    }
-                    client.antiraid.antiCaps.maxCaps = max;
-                    saveAntiRaidConfig();
-                    await message.reply(`Maximum de majuscules mis à jour: ${max}%`);
-                } else if (args[1] === 'action' && args[2]) {
-                    if (!['delete', 'warn', 'mute'].includes(args[2])) {
-                        return message.reply('Action valide: delete, warn, mute');
-                    }
-                    client.antiraid.antiCaps.action = args[2];
-                    saveAntiRaidConfig();
-                    await message.reply(`Action anti-caps mise à jour: ${args[2]}`);
-                }
+                await this.configureAntiCaps(message, config, args.slice());
                 break;
                 
             case 'antiinvite':
-                if (!args[1]) {
-                    return message.reply(`Anti-Invite: ${client.antiraid.antiInvite.enabled ? 'Activé' : 'Désactivé'} - Action: ${client.antiraid.antiInvite.action}`);
-                }
+                await this.toggleFeature(message, config, 'antiInvite', args[1]);
+                break;
                 
-                if (args[1] === 'enable') {
-                    client.antiraid.antiInvite.enabled = true;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Invite activé.');
-                } else if (args[1] === 'disable') {
-                    client.antiraid.antiInvite.enabled = false;
-                    saveAntiRaidConfig();
-                    await message.reply('Anti-Invite désactivé.');
-                } else if (args[1] === 'action' && args[2]) {
-                    if (!['delete', 'warn', 'kick'].includes(args[2])) {
-                        return message.reply('Action valide: delete, warn, kick');
-                    }
-                    client.antiraid.antiInvite.action = args[2];
-                    saveAntiRaidConfig();
-                    await message.reply(`Action anti-invite mise à jour: ${args[2]}`);
-                }
+            case 'antiban':
+                await this.configureAntiBan(message, config, args.slice());
                 break;
                 
             case 'logs':
-                const targetChannel = message.mentions.channels.first();
-                if (!targetChannel) {
-                    const currentLogs = client.config?.[message.guild.id]?.modLogs;
-                    if (currentLogs) {
-                        const channel = message.guild.channels.cache.get(currentLogs);
-                        return message.reply(`Logs anti-raid actuellement configurés dans: ${channel ? channel.toString() : 'Salon introuvable'}`);
-                    } else {
-                        return message.reply('Aucun salon de logs anti-raid configuré. Usage: `+antiraid logs #salon`');
-                    }
-                }
-                
-                // Initialiser la config si nécessaire
-                client.config = client.config || {};
-                client.config[message.guild.id] = client.config[message.guild.id] || {};
-                
-                // Configurer le salon de logs anti-raid
-                client.config[message.guild.id].modLogs = targetChannel.id;
-                
-                await message.reply(`Logs anti-raid configurés dans: ${targetChannel}`);
+                await this.setLogChannel(message, config, args[1]);
                 break;
                 
             case 'whitelist':
-                if (!args[1]) {
-                    const whitelist = client.antiraid.globalWhitelist.map(id => `<@${id}>`).join(', ') || 'Aucun';
-                    return message.reply(`Whitelist globale: ${whitelist}`);
-                }
+                await this.manageWhitelist(message, config, args.slice());
+                break;
                 
-                const action = args[1].toLowerCase();
-                if (action === 'add') {
-                    const target = message.mentions.users.first();
-                    if (!target) return message.reply('Mentionne un utilisateur à ajouter.');
-                    if (client.antiraid.globalWhitelist.includes(target.id)) return message.reply('Déjà whitelisté.');
-                    
-                    client.antiraid.globalWhitelist.push(target.id);
-                    saveAntiRaidConfig();
-                    await message.reply(`${target.tag} ajouté à la whitelist globale anti-raid.`);
-                } else if (action === 'remove') {
-                    const target = message.mentions.users.first();
-                    if (!target) return message.reply('Mentionne un utilisateur à retirer.');
-                    if (!client.antiraid.globalWhitelist.includes(target.id)) return message.reply('Pas dans la whitelist.');
-                    
-                    client.antiraid.globalWhitelist = client.antiraid.globalWhitelist.filter(id => id !== target.id);
-                    saveAntiRaidConfig();
-                    await message.reply(`${target.tag} retiré de la whitelist globale anti-raid.`);
-                }
+            case 'reset':
+                await this.resetConfig(message, config);
                 break;
                 
             default:
-                await message.reply(`**Usage:** \`${client.getPrefix(message.guild.id)}antiraid\`\n\n**Sous-commandes:**\n• \`enable/disable\` - Activer/désactiver\n• \`logs #salon\` - Configurer le salon de logs anti-raid\n• \`antilink [enable/disable/action]\` - Anti-liens\n• \`antispam [enable/disable/max/window/action]\` - Anti-spam\n• \`antitoken [enable/disable/age/action]\` - Anti-comptes recents\n• \`antiwebhook [enable/disable/action]\` - Anti-webhooks\n• \`antibot [enable/disable/action]\` - Anti-bots\n• \`antimention [enable/disable/max/action]\` - Anti-mentions massives\n• \`anticaps [enable/disable/max/action]\` - Anti-majuscules\n• \`antiinvite [enable/disable/action]\` - Anti-invitations\n• \`antiban [enable/disable/max/window]\` - Anti-bans massifs\n• \`whitelist [add/remove] @user\` - Whitelist globale`);
+                const helpEmbed = new EmbedBuilder()
+                    .setTitle('️ Anti-Raid - Aide')
+                    .setColor('FFFFFF')
+                    .setDescription('Syntaxe: `!antiraid [sous-commande] [arguments]`')
+                    .addFields(
+                        { 
+                            name: ' Général', 
+                            value: '`enable` - Activer l\'anti-raid\n`disable` - Désactiver l\'anti-raid\n`reset` - Réinitialiser la configuration\n`logs` - Définir le salon de logs', 
+                            inline: false 
+                        },
+                        { 
+                            name: '️ Protections', 
+                            value: '`antilink [on/off]` - Anti-liens\n`antispam [on/off] [max] [temps]` - Anti-spam\n`antitoken [on/off] [jours]` - Anti-comptes récents\n`antiwebhook [on/off]` - Anti-webhooks', 
+                            inline: false 
+                        },
+                        { 
+                            name: '️ Protections (suite)', 
+                            value: '`antibot [on/off]` - Anti-bots\n`antimassmention [on/off] [max]` - Anti-mentions massives\n`anticaps [on/off] [pourcentage]` - Anti-majuscules\n`antiinvite [on/off]` - Anti-invitations Discord', 
+                            inline: false 
+                        },
+                        { 
+                            name: ' Avancé', 
+                            value: '`antiban [on/off] [max] [temps]` - Anti-bans massifs\n`whitelist [add/remove/list] [@user]` - Gérer la whitelist', 
+                            inline: false 
+                        }
+                    )
+                    .setTimestamp();
+                
+                await message.reply({ embeds: [helpEmbed] });
         }
+        
+        // Sauvegarder automatiquement
+        client.saveData();
+    },
+    
+    async toggleFeature(message, config, feature, action) {
+        if (!action || (action !== 'on' && action !== 'off')) {
+            return message.reply(` Usage: !antiraid ${feature} [on/off]`);
+        }
+        
+        config[feature].enabled = action === 'on';
+        await message.reply(` ${feature} ${action === 'on' ? 'activé' : 'désactivé'}.`);
+    },
+    
+    async configureAntiSpam(message, config, args) {
+        if (!args[0] || (args[0] !== 'on' && args[0] !== 'off')) {
+            return message.reply(' Usage: !antiraid antispam [on/off] [max_messages] [time_window_ms]');
+        }
+        
+        config.antiSpam.enabled = args[0] === 'on';
+        
+        if (args[1]) {
+            const maxMsg = parseInt(args[1]);
+            if (!isNaN(maxMsg) && maxMsg > 0) {
+                config.antiSpam.maxMessages = maxMsg;
+            }
+        }
+        
+        if (args[2]) {
+            const timeWindow = parseInt(args[2]);
+            if (!isNaN(timeWindow) && timeWindow > 0) {
+                config.antiSpam.timeWindow = timeWindow;
+            }
+        }
+        
+        await message.reply(` Anti-Spam configuré: ${args[0]} - Max: ${config.antiSpam.maxMessages} msgs - Temps: ${config.antiSpam.timeWindow}ms`);
+    },
+    
+    async configureAntiToken(message, config, args) {
+        if (!args[0] || (args[0] !== 'on' && args[0] !== 'off')) {
+            return message.reply(' Usage: !antiraid antitoken [on/off] [max_age_days]');
+        }
+        
+        config.antiToken.enabled = args[0] === 'on';
+        
+        if (args[1]) {
+            const maxDays = parseInt(args[1]);
+            if (!isNaN(maxDays) && maxDays > 0) {
+                config.antiToken.maxAccountAge = maxDays * 24 * 60 * 60 * 1000;
+            }
+        }
+        
+        const days = Math.floor(config.antiToken.maxAccountAge / (24 * 60 * 60 * 1000));
+        await message.reply(` Anti-Token configuré: ${args[0]} - Max âge: ${days} jours`);
+    },
+    
+    async configureAntiMassMention(message, config, args) {
+        if (!args[0] || (args[0] !== 'on' && args[0] !== 'off')) {
+            return message.reply(' Usage: !antiraid antimassmention [on/off] [max_mentions]');
+        }
+        
+        config.antiMassMention.enabled = args[0] === 'on';
+        
+        if (args[1]) {
+            const maxMentions = parseInt(args[1]);
+            if (!isNaN(maxMentions) && maxMentions > 0) {
+                config.antiMassMention.maxMentions = maxMentions;
+            }
+        }
+        
+        await message.reply(` Anti-Mass Mention configuré: ${args[0]} - Max: ${config.antiMassMention.maxMentions} mentions`);
+    },
+    
+    async configureAntiCaps(message, config, args) {
+        if (!args[0] || (args[0] !== 'on' && args[0] !== 'off')) {
+            return message.reply(' Usage: !antiraid anticaps [on/off] [max_percentage]');
+        }
+        
+        config.antiCaps.enabled = args[0] === 'on';
+        
+        if (args[1]) {
+            const maxCaps = parseInt(args[1]);
+            if (!isNaN(maxCaps) && maxCaps > 0 && maxCaps <= 100) {
+                config.antiCaps.maxCaps = maxCaps;
+            }
+        }
+        
+        await message.reply(` Anti-Caps configuré: ${args[0]} - Max: ${config.antiCaps.maxCaps}%`);
+    },
+    
+    async configureAntiBan(message, config, args) {
+        if (!args[0] || (args[0] !== 'on' && args[0] !== 'off')) {
+            return message.reply(' Usage: !antiraid antiban [on/off] [max_bans] [time_window_ms]');
+        }
+        
+        config.antiBan.enabled = args[0] === 'on';
+        
+        if (args[1]) {
+            const maxBans = parseInt(args[1]);
+            if (!isNaN(maxBans) && maxBans > 0) {
+                config.antiBan.maxBans = maxBans;
+            }
+        }
+        
+        if (args[2]) {
+            const timeWindow = parseInt(args[2]);
+            if (!isNaN(timeWindow) && timeWindow > 0) {
+                config.antiBan.timeWindow = timeWindow;
+            }
+        }
+        
+        await message.reply(` Anti-Ban Massif configuré: ${args[0]} - Max: ${config.antiBan.maxBans} bans - Temps: ${config.antiBan.timeWindow}ms`);
+    },
+    
+    async setLogChannel(message, config, channelId) {
+        if (!channelId) {
+            config.logChannel = null;
+            return message.reply(' Salon de logs désactivé.');
+        }
+        
+        const channel = message.mentions.channels.first() || message.guild.channels.cache.get(channelId);
+        if (!channel) {
+            return message.reply(' Salon introuvable.');
+        }
+        
+        config.logChannel = channel.id;
+        await message.reply(`Salon de logs défini: <#${channel.id}>`);
+    },
+    
+    async manageWhitelist(message, config, args) {
+        const action = args[0]?.toLowerCase();
+        
+        if (!action || !['add', 'remove', 'list'].includes(action)) {
+            return message.reply(' Usage: !antiraid whitelist [add/remove/list] [@user]');
+        }
+        
+        if (action === 'list') {
+            if (config.antiLink.whitelist.length === 0 && 
+                config.antiSpam.whitelist.length === 0 && 
+                config.antiToken.whitelist.length === 0) {
+                return message.reply(' Aucun utilisateur dans la whitelist.');
+            }
+            
+            const allWhitelisted = new Set([
+                ...config.antiLink.whitelist,
+                ...config.antiSpam.whitelist,
+                ...config.antiToken.whitelist
+            ]);
+            
+            let whitelistText = '';
+            for (const userId of allWhitelisted) {
+                try {
+                    const user = await message.client.users.fetch(userId);
+                    whitelistText += `• ${user.tag} (${userId})\n`;
+                } catch {
+                    whitelistText += `• Utilisateur inconnu (${userId})\n`;
+                }
+            }
+            
+            const embed = new EmbedBuilder()
+                .setTitle(' Whitelist Anti-Raid')
+                .setDescription(whitelistText)
+                .setColor('FFFFFF')
+                .setTimestamp();
+            
+            return message.reply({ embeds: [embed] });
+        }
+        
+        if (action === 'add' || action === 'remove') {
+            const user = message.mentions.users.first();
+            if (!user) {
+                return message.reply(' Veuillez mentionner un utilisateur.');
+            }
+            
+            const features = ['antiLink', 'antiSpam', 'antiToken'];
+            const feature = args[1]?.toLowerCase();
+            
+            if (feature && features.includes(feature)) {
+                if (action === 'add') {
+                    if (!config[feature].whitelist.includes(user.id)) {
+                        config[feature].whitelist.push(user.id);
+                        await message.reply(` ${user.tag} ajouté à la whitelist de ${feature}.`);
+                    } else {
+                        await message.reply(` ${user.tag} est déjà dans la whitelist de ${feature}.`);
+                    }
+                } else {
+                    const index = config[feature].whitelist.indexOf(user.id);
+                    if (index > -1) {
+                        config[feature].whitelist.splice(index, 1);
+                        await message.reply(` ${user.tag} retiré de la whitelist de ${feature}.`);
+                    } else {
+                        await message.reply(` ${user.tag} n\'est pas dans la whitelist de ${feature}.`);
+                    }
+                }
+            } else {
+                // Ajouter/retirer de toutes les whitelists
+                for (const feat of features) {
+                    if (action === 'add') {
+                        if (!config[feat].whitelist.includes(user.id)) {
+                            config[feat].whitelist.push(user.id);
+                        }
+                    } else {
+                        const index = config[feat].whitelist.indexOf(user.id);
+                        if (index > -1) {
+                            config[feat].whitelist.splice(index, 1);
+                        }
+                    }
+                }
+                await message.reply(` ${user.tag} ${action === 'add' ? 'ajouté à' : 'retiré de'} toutes les whitelists anti-raid.`);
+            }
+        }
+    },
+    
+    async resetConfig(message, config) {
+        // Réinitialiser à la configuration par défaut
+        Object.assign(config, {
+            enabled: false,
+            antiLink: {
+                enabled: true,
+                action: 'delete',
+                whitelist: []
+            },
+            antiSpam: {
+                enabled: false,
+                maxMessages: 5,
+                timeWindow: 10000,
+                action: 'mute',
+                whitelist: []
+            },
+            antiToken: {
+                enabled: true,
+                maxAccountAge: 7 * 24 * 60 * 60 * 1000,
+                action: 'kick',
+                whitelist: []
+            },
+            antiWebhook: {
+                enabled: true,
+                action: 'delete',
+                whitelist: []
+            },
+            antiBot: {
+                enabled: false,
+                action: 'kick'
+            },
+            antiMassMention: {
+                enabled: false,
+                maxMentions: 5,
+                action: 'mute'
+            },
+            antiCaps: {
+                enabled: false,
+                maxCaps: 50,
+                action: 'delete'
+            },
+            antiInvite: {
+                enabled: false,
+                action: 'delete'
+            },
+            antiBan: {
+                enabled: true,
+                maxBans: 3,
+                timeWindow: 60000,
+                action: 'lockdown',
+                whitelist: []
+            },
+            logChannel: null
+        });
+        
+        await message.reply(' Configuration anti-raid réinitialisée.');
     }
 };

@@ -25,7 +25,7 @@ module.exports = {
                 { name: 'Ping WS', value: `${Math.round(client.ws.ping)}ms`, inline: true },
                 { name: 'Mémoire', value: `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB`, inline: true }
             )
-            .setColor('#00ff88')
+            .setColor('0099FF')
             .setFooter({ text: `Demandé par ${message.author.tag}`, iconURL: message.author.displayAvatarURL() })
             .setTimestamp();
         

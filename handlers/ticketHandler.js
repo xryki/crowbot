@@ -113,7 +113,7 @@ module.exports = {
             try {
                 await interaction.update({ content: 'Création du ticket en cours...', components: [] });
             } catch (error) {
-                if (error.code === 10062) { // Unknown interaction
+                if (error.code === 0) { // Unknown interaction
                     console.log('Interaction expirée lors de la création du ticket');
                     return; // Arrêter le traitement si l'interaction a expiré
                 } else {
@@ -159,9 +159,9 @@ module.exports = {
                 
                 // Créer l'embed du ticket
                 const ticketEmbed = new EmbedBuilder()
-                    .setTitle(`Ticket #${ticketNumber}`)
+                    .setTitle(`Ticket ${ticketNumber}`)
                     .setDescription(`Raison : ${reasonLabels[reason] || reason}\n\nCréé par : ${interaction.user}\n\nVeuillez décrire votre demande en détail.`)
-                    .setColor('#808080')
+                    .setColor('')
                     .addFields(
                         { name: 'Instructions', value: '• Décrivez votre problème clairement\n• Attendez qu\'un membre du staff réponde\n• Soyez patient et respectueux', inline: false }
                     )
@@ -205,8 +205,7 @@ module.exports = {
                 });
                 
                 // Sauvegarder immédiatement les données du ticket
-                const DataSaver = require('../dataSaver');
-                const dataSaver = new DataSaver();
+                const dataSaver = require('../dataSaver');
                 dataSaver.saveData('ticketDataActive', Object.fromEntries(client.ticketData));
                 
                 await interaction.followUp({
@@ -236,7 +235,7 @@ module.exports = {
             const confirmEmbed = new EmbedBuilder()
                 .setTitle('Fermeture du ticket')
                 .setDescription('Êtes-vous sûr de vouloir fermer ce ticket ?')
-                .setColor('#808080');
+                .setColor('');
             
             const row = new ActionRowBuilder()
                 .addComponents(
@@ -284,9 +283,9 @@ module.exports = {
                     const transcriptChannel = guild.channels.cache.get(panelCfg.transcriptChannelId);
                     if (transcriptChannel) {
                         const transcriptEmbed = new EmbedBuilder()
-                            .setTitle(`Transcript - Ticket #${channel.name}`)
+                            .setTitle(`Transcript - Ticket ${channel.name}`)
                             .setDescription(`Transcript du ticket fermé par ${interaction.user}`)
-                            .setColor('#808080')
+                            .setColor('')
                             .setTimestamp();
                         
                         await transcriptChannel.send({
@@ -306,7 +305,7 @@ module.exports = {
                         const dmEmbed = new EmbedBuilder()
                             .setTitle('Ticket Fermé - Transcript')
                             .setDescription(`Votre ticket "${channel.name}" a été fermé par ${interaction.user.tag}`)
-                            .setColor('#808080')
+                            .setColor('')
                             .addFields(
                                 { name: 'Raison du ticket', value: ticketData.reason, inline: false },
                                 { name: 'Durée', value: `<t:${Math.floor(ticketData.createdAt / 1000)}:R>`, inline: false }
@@ -334,7 +333,7 @@ module.exports = {
             try {
                 await interaction.update({ content: 'Fermeture du ticket...', components: [] });
             } catch (error) {
-                if (error.code === 10062) { // Unknown interaction
+                if (error.code === 0) { // Unknown interaction
                     console.log('Interaction expirée, envoi d\'un message normal');
                     await channel.send('Fermeture du ticket...');
                 } else {
@@ -350,13 +349,12 @@ module.exports = {
                     client.ticketData.delete(channel.id);
                     
                     // Sauvegarder immédiatement après suppression
-                    const DataSaver = require('../dataSaver');
-                    const dataSaver = new DataSaver();
+                    const dataSaver = require('../dataSaver');
                     dataSaver.saveData('ticketDataActive', Object.fromEntries(client.ticketData));
                 } catch (error) {
                     console.error('Erreur suppression canal ticket:', error);
                 }
-            }, 3000);
+            }, );
         }
         
         // Annulation de fermeture
@@ -364,7 +362,7 @@ module.exports = {
             try {
                 await interaction.update({ content: 'Fermeture annulée.', components: [] });
             } catch (error) {
-                if (error.code === 10062) { // Unknown interaction
+                if (error.code === 0) { // Unknown interaction
                     console.log('Interaction expirée lors de l\'annulation de fermeture');
                     return;
                 } else {
@@ -387,7 +385,7 @@ module.exports = {
             const claimEmbed = new EmbedBuilder()
                 .setTitle('Ticket pris en charge')
                 .setDescription(`Ce ticket est maintenant pris en charge par ${interaction.user}`)
-                .setColor('#808080')
+                .setColor('')
                 .setTimestamp();
             
             await channel.send({ embeds: [claimEmbed] });
@@ -411,7 +409,7 @@ module.exports = {
             const panelKey = ticketData.panelKey || 'support';
             const panelCfg = ticketConfig?.panels ? (ticketConfig.panels[panelKey] || null) : ticketConfig;
             const supportRoleIds = getSupportRoleIds(panelCfg);
-            const hasStaffRole = supportRoleIds.length > 0
+            const hasStaffRole = supportRoleIds.length > 0 
                 ? supportRoleIds.some(roleId => member.roles.cache.has(roleId))
                 : member.permissions.has('ManageChannels');
             
@@ -430,8 +428,8 @@ module.exports = {
                 .setLabel('Nouveau nom du ticket')
                 .setPlaceholder('Ex: support-probleme-connexion')
                 .setStyle(TextInputStyle.Short)
-                .setMinLength(3)
-                .setMaxLength(100)
+                .setMinLength()
+                .setMaxLength()
                 .setValue(channel.name.replace('ticket-', ''));
             
             const actionRow = new ActionRowBuilder().addComponents(nameInput);
@@ -458,7 +456,7 @@ module.exports = {
             const panelKey = ticketData.panelKey || 'support';
             const panelCfg = ticketConfig?.panels ? (ticketConfig.panels[panelKey] || null) : ticketConfig;
             const supportRoleIds = getSupportRoleIds(panelCfg);
-            const hasStaffRole = supportRoleIds.length > 0
+            const hasStaffRole = supportRoleIds.length > 0 
                 ? supportRoleIds.some(roleId => member.roles.cache.has(roleId))
                 : member.permissions.has('ManageChannels');
             
@@ -476,7 +474,7 @@ module.exports = {
                 const renameEmbed = new EmbedBuilder()
                     .setTitle('Ticket renommé')
                     .setDescription(`Le ticket a été renommé en \`${finalName}\` par ${interaction.user}`)
-                    .setColor('#808080')
+                    .setColor('')
                     .setTimestamp();
                 
                 await channel.send({ embeds: [renameEmbed] });
@@ -492,7 +490,7 @@ module.exports = {
             console.error('Erreur dans handleTicketInteraction:', error);
             
             // Gérer les erreurs d'interaction expirée
-            if (error.code === 10062) { // Unknown interaction
+            if (error.code === 0) { // Unknown interaction
                 console.log('Interaction expirée dans handleTicketInteraction');
                 return;
             }

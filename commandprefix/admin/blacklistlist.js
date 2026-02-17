@@ -5,6 +5,11 @@ module.exports = {
     description: 'Affiche la liste des utilisateurs blacklistés',
     ownerOnly: true,
     async execute(message, args, client) {
+        // Vérifier si l'utilisateur est un owner
+        if (!client.isOwner(message.author.id, message.guild.id)) {
+            return message.reply('Commande réservée aux owners du bot.');
+        }
+        
         try {
             client.blacklist = client.blacklist || [];
             
@@ -32,21 +37,21 @@ module.exports = {
             // Trier par nom d'utilisateur
             blacklistedUsers.sort((a, b) => a.user.username.localeCompare(b.user.username));
             
-            // Créer les pages (15 utilisateurs par page)
-            const itemsPerPage = 15;
+            // Créer les pages (5 utilisateurs par page)
+            const itemsPerPage = 5;
             const pages = [];
             
             for (let i = 0; i < blacklistedUsers.length; i += itemsPerPage) {
                 const pageUsers = blacklistedUsers.slice(i, i + itemsPerPage);
                 
                 const description = pageUsers.map((item, index) => {
-                    return `**${i + index + 1}.** ${item.user.tag} (${item.user.id})`;
+                    return `${i + index + 1}. <@${item.user.id}> - **${item.user.tag}**`;
                 }).join('\n');
                 
                 const embed = new EmbedBuilder()
                     .setTitle('Liste des blacklistés')
                     .setDescription(description)
-                    .setColor('#FFFFFF')
+                    .setColor('FFFFFF')
                     .setFooter({ 
                         text: `Page ${Math.floor(i / itemsPerPage) + 1}/${Math.ceil(blacklistedUsers.length / itemsPerPage)} • Total: ${blacklistedUsers.length} utilisateur(s)` 
                     })

@@ -5,7 +5,7 @@ module.exports = {
     description: 'Crée une sauvegarde complète du serveur',
     ownerOnly: true,
     async execute(message, args, client) {
-        // Vérifier si l'utilisateur est owner (global ou serveur)
+        // Vérifier si l'utilisateur est un owner
         if (!client.isOwner(message.author.id, message.guild.id)) {
             return message.reply('Commande réservée aux owners du bot.');
         }
@@ -16,7 +16,7 @@ module.exports = {
         const customName = args.join(' ');
         
         // Demander confirmation pour les éléments optionnels
-        await message.reply('Sauvegarde du Serveur\n\nQuels éléments voulez-vous sauvegarder ?\n\n**Options disponibles :**\n- `roles` : Rôles et couleurs\n- `emojis` : Émojis du serveur\n- `stickers` : Autocollants du serveur\n\nRépondez par `oui` ou `non` pour chaque option.');
+        await message.reply('Sauvegarde du Serveur\n\nQuels éléments voulez-vous sauvegarder ?\n\nOptions disponibles :\n- `roles` : Rôles et couleurs\n- `emojis` : Émojis du serveur\n- `stickers` : Autocollants du serveur\n\nRépondez par `oui` ou `non` pour chaque option.');
 
         // Poser les questions
         const questions = [
@@ -32,7 +32,7 @@ module.exports = {
             
             const response = await message.channel.awaitMessages({
                 max: 1,
-                time: 30000,
+                time: 60000,
                 errors: ['time']
             }).then(collected => {
                 const msg = collected.first();
@@ -42,7 +42,7 @@ module.exports = {
             options[question.key] = response.includes('oui');
         }
 
-        await message.channel.send('🔄 **Création de la sauvegarde en cours...**');
+        await message.channel.send(' Création de la sauvegarde en cours...');
 
         try {
             const backup = {
@@ -150,20 +150,20 @@ module.exports = {
             }
 
             // Sauvegarder en JSON
-            const filename = customName ? `${customName.replace(/[^a-zA-Z0-9]/g, '_')}.json` : `backup_${guild.id}_${Date.now()}.json`;
-            fs.writeFileSync(`${backupDir}/${filename}`, JSON.stringify(backup, null, 2));
+            const filename = customName ? `${customName.replace(/[^a-zA-Z-]/g, '_')}.json` : `backup_${guild.id}_${Date.now()}.json`;
+            fs.writeFileSync(`${backupDir}/${filename}`, JSON.stringify(backup, null, ));
 
             // Créer un résumé en texte brut
-            let summary = `Sauvegarde terminée\n\nSauvegarde du serveur **${guild.name}** créée avec succès !\n\n**Nom**: ${backup.customName}\n**Fichier**: \`${filename}\`\n**Salons**: ${backup.channels.length}\n**Membres**: ${backup.serverInfo.memberCount}`;
+            let summary = `Sauvegarde terminée\n\nSauvegarde du serveur ${guild.name} créée avec succès !\n\nNom: ${backup.customName}\nFichier: \`${filename}\`\nSalons: ${backup.channels.length}\nMembres: ${backup.serverInfo.memberCount}`;
             
             if (options.roles && backup.roles) {
-                summary += `\n**Rôles**: ${backup.roles.length}`;
+                summary += `\nRôles: ${backup.roles.length}`;
             }
             if (options.emojis && backup.emojis) {
-                summary += `\n**Émojis**: ${backup.emojis.length}`;
+                summary += `\nÉmojis: ${backup.emojis.length}`;
             }
             if (options.stickers && backup.stickers) {
-                summary += `\n**Autocollants**: ${backup.stickers.length}`;
+                summary += `\nAutocollants: ${backup.stickers.length}`;
             }
 
             await message.channel.send(summary);

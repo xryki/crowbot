@@ -2,7 +2,7 @@ const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     name: 'user',
-    description: 'Infos utilisateur',
+    description: 'Infos utilisateur (mention possible)',
     async execute(message, args) {
         const member = message.mentions.members.first() || message.member;
         const user = member.user;
@@ -16,7 +16,7 @@ module.exports = {
                 { name: 'Rejoint le serveur', value: `<t:${Math.floor(member.joinedTimestamp / 1000)}:R>`, inline: true },
                 { name: 'Rôles', value: member.roles.cache.map(r => r.name).join(', ') || 'Aucun', inline: false }
             )
-            .setColor('#FFFFFF');
+            .setColor('FFFFFF');
         
         message.reply({ embeds: [embed] });
     }

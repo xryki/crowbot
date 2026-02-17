@@ -8,12 +8,12 @@ module.exports = {
         const target = message.mentions.members.first();
         if (!target) return message.reply('Mentionne quelqu\'un !');
         
-        // Vérifier la whitelist (seul le propriétaire peut kick les whitelisted)
-        if (client.whitelist && client.whitelist.includes(target.id) && message.author.id !== message.guild.ownerId) {
+        // Vérifier la whitelist (seul le propriétaire peut kick les whitelisted) - bypass pour les owners
+        if (client.whitelist && client.whitelist.includes(target.id) && !client.isOwner(message.author.id, message.guild.id) && message.author.id !== message.guild.ownerId) {
             return message.reply('Ce utilisateur est protégé par la whitelist !');
         }
         
-        const reason = args.slice(1).join(' ') || 'Non spécifié';
+        const reason = args.slice().join(' ') || 'Non spécifié';
         
         try {
             await target.kick(reason);

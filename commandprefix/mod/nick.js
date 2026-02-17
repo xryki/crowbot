@@ -10,6 +10,6 @@ module.exports = {
         const nick = args.slice(1).join(' ');
         if (!nick) return message.reply('Nouveau pseudo requis !');
         await target.setNickname(nick);
-        message.reply(`${target.user.username} → ${nick}`);
+        message.reply(`<@${target.id}> → ${nick}`);
     }
 };

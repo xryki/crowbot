@@ -37,7 +37,7 @@ module.exports = {
                 const channelFilter = (m) => m.author.id === message.author.id;
                 const channelCollector = message.channel.createMessageCollector({ 
                     filter: channelFilter, 
-                    time: 30000, 
+                    time: 60000, 
                     max: 1 
                 });
                 

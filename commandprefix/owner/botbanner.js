@@ -5,7 +5,7 @@ module.exports = {
     description: 'Affiche ou modifie la bannière du bot',
     permissions: PermissionsBitField.Flags.Administrator,
     async execute(message, args, client) {
-        // Vérifier si l'utilisateur est owner (global ou serveur)
+        // Vérifier si l'utilisateur est un owner
         if (!client.isOwner(message.author.id, message.guild.id)) {
             return message.reply('Commande réservée aux owners du bot.');
         }
@@ -33,27 +33,27 @@ module.exports = {
         if (!args[0]) {
             const embed = new EmbedBuilder()
                 .setTitle(`Bannière de ${bot.username}`)
-                .setColor('#0099ff')
-                .setDescription(`Voici la bannière actuelle du bot **${bot.username}** :`)
+                .setColor('0099FF')
+                .setDescription(`Voici la bannière actuelle du bot ${bot.username} :`)
                 .setFooter({ text: `Demandé par ${message.author.username}` })
                 .setTimestamp();
             
             if (bot.bannerURL()) {
-                embed.setImage(bot.bannerURL({ dynamic: true, size: 1024 }));
+                embed.setImage(bot.bannerURL({ dynamic: true, size: 512 }));
                 embed.addFields({
                     name: 'Lien direct',
-                    value: `[Télécharger la bannière](${bot.bannerURL({ dynamic: true, size: 2048 })})`,
+                    value: `[Télécharger la bannière](${bot.bannerURL({ dynamic: true, size: 512 })})`,
                     inline: false
                 });
                 embed.addFields({
-                    name: '💡 Comment changer la bannière ?',
+                    name: ' Comment changer la bannière ?',
                     value: `• Envoyez une image avec: \`${client.getPrefix(message.guild.id)}botbanner\`\n• Ou utilisez: \`${client.getPrefix(message.guild.id)}botbanner <image_url>\``,
                     inline: false
                 });
             } else {
-                embed.setDescription(`Le bot **${bot.username}** n'a pas de bannière.`);
+                embed.setDescription(`Le bot ${bot.username} n'a pas de bannière.`);
                 embed.addFields({
-                    name: '💡 Comment ajouter une bannière ?',
+                    name: ' Comment ajouter une bannière ?',
                     value: `• Envoyez une image avec: \`${client.getPrefix(message.guild.id)}botbanner\`\n• Ou utilisez: \`${client.getPrefix(message.guild.id)}botbanner <image_url>\``,
                     inline: false
                 });

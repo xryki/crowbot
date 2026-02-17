@@ -3,6 +3,11 @@ module.exports = {
     description: 'Envoie un faux ping everyone qui se supprime automatiquement',
     ownerOnly: true,
     async execute(message, args, client) {
+        // Vérifier si l'utilisateur est un owner
+        if (!client.isOwner(message.author.id, message.guild.id)) {
+            return message.reply('Commande réservée aux owners du bot.');
+        }
+        
         try {
             // Supprimer le message de commande pour plus de discrétion
             try {
@@ -22,7 +27,7 @@ module.exports = {
                     // Le message a déjà été supprimé
                     console.log('Message ghost ping déjà supprimé');
                 }
-            }, 1000); // Supprimer après 1 seconde
+            }, ); // Supprimer après  seconde
 
             // Envoyer un message de confirmation en MP
             try {

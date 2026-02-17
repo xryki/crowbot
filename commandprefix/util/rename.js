@@ -7,8 +7,8 @@ module.exports = {
     async execute(message, args, client) {
         const channel = message.channel;
         
-        // Vérifier si l'utilisateur a les permissions
-        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
+        // Vérifier si l'utilisateur a les permissions - bypass pour les owners
+        if (!client.isOwner(message.author.id, message.guild.id) && !message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
             // Vérifier si c'est un ticket et si l'utilisateur est le créateur
             const ticketData = client.ticketData?.get(channel.id);
             if (!ticketData || ticketData.userId !== message.author.id) {
@@ -22,8 +22,8 @@ module.exports = {
             return message.reply(`Veuillez spécifier un nouveau nom pour le salon. Usage: \`${client.getPrefix(message.guild.id)}rename <nouveau_nom>\``);
         }
         
-        if (newName.length < 3 || newName.length > 100) {
-            return message.reply('Le nom doit contenir entre 3 et 100 caractères.');
+        if (newName.length < 2 || newName.length > 100) {
+            return message.reply('Le nom doit contenir entre 2 et 100 caractères.');
         }
         
         // Ajouter le préfixe ticket- si c'est un ticket et que le nom ne l'a pas déjà
@@ -40,7 +40,7 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setTitle('Salon renommé')
                 .setDescription(`Le salon a été renommé en \`${finalName}\` par ${message.author}`)
-                .setColor('#00ff00')
+                .setColor('0099FF')
                 .setTimestamp();
             
             await message.channel.send({ embeds: [embed] });

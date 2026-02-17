@@ -2,7 +2,7 @@ const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     name: 'profile',
-    description: 'Affiche votre profil avec avatars et bannières',
+    description: 'Affiche le profil avec avatars et bannières d\'un utilisateur',
     async execute(message, args, client) {
         const user = message.mentions.users.first() || message.author;
         
@@ -12,17 +12,17 @@ module.exports = {
         
         const embed = new EmbedBuilder()
             .setTitle(`Profil de ${fetchedUser.username}`)
-            .setColor('#FFFFFF')
-            .setThumbnail(fetchedUser.displayAvatarURL({ dynamic: true, size: 256 }))
+            .setColor('FFFFFF')
+            .setThumbnail(fetchedUser.displayAvatarURL({ dynamic: true, size: 512 }))
             .addFields(
                 {
                     name: 'Informations',
-                    value: `**Nom:** ${fetchedUser.username}\n**Tag:** ${fetchedUser.tag}\n**ID:** ${fetchedUser.id}`,
+                    value: `Nom: ${fetchedUser.username}\nTag: ${fetchedUser.tag}\nID: ${fetchedUser.id}`,
                     inline: false
                 },
                 {
                     name: 'Dates',
-                    value: `**Créé le:** ${fetchedUser.createdAt.toLocaleDateString('fr-FR')}\n**Rejoint le:** ${member ? member.joinedAt.toLocaleDateString('fr-FR') : 'Non disponible'}`,
+                    value: `Créé le: ${fetchedUser.createdAt.toLocaleDateString('fr-FR')}\nRejoint le: ${member ? member.joinedAt.toLocaleDateString('fr-FR') : 'Non disponible'}`,
                     inline: false
                 }
             )
@@ -30,7 +30,7 @@ module.exports = {
             .setTimestamp();
         
         // Avatar principal
-        const mainAvatar = fetchedUser.displayAvatarURL({ dynamic: true, size: 2048 });
+        const mainAvatar = fetchedUser.displayAvatarURL({ dynamic: true, size: 512 });
         embed.addFields({
             name: 'Avatar principal',
             value: `[Voir en HD](${mainAvatar})`,
@@ -39,7 +39,7 @@ module.exports = {
         
         // Avatar serveur (si différent)
         if (member && member.displayAvatarURL({ dynamic: true }) !== fetchedUser.displayAvatarURL({ dynamic: true })) {
-            const serverAvatar = member.displayAvatarURL({ dynamic: true, size: 2048 });
+            const serverAvatar = member.displayAvatarURL({ dynamic: true, size: 512 });
             embed.addFields({
                 name: 'Avatar serveur',
                 value: `[Voir en HD](${serverAvatar})`,
@@ -56,7 +56,7 @@ module.exports = {
         }
         
         // Bannière principale (Nitro)
-        const mainBanner = fetchedUser.bannerURL({ dynamic: true, size: 2048 });
+        const mainBanner = fetchedUser.bannerURL({ dynamic: true, size: 512 });
         if (mainBanner) {
             embed.addFields({
                 name: 'Bannière principale (Nitro)',
@@ -73,7 +73,7 @@ module.exports = {
         
         // Bannière serveur
         if (member && member.bannerURL()) {
-            const serverBanner = member.bannerURL({ dynamic: true, size: 2048 });
+            const serverBanner = member.bannerURL({ dynamic: true, size: 512 });
             embed.addFields({
                 name: 'Bannière serveur',
                 value: `[Voir en HD](${serverBanner})`,

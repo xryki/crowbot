@@ -18,7 +18,12 @@ module.exports = {
         
         try {
             await target.timeout(null);
-            message.reply(`${target.user.tag} n'est plus **timeout**.`);
+            const replyMessage = await message.reply(`${target.user.tag} n'est plus timeout.`);
+            
+            // Supprimer le message du bot après  secondes
+            setTimeout(() => {
+                replyMessage.delete().catch(console.error);
+            }, );
             
             // Envoyer les logs
             await client.sendLog(message.guild, 'Unmute', message.member, target, 'Mute retiré');

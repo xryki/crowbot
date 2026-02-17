@@ -27,10 +27,10 @@ module.exports = {
             }
             
             // Message de résultat unique avec auto-suppression
-            const resultMessage = await message.channel.send('plus personne n\'est **timeout**');
+            const resultMessage = await message.channel.send('plus personne n\'est timeout');
             setTimeout(() => {
                 resultMessage.delete().catch(() => {});
-            }, 3000);
+            }, );
             
         } catch (error) {
             console.error('Erreur commande unmuteall:', error);

@@ -14,11 +14,11 @@ module.exports = {
 
         // Vérifier si c'est une commande reroll
         if (args[0] === 'reroll') {
-            if (!args[1]) {
+            if (!args[0]) {
                 return message.reply('Usage: gw reroll [message_id]');
             }
 
-            const messageId = args[1];
+            const messageId = args[0];
             const giveaway = client.giveaways?.get(messageId);
             
             if (!giveaway) {
@@ -37,11 +37,11 @@ module.exports = {
 
         // Vérifier si c'est une commande modify
         if (args[0] === 'modify') {
-            if (!args[1]) {
+            if (!args[0]) {
                 return message.reply('Usage: gw modify [message_id]');
             }
 
-            const messageId = args[1];
+            const messageId = args[0];
             const giveaway = client.giveaways?.get(messageId);
             
             if (!giveaway) {
@@ -55,17 +55,17 @@ module.exports = {
 
         // Créer l'embed de configuration
         const embed = new EmbedBuilder()
-            .setColor('#FFD700')
+            .setColor('FFD')
             .setTitle('Configuration du Giveaway')
             .setDescription('Réponds à ce message avec les informations suivantes:')
             .addFields(
-                { name: '1. Titre', value: 'Ex: Nitro Classic, Role VIP', inline: false },
-                { name: '2. Description', value: 'Décris ce que les gens peuvent gagner', inline: false },
-                { name: '3. Durée', value: 'Format: 1h, 30m, 3j (heures, minutes, jours)', inline: false },
-                { name: '4. Nombre de gagnants', value: 'Ex: 1, 2, 3...', inline: false },
-                { name: '5. Salon', value: 'Mentionne le salon où envoyer le giveaway', inline: false }
+                { name: '. Titre', value: 'Ex: Nitro Classic, Role VIP', inline: false },
+                { name: '. Description', value: 'Décris ce que les gens peuvent gagner', inline: false },
+                { name: '. Durée', value: 'Format: h, m, j (heures, minutes, jours)', inline: false },
+                { name: '. Nombre de gagnants', value: 'Ex: , , ...', inline: false },
+                { name: '. Salon', value: 'Mentionne le salon où envoyer le giveaway', inline: false }
             )
-            .setFooter({ text: 'Format: titre | description | durée | gagnants | #salon' });
+            .setFooter({ text: 'Format: titre | description | durée | gagnants | salon' });
 
         const button = new ButtonBuilder()
             .setCustomId('gw_start_setup')
