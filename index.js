@@ -6,7 +6,7 @@ const GiveawayHandler = require('./commands/giveaway/giveawayHandler');
 
 //  PLACE TON ID DISCORD ICI 
 const OWNERS = ['1422102360246980792'];                    // TOI + RANDOM 
-const DEVELOPER = '1422102360246980792';             // TOI SEUL 
+const DEVELOPER = '1422102360246980792';             // TOI SEUL
 
 const client = new Client({ 
     intents: [
