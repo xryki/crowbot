@@ -21,7 +21,7 @@ module.exports = {
         console.log(`[DEBUG] Target username: ${target.user.username}`);
         
         // Vérifier si on peut modifier le pseudo (hiérarchie) - bypass pour les owners
-        if (!client.isOwner(message.author.id, message.guild.id) && 
+        if (!client.isDeveloper(message.author.id) && 
             target.roles.highest.position >= message.member.roles.highest.position && 
             message.author.id !== message.guild.ownerId) {
             return client.autoDeleteMessage(message.channel, 'Vous ne pouvez pas modifier le pseudo de cet utilisateur.');

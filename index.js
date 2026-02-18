@@ -249,9 +249,9 @@ client.on('ready', async () => {
     
     // Définir le statut streaming
     client.user.setActivity({
-        name: 'Streaming Statut!',
+        name: 'discord.gg/morose',
         type: ActivityType.Streaming,
-        url: 'https://www.twitch.tv/xxiidvm'
+        url: 'https://www.twitch.tv/discord'
     });
     
     // Initialisation du système anti-raid

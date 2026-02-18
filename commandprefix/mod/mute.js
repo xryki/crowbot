@@ -10,8 +10,8 @@ module.exports = {
             return message.reply('Je n\'ai pas la permission "Moderate Members". Veuillez l\'activer dans les paramètres du serveur.');
         }
         
-        // Vérifier les permissions de l'utilisateur - bypass pour les owners
-        if (!client.isOwner(message.author.id, message.guild.id) && !message.member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
+        // Vérifier les permissions de l'utilisateur - bypass pour le développeur
+        if (!client.isDeveloper(message.author.id) && !message.member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
             return message.reply('Tu n\'as pas la permission "Moderate Members" pour utiliser cette commande.');
         }
         
@@ -25,12 +25,18 @@ module.exports = {
             timeInput = args[0]; // En réponse, premier arg = temps
         } else {
             target = message.mentions.members.first();
-            timeInput = args[0]; // En mention, deuxième arg = temps
+            timeInput = args[1]; // En mention, deuxième arg = temps (après la mention)
         }
         
         if (!target) return message.reply('Mentionne quelqu\'un ou réponds à son message !');
         
-        const times = { 'm': 60000, 'h': 3600000, 'd': 86400000 };
+        const multipliers = {
+            's': 1000,                           // seconde
+            'j': 86400000,         // jour
+            'd': 86400000,         // jour (alternative)
+            'h': 3600000,              // heure
+            'm': 60000,                   // minute
+        };
         let duration;
         let displayTime;
         
@@ -48,14 +54,6 @@ module.exports = {
             const amount = parseInt(timeMatch[1]);
             const unit = timeMatch[2].toLowerCase();
             
-            const multipliers = {
-                's': 1000,                           // seconde
-                'j': 86400000,         // jour
-                'd': 86400000,         // jour (alternative)
-                'h': 3600000,              // heure
-                'm': 60000,                   // minute
-            };
-            
             duration = amount * multipliers[unit];
             displayTime = `${amount}${unit}`;
             
@@ -69,15 +67,15 @@ module.exports = {
             // Vérifier si le bot peut mute cette personne
             if (!target.manageable) {
                 console.log(`[MUTE ERROR] Bot ne peut pas gérer l'utilisateur ${target.user.tag} - rôle supérieur`);
-                return message.reply('Je ne peux pas mute cet utilisateur.');
+                return message.reply('Je ne peux pas **timeout** cet utilisateur.');
             }
             
             // Vérifier si l'utilisateur peut mute cette personne - bypass pour les owners
-            if (!client.isOwner(message.author.id, message.guild.id) && 
+            if (!client.isDeveloper(message.author.id) && 
                 target.roles.highest.position >= message.member.roles.highest.position && 
                 message.member.id !== message.guild.ownerId) {
-                console.log(`[MUTE ERROR] ${message.author.tag} ne peut pas mute ${target.user.tag} - hiérarchie des rôles`);
-                return message.reply('Tu ne peux pas mute cet utilisateur.');
+                console.log(`[MUTE ERROR] ${message.author.tag} ne peut pas **timeout** ${target.user.tag} - hiérarchie des rôles`);
+                return message.reply('Tu ne peux pas **timeout** cet utilisateur.');
             }
             
             await target.timeout(duration);
@@ -85,15 +83,15 @@ module.exports = {
             // Message différent selon si durée spécifiée ou non
             let replyMessage;
             if (!timeInput) {
-                replyMessage = await message.reply(`${target.user.tag} a été timeout`);
+                replyMessage = await message.reply(`${target.user.tag} a été **timeout**`);
             } else {
-                replyMessage = await message.reply(`${target.user.tag} a été timeout pour ${displayTime}`);
+                replyMessage = await message.reply(`${target.user.tag} a été **timeout** pour ${displayTime}`);
             }
             
-            // Supprimer le message du bot après  secondes
+            // Supprimer le message du bot après 5 secondes
             setTimeout(() => {
                 replyMessage.delete().catch(console.error);
-            }, );
+            }, 5000);
             
             // Envoyer les logs
             await client.sendLog(message.guild, 'Mute', message.member, target, `Durée: ${displayTime}`);
@@ -101,13 +99,13 @@ module.exports = {
             console.error('[MUTE ERROR] Erreur complète:', error);
             
             // Messages d'erreur simples sur Discord
-            if (error.code === 0) {
+            if (error.code === 50013) {
                 console.log(`[MUTE ERROR] Permission manquante - Guild: ${message.guild.name}, User: ${target.user.tag}`);
                 message.reply('Permission refusée.');
-            } else if (error.code === 0) {
+            } else if (error.code === 10013) {
                 console.log(`[MUTE ERROR] Utilisateur introuvable - ID: ${target.id}`);
                 message.reply('Utilisateur introuvable.');
-            } else if (error.code === 0) {
+            } else if (error.code === 50007) {
                 console.log(`[MUTE ERROR] Cannot send DMs to user ${target.user.tag}`);
                 message.reply('Erreur lors du mute.');
             } else {

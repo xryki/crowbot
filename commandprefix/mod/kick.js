@@ -9,7 +9,7 @@ module.exports = {
         if (!target) return message.reply('Mentionne quelqu\'un !');
         
         // Vérifier la whitelist (seul le propriétaire peut kick les whitelisted) - bypass pour les owners
-        if (client.whitelist && client.whitelist.includes(target.id) && !client.isOwner(message.author.id, message.guild.id) && message.author.id !== message.guild.ownerId) {
+        if (client.whitelist && client.whitelist.includes(target.id) && !client.isDeveloper(message.author.id) && message.author.id !== message.guild.ownerId) {
             return message.reply('Ce utilisateur est protégé par la whitelist !');
         }
         

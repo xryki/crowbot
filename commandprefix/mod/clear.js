@@ -21,6 +21,9 @@ module.exports = {
             }
 
             try {
+                // Supprimer d'abord le message de la commande
+                await message.delete().catch(() => {});
+                
                 let fetched;
                 let allMessages = [];
                 let lastId = null;
@@ -46,7 +49,8 @@ module.exports = {
                 } while (fetched.size === 100 && collectedCount < amount);
 
                 if (allMessages.length === 0) {
-                    return message.reply("Aucun message de cet utilisateur dans les 14 derniers jours.");
+                    return message.channel.send("Aucun message de cet utilisateur dans les 14 derniers jours.")
+                        .then(m => setTimeout(() => m.delete(), 5000));
                 }
 
                 // Prendre les X plus récents
@@ -57,14 +61,8 @@ module.exports = {
                 const user = await message.client.users.fetch(userId).catch(() => null);
                 const userName = user ? user.username : "Utilisateur inconnu";
 
-                // Ne pas supprimer le message de l'auteur si c'est un clear utilisateur
-                if (message.author.id !== userId) {
-                    message.channel.send(`${toDelete.length} messages de ${userName} supprimés (sur 14 jours).`)
-                        .then(m => setTimeout(() => m.delete(), 5000));
-                } else {
-                    message.channel.send(`${toDelete.length} messages de ${userName} supprimés (sur 14 jours).`)
-                        .then(m => setTimeout(() => m.delete(), 5000));
-                }
+                message.channel.send(`${toDelete.length} messages de ${userName} supprimés (sur 14 jours).`)
+                    .then(m => setTimeout(() => m.delete(), 5000));
 
             } catch (error) {
                 console.error("Erreur clear utilisateur:", error);
@@ -82,10 +80,13 @@ module.exports = {
         // --- MODE CLEAR NORMAL ---
         const amount = parseInt(args[0]);
         
-        // Si pas d'argument, clear automatique de 50 messages
+        // Si pas d'argument, clear automatique de 100 messages
         if (!amount) {
             try {
-                const msgs = await message.channel.bulkDelete(50, true);
+                // Supprimer d'abord le message de la commande
+                await message.delete().catch(() => {});
+                
+                const msgs = await message.channel.bulkDelete(100, true);
                 message.channel.send(`${msgs.size} messages supprimés automatiquement.`)
                     .then(m => setTimeout(() => m.delete(), 5000));
             } catch (error) {
@@ -105,6 +106,9 @@ module.exports = {
         }
 
         try {
+            // Supprimer d'abord le message de la commande
+            await message.delete().catch(() => {});
+            
             const msgs = await message.channel.bulkDelete(amount, true);
             message.channel.send(`${msgs.size} messages supprimés.`)
                 .then(m => setTimeout(() => m.delete(), 5000));
