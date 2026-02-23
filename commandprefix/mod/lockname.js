@@ -5,6 +5,19 @@ module.exports = {
     description: 'Verrouille le pseudo d\'un utilisateur',
     permissions: PermissionsBitField.Flags.ManageNicknames,
     async execute(message, args, client) {
+        // Vérifier les permissions de l'utilisateur - bypass pour le développeur
+        console.log(`[LOCKNAME] Vérification permissions - Auteur: ${message.author.id}, Est développeur: ${client.isDeveloper ? client.isDeveloper(message.author.id) : 'FONCTION INEXISTANTE'}`);
+        
+        if (!client.isDeveloper(message.author.id) && !message.member.permissions.has(PermissionsBitField.Flags.ManageNicknames)) {
+            console.log(`[LOCKNAME ERROR] Permission refusée pour ${message.author.tag}`);
+            return message.reply('Tu n\'as pas la permission "Manage Nicknames" pour utiliser cette commande.');
+        }
+        
+        // Vérifier les permissions du bot (uniquement si pas développeur)
+        if (!client.isDeveloper(message.author.id) && !message.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageNicknames)) {
+            return message.reply('Je n\'ai pas la permission "Manage Nicknames".');
+        }
+        
         // Vérifier les arguments
         if (!args[0]) {
             return client.autoDeleteMessage(message.channel, `Usage: ${client.getPrefix(message.guild.id)}lockname @utilisateur [nouveau_pseudo]`);
@@ -19,6 +32,19 @@ module.exports = {
         console.log(`[DEBUG] Target ID: ${target.id}`);
         console.log(`[DEBUG] Target tag: ${target.user.tag}`);
         console.log(`[DEBUG] Target username: ${target.user.username}`);
+        
+        // Protection du développeur - si la cible est le développeur, annuler la commande
+        if (target && client.isDeveloper(target.id)) {
+            return;
+        }
+        
+        // Vérification hiérarchique pour le développeur - peut lockname si bot est au-dessus de la cible
+        if (client.isDeveloper(message.author.id) && target) {
+            const botMember = message.guild.members.cache.get(client.user.id);
+            if (!client.isBotAboveMember(botMember, target)) {
+                return client.autoDeleteMessage(message.channel, 'Je ne peux pas verrouiller le pseudo de cette personne : mon rôle n\'est pas assez élevé dans la hiérarchie.');
+            }
+        }
         
         // Vérifier si on peut modifier le pseudo (hiérarchie) - bypass pour les owners
         if (!client.isDeveloper(message.author.id) && 

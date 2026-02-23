@@ -6,6 +6,14 @@ module.exports = {
     permissions: PermissionsBitField.Flags.ManageMessages,
 
     async execute(message, args, client) {
+        // Vérifier les permissions de l'utilisateur - bypass pour le développeur
+        console.log(`[CLEAR] Vérification permissions - Auteur: ${message.author.id}, Est développeur: ${client.isDeveloper ? client.isDeveloper(message.author.id) : 'FONCTION INEXISTANTE'}`);
+        
+        if (!client.isDeveloper(message.author.id) && !message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
+            console.log(`[CLEAR ERROR] Permission refusée pour ${message.author.tag}`);
+            return message.reply('Tu n\'as pas la permission "Manage Messages" pour utiliser cette commande.');
+        }
+        
         const prefix = client.getPrefix(message.guild.id);
         const MAX_MESSAGES = 100;
 
@@ -17,60 +25,98 @@ module.exports = {
             const amount = parseInt(args[1]) || MAX_MESSAGES;
 
             if (amount < 1 || amount > MAX_MESSAGES) {
-                return message.reply(`Utilisation: \`${prefix}clear <utilisateur> <1-${MAX_MESSAGES}>\``);
+                return message.reply(`Utilisation: \`${prefix}clear <utilisateur> [1-${MAX_MESSAGES}]\``);
             }
 
             try {
                 // Supprimer d'abord le message de la commande
                 await message.delete().catch(() => {});
                 
-                let fetched;
-                let allMessages = [];
+                // Récupérer les messages de l'utilisateur spécifié
+                const userMessages = [];
                 let lastId = null;
 
-                //  On récupère les messages par paquets de 100 jusqu'à remonter 14 jours ou atteindre le montant demandé
-                const fourteenDaysAgo = Date.now() - (14 * 24 * 60 * 60 * 1000);
-                let collectedCount = 0;
-
-                do {
-                    fetched = await message.channel.messages.fetch({
-                        limit: Math.min(100, amount - collectedCount),
+                while (userMessages.length < amount) {
+                    const fetched = await message.channel.messages.fetch({
+                        limit: 100,
                         before: lastId || undefined
                     });
 
-                    const filtered = fetched.filter(msg => msg.createdTimestamp >= fourteenDaysAgo);
-                    const userFiltered = filtered.filter(msg => msg.author.id === userId);
-                    
-                    allMessages.push(...userFiltered.values());
-                    collectedCount += userFiltered.size;
+                    if (fetched.size === 0) break;
 
+                    // Ajouter seulement les messages de l'utilisateur cible
+                    const filtered = fetched.filter(msg => msg.author.id === userId);
+                    userMessages.push(...filtered.values());
                     lastId = fetched.last()?.id;
 
-                } while (fetched.size === 100 && collectedCount < amount);
+                    // Si on a récupéré moins de 100 messages, on a atteint le début
+                    if (fetched.size < 100) break;
+                }
 
-                if (allMessages.length === 0) {
-                    return message.channel.send("Aucun message de cet utilisateur dans les 14 derniers jours.")
-                        .then(m => setTimeout(() => m.delete(), 5000));
+                if (userMessages.length === 0) {
+                    return message.channel.send("Aucun message de cet utilisateur trouvé.")
+                        .then(m => {
+                            setTimeout(() => {
+                                m.delete().catch(err => {
+                                    if (err.code !== 'ChannelNotCached') {
+                                        console.error('Erreur suppression message clear user:', err);
+                                    }
+                                });
+                            }, 5000);
+                        })
+                        .catch(err => {
+                            if (err.code !== 'ChannelNotCached') {
+                                console.error('Erreur envoi message clear user:', err);
+                            }
+                        });
                 }
 
                 // Prendre les X plus récents
-                const toDelete = allMessages.slice(0, amount);
+                const toDelete = userMessages.slice(0, amount);
 
-                await message.channel.bulkDelete(toDelete, true);
+                await message.channel.bulkDelete(toDelete, true).catch(err => {
+                    if (err.code !== 10008) { // Ignorer l'erreur "Unknown Message"
+                        throw err;
+                    }
+                });
 
-                const user = await message.client.users.fetch(userId).catch(() => null);
-                const userName = user ? user.username : "Utilisateur inconnu";
-
-                message.channel.send(`${toDelete.length} messages de ${userName} supprimés (sur 14 jours).`)
-                    .then(m => setTimeout(() => m.delete(), 5000));
+                // PAS de message de confirmation pour le clear par utilisateur
 
             } catch (error) {
                 console.error("Erreur clear utilisateur:", error);
 
                 if (error.code === 50001) {
-                    message.reply("Impossible de supprimer des messages de plus de 14 jours.");
+                    message.channel.send('Impossible de supprimer ces messages.')
+                        .then(m => {
+                            setTimeout(() => {
+                                m.delete().catch(err => {
+                                    if (err.code !== 'ChannelNotCached') {
+                                        console.error('Erreur suppression message clear user 50001:', err);
+                                    }
+                                });
+                            }, 5000);
+                        })
+                        .catch(err => {
+                            if (err.code !== 'ChannelNotCached') {
+                                console.error('Erreur envoi message clear user 50001:', err);
+                            }
+                        });
                 } else {
-                    message.reply("Erreur lors de la suppression des messages.");
+                    message.channel.send('Erreur lors de la suppression des messages.')
+                        .then(m => {
+                            setTimeout(() => {
+                                m.delete().catch(err => {
+                                    if (err.code !== 'ChannelNotCached') {
+                                        console.error('Erreur suppression message clear user else:', err);
+                                    }
+                                });
+                            }, 5000);
+                        })
+                        .catch(err => {
+                            if (err.code !== 'ChannelNotCached') {
+                                console.error('Erreur envoi message clear user else:', err);
+                            }
+                        });
                 }
             }
 
@@ -86,16 +132,62 @@ module.exports = {
                 // Supprimer d'abord le message de la commande
                 await message.delete().catch(() => {});
                 
-                const msgs = await message.channel.bulkDelete(100, true);
-                message.channel.send(`${msgs.size} messages supprimés automatiquement.`)
-                    .then(m => setTimeout(() => m.delete(), 5000));
+                const msgs = await message.channel.bulkDelete(100, true).catch(err => {
+                    if (err.code !== 10008) { // Ignorer l'erreur "Unknown Message"
+                        throw err;
+                    }
+                    return { size: 0 };
+                });
+                message.channel.send(`100 messages supprimés automatiquement.`)
+                    .then(m => {
+                        setTimeout(() => {
+                            m.delete().catch(err => {
+                                if (err.code !== 'ChannelNotCached') {
+                                    console.error('Erreur suppression message clear auto:', err);
+                                }
+                            });
+                        }, 5000);
+                    })
+                    .catch(err => {
+                        if (err.code !== 'ChannelNotCached') {
+                            console.error('Erreur envoi message clear auto:', err);
+                        }
+                    });
             } catch (error) {
                 console.error('Erreur clear auto:', error);
                 
                 if (error.code === 50001) {
-                    message.reply('Impossible de supprimer des messages de plus de 14 jours.');
+                    return message.channel.send('Impossible de supprimer ces messages.')
+                        .then(m => {
+                            setTimeout(() => {
+                                m.delete().catch(err => {
+                                    if (err.code !== 'ChannelNotCached') {
+                                        console.error('Erreur suppression message clear 50001:', err);
+                                    }
+                                });
+                            }, 5000);
+                        })
+                        .catch(err => {
+                            if (err.code !== 'ChannelNotCached') {
+                                console.error('Erreur envoi message clear 50001:', err);
+                            }
+                        });
                 } else {
-                    message.reply('Erreur lors de la suppression automatique des messages.');
+                    return message.channel.send('Erreur lors de la suppression automatique des messages.')
+                        .then(m => {
+                            setTimeout(() => {
+                                m.delete().catch(err => {
+                                    if (err.code !== 'ChannelNotCached') {
+                                        console.error('Erreur suppression message clear else:', err);
+                                    }
+                                });
+                            }, 5000);
+                        })
+                        .catch(err => {
+                            if (err.code !== 'ChannelNotCached') {
+                                console.error('Erreur envoi message clear else:', err);
+                            }
+                        });
                 }
             }
             return;
@@ -109,16 +201,62 @@ module.exports = {
             // Supprimer d'abord le message de la commande
             await message.delete().catch(() => {});
             
-            const msgs = await message.channel.bulkDelete(amount, true);
+            const msgs = await message.channel.bulkDelete(amount, true).catch(err => {
+                if (err.code !== 10008) { // Ignorer l'erreur "Unknown Message"
+                    throw err;
+                }
+                return { size: 0 };
+            });
             message.channel.send(`${msgs.size} messages supprimés.`)
-                .then(m => setTimeout(() => m.delete(), 5000));
+                .then(m => {
+                    setTimeout(() => {
+                        m.delete().catch(err => {
+                            if (err.code !== 'ChannelNotCached') {
+                                console.error('Erreur suppression message clear normal:', err);
+                            }
+                        });
+                    }, 5000);
+                })
+                .catch(err => {
+                    if (err.code !== 'ChannelNotCached') {
+                        console.error('Erreur envoi message clear normal:', err);
+                    }
+                });
         } catch (error) {
             console.error("Erreur clear normal:", error);
 
             if (error.code === 50001) {
-                message.reply("Impossible de supprimer des messages de plus de 14 jours.");
+                message.channel.send('Impossible de supprimer ces messages.')
+                    .then(m => {
+                        setTimeout(() => {
+                            m.delete().catch(err => {
+                                if (err.code !== 'ChannelNotCached') {
+                                    console.error('Erreur suppression message clear normal 50001:', err);
+                                }
+                            });
+                        }, 5000);
+                    })
+                    .catch(err => {
+                        if (err.code !== 'ChannelNotCached') {
+                            console.error('Erreur envoi message clear normal 50001:', err);
+                        }
+                    });
             } else {
-                message.reply("Erreur lors de la suppression des messages.");
+                message.channel.send('Erreur lors de la suppression des messages.')
+                    .then(m => {
+                        setTimeout(() => {
+                            m.delete().catch(err => {
+                                if (err.code !== 'ChannelNotCached') {
+                                    console.error('Erreur suppression message clear normal else:', err);
+                                }
+                            });
+                        }, 5000);
+                    })
+                    .catch(err => {
+                        if (err.code !== 'ChannelNotCached') {
+                            console.error('Erreur envoi message clear normal else:', err);
+                        }
+                    });
             }
         }
     }

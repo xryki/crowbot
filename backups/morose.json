@@ -1,0 +1,645 @@
+{
+  "timestamp": "2026-02-14T12:49:01.372Z",
+  "customName": "morose",
+  "serverInfo": {
+    "name": "morose",
+    "icon": "https://cdn.discordapp.com/icons/1466542414201229427/a_37fdc09cef88cf7e26f1bed3b35f70e5.gif",
+    "banner": null,
+    "description": null,
+    "ownerId": "1383288283433406584",
+    "memberCount": 47,
+    "createdAt": "2026-01-29T21:15:58.586Z"
+  },
+  "channels": [
+    {
+      "id": "1471505484606345299",
+      "name": "cmd",
+      "type": 0,
+      "position": 2,
+      "parentId": "1471505437634461746",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505479686688962",
+      "name": "aslamalikum",
+      "type": 2,
+      "position": 2,
+      "parentId": "1471505436682485921",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505442445459578",
+      "name": "infos",
+      "type": 4,
+      "position": 2,
+      "parentId": null,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471942176924762135",
+      "name": "nyxo",
+      "type": 2,
+      "position": 1,
+      "parentId": "1471505441593884762",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": [
+        {
+          "id": "1466542414201229427",
+          "type": 0,
+          "allow": "0",
+          "deny": "1049600"
+        },
+        {
+          "id": "1466545848648208610",
+          "type": 0,
+          "allow": "1049600",
+          "deny": "0"
+        }
+      ]
+    },
+    {
+      "id": "1471505441593884762",
+      "name": "❤️‍🩹    vocaux owner",
+      "type": 4,
+      "position": 0,
+      "parentId": null,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505493842333829",
+      "name": "eh hawa",
+      "type": 2,
+      "position": 1,
+      "parentId": "1471505436682485921",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505470572204218",
+      "name": "troudbals vocals",
+      "type": 2,
+      "position": 7,
+      "parentId": "1471505436682485921",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505503245959198",
+      "name": "uhq",
+      "type": 2,
+      "position": 0,
+      "parentId": "1471505436682485921",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471853651625775227",
+      "name": "logs-vocaux",
+      "type": 0,
+      "position": 1,
+      "parentId": "1471853648849010962",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1466542414201229427",
+          "type": 0,
+          "allow": "0",
+          "deny": "68608"
+        },
+        {
+          "id": "1462221795191947344",
+          "type": 1,
+          "allow": "68608",
+          "deny": "0"
+        }
+      ]
+    },
+    {
+      "id": "1471505488481882113",
+      "name": "chat-ct",
+      "type": 0,
+      "position": 0,
+      "parentId": "1471505435424063571",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1466542414201229427",
+          "type": 0,
+          "allow": "0",
+          "deny": "117824"
+        }
+      ]
+    },
+    {
+      "id": "1471505495574712370",
+      "name": "nikiminaj",
+      "type": 2,
+      "position": 6,
+      "parentId": "1471505436682485921",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505481896955966",
+      "name": "annonces",
+      "type": 0,
+      "position": 0,
+      "parentId": "1471505442445459578",
+      "topic": "",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1466542414201229427",
+          "type": 0,
+          "allow": "0",
+          "deny": "2048"
+        }
+      ]
+    },
+    {
+      "id": "1471505460753465405",
+      "name": "gg t dox",
+      "type": 2,
+      "position": 3,
+      "parentId": "1471505436682485921",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505469440000050",
+      "name": "code-of-seduction",
+      "type": 0,
+      "position": 2,
+      "parentId": "1471505442445459578",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1466542414201229427",
+          "type": 0,
+          "allow": "0",
+          "deny": "2048"
+        }
+      ]
+    },
+    {
+      "id": "1471853650140725351",
+      "name": "logs-modération",
+      "type": 0,
+      "position": 0,
+      "parentId": "1471853648849010962",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1466542414201229427",
+          "type": 0,
+          "allow": "0",
+          "deny": "68608"
+        },
+        {
+          "id": "1462221795191947344",
+          "type": 1,
+          "allow": "68608",
+          "deny": "0"
+        }
+      ]
+    },
+    {
+      "id": "1471505436682485921",
+      "name": "vc 1",
+      "type": 4,
+      "position": 4,
+      "parentId": null,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505435424063571",
+      "name": "Help",
+      "type": 4,
+      "position": 7,
+      "parentId": null,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505487538421890",
+      "name": "love-room",
+      "type": 0,
+      "position": 3,
+      "parentId": "1471505437634461746",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505496983732339",
+      "name": "nehess",
+      "type": 2,
+      "position": 0,
+      "parentId": "1471505438536106127",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 4,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505498204274832",
+      "name": "mods",
+      "type": 0,
+      "position": 5,
+      "parentId": "1471505442445459578",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1466542414201229427",
+          "type": 0,
+          "allow": "0",
+          "deny": "117824"
+        }
+      ]
+    },
+    {
+      "id": "1471505443376332946",
+      "name": "hawa x loulou",
+      "type": 2,
+      "position": 0,
+      "parentId": "1471505439601459273",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 2,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505444395811027",
+      "name": "tu sxcll ou tu fais lptit",
+      "type": 2,
+      "position": 1,
+      "parentId": "1471505439601459273",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 2,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505480831729750",
+      "name": "pics",
+      "type": 0,
+      "position": 1,
+      "parentId": "1471505437634461746",
+      "topic": "📸",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505452218191882",
+      "name": "le maillot a fatou",
+      "type": 2,
+      "position": 4,
+      "parentId": "1471505436682485921",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505458291282155",
+      "name": "txt",
+      "type": 0,
+      "position": 0,
+      "parentId": "1471505437634461746",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1466542414201229427",
+          "type": 0,
+          "allow": "0",
+          "deny": "0"
+        }
+      ]
+    },
+    {
+      "id": "1471505438536106127",
+      "name": "sleepcall",
+      "type": 4,
+      "position": 6,
+      "parentId": null,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505450145939672",
+      "name": "tickets",
+      "type": 0,
+      "position": 4,
+      "parentId": "1471505442445459578",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1466542414201229427",
+          "type": 0,
+          "allow": "0",
+          "deny": "2048"
+        }
+      ]
+    },
+    {
+      "id": "1471505489027137662",
+      "name": "lyly uhq",
+      "type": 2,
+      "position": 0,
+      "parentId": "1471505441593884762",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": [
+        {
+          "id": "1466542414201229427",
+          "type": 0,
+          "allow": "0",
+          "deny": "808570448"
+        }
+      ]
+    },
+    {
+      "id": "1471505451173675169",
+      "name": "partenariat",
+      "type": 0,
+      "position": 3,
+      "parentId": "1471505442445459578",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1466542414201229427",
+          "type": 0,
+          "allow": "0",
+          "deny": "2048"
+        }
+      ]
+    },
+    {
+      "id": "1471505453384208487",
+      "name": "on tprend en leuleu",
+      "type": 2,
+      "position": 5,
+      "parentId": "1471505436682485921",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505445825941616",
+      "name": "moderator-only",
+      "type": 0,
+      "position": 1,
+      "parentId": "1471505442445459578",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1466542414201229427",
+          "type": 0,
+          "allow": "0",
+          "deny": "117824"
+        }
+      ]
+    },
+    {
+      "id": "1471853648849010962",
+      "name": "Logs",
+      "type": 4,
+      "position": 1,
+      "parentId": null,
+      "permissionOverwrites": [
+        {
+          "id": "1466542414201229427",
+          "type": 0,
+          "allow": "0",
+          "deny": "68608"
+        },
+        {
+          "id": "1462221795191947344",
+          "type": 1,
+          "allow": "68608",
+          "deny": "0"
+        }
+      ]
+    },
+    {
+      "id": "1471853652644855955",
+      "name": "logs-rôles",
+      "type": 0,
+      "position": 2,
+      "parentId": "1471853648849010962",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1466542414201229427",
+          "type": 0,
+          "allow": "0",
+          "deny": "68608"
+        },
+        {
+          "id": "1462221795191947344",
+          "type": 1,
+          "allow": "68608",
+          "deny": "0"
+        }
+      ]
+    },
+    {
+      "id": "1471844272364851200",
+      "name": "kiffeurs/euses",
+      "type": 2,
+      "position": 2,
+      "parentId": "1471505439601459273",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 3,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471854493795745944",
+      "name": "transcription-ticket",
+      "type": 0,
+      "position": 4,
+      "parentId": "1471853648849010962",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1466542414201229427",
+          "type": 0,
+          "allow": "0",
+          "deny": "1024"
+        }
+      ]
+    },
+    {
+      "id": "1471505437634461746",
+      "name": "chat",
+      "type": 4,
+      "position": 3,
+      "parentId": null,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471505439601459273",
+      "name": "prv",
+      "type": 4,
+      "position": 5,
+      "parentId": null,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1471853654381297705",
+      "name": "logs-chat",
+      "type": 0,
+      "position": 3,
+      "parentId": "1471853648849010962",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1466542414201229427",
+          "type": 0,
+          "allow": "0",
+          "deny": "68608"
+        },
+        {
+          "id": "1462221795191947344",
+          "type": 1,
+          "allow": "68608",
+          "deny": "0"
+        }
+      ]
+    }
+  ],
+  "roles": null,
+  "emojis": [],
+  "stickers": [
+    {
+      "id": "1467924716516802843",
+      "name": "kk",
+      "description": "",
+      "tags": "thumbsup",
+      "url": "https://cdn.discordapp.com/stickers/1467924716516802843.png"
+    },
+    {
+      "id": "1467924796393127988",
+      "name": "kk",
+      "description": "",
+      "tags": "heart",
+      "url": "https://cdn.discordapp.com/stickers/1467924796393127988.png"
+    },
+    {
+      "id": "1467924894992961680",
+      "name": "kk",
+      "description": "",
+      "tags": "thumbsup",
+      "url": "https://cdn.discordapp.com/stickers/1467924894992961680.png"
+    },
+    {
+      "id": "1467924986898546922",
+      "name": "kk",
+      "description": "",
+      "tags": "100",
+      "url": "https://cdn.discordapp.com/stickers/1467924986898546922.png"
+    },
+    {
+      "id": "1467925099570270291",
+      "name": "kk",
+      "description": "",
+      "tags": "x",
+      "url": "https://cdn.discordapp.com/stickers/1467925099570270291.png"
+    },
+    {
+      "id": "1467925193229078548",
+      "name": "kk",
+      "description": "",
+      "tags": "100",
+      "url": "https://cdn.discordapp.com/stickers/1467925193229078548.png"
+    },
+    {
+      "id": "1467925279006654548",
+      "name": "kk",
+      "description": "",
+      "tags": "angry",
+      "url": "https://cdn.discordapp.com/stickers/1467925279006654548.png"
+    },
+    {
+      "id": "1467925357842796646",
+      "name": "kk",
+      "description": "",
+      "tags": "smiling_imp",
+      "url": "https://cdn.discordapp.com/stickers/1467925357842796646.png"
+    },
+    {
+      "id": "1467925459244290225",
+      "name": "kk",
+      "description": "",
+      "tags": "smiling_imp",
+      "url": "https://cdn.discordapp.com/stickers/1467925459244290225.png"
+    },
+    {
+      "id": "1467925554610045053",
+      "name": "kk",
+      "description": "",
+      "tags": "regional_indicator_t",
+      "url": "https://cdn.discordapp.com/stickers/1467925554610045053.png"
+    }
+  ]
+}

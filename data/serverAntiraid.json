@@ -1,0 +1,302 @@
+{
+  "1466542414201229427": {
+    "enabled": true,
+    "antiLink": {
+      "enabled": true,
+      "action": "delete",
+      "whitelist": []
+    },
+    "antiSpam": {
+      "enabled": false,
+      "maxMessages": 5,
+      "timeWindow": 10000,
+      "action": "mute",
+      "whitelist": []
+    },
+    "antiToken": {
+      "enabled": true,
+      "maxAccountAge": 604800000,
+      "action": "kick",
+      "whitelist": []
+    },
+    "antiWebhook": {
+      "enabled": true,
+      "action": "delete",
+      "whitelist": []
+    },
+    "antiBot": {
+      "enabled": false,
+      "action": "kick"
+    },
+    "antiMassMention": {
+      "enabled": false,
+      "maxMentions": 5,
+      "action": "mute"
+    },
+    "antiCaps": {
+      "enabled": false,
+      "maxCaps": 50,
+      "action": "delete"
+    },
+    "antiInvite": {
+      "enabled": false,
+      "action": "delete"
+    },
+    "antiBan": {
+      "enabled": true,
+      "maxBans": 3,
+      "timeWindow": 60000,
+      "action": "lockdown",
+      "whitelist": []
+    },
+    "logChannel": null,
+    "antiban": {
+      "enabled": true
+    },
+    "antiwebhook": {
+      "enabled": true
+    },
+    "antilink": {
+      "enabled": true
+    },
+    "antispam": {
+      "enabled": false
+    },
+    "antitoken": {
+      "enabled": false
+    },
+    "antibot": {
+      "enabled": true
+    },
+    "antimassmention": {
+      "enabled": false
+    },
+    "anticaps": {
+      "enabled": false
+    },
+    "antiinvite": {
+      "enabled": false
+    }
+  },
+  "1454063797198393346": {
+    "enabled": false,
+    "antiLink": {
+      "enabled": false,
+      "action": "delete",
+      "whitelist": []
+    },
+    "antiSpam": {
+      "enabled": false,
+      "maxMessages": 5,
+      "timeWindow": 10000,
+      "action": "mute",
+      "whitelist": []
+    },
+    "antiToken": {
+      "enabled": true,
+      "maxAccountAge": 604800000,
+      "action": "kick",
+      "whitelist": []
+    },
+    "antiWebhook": {
+      "enabled": true,
+      "action": "delete",
+      "whitelist": []
+    },
+    "antiBot": {
+      "enabled": false,
+      "action": "kick"
+    },
+    "antiMassMention": {
+      "enabled": false,
+      "maxMentions": 5,
+      "action": "mute"
+    },
+    "antiCaps": {
+      "enabled": false,
+      "maxCaps": 50,
+      "action": "delete"
+    },
+    "antiInvite": {
+      "enabled": false,
+      "action": "delete"
+    },
+    "antiBan": {
+      "enabled": true,
+      "maxBans": 3,
+      "timeWindow": 60000,
+      "action": "lockdown",
+      "whitelist": []
+    },
+    "logChannel": null
+  },
+  "1411014060623007857": {
+    "enabled": true,
+    "antiLink": {
+      "enabled": true,
+      "action": "delete",
+      "whitelist": []
+    },
+    "antiSpam": {
+      "enabled": false,
+      "maxMessages": 5,
+      "timeWindow": 10000,
+      "action": "mute",
+      "whitelist": []
+    },
+    "antiToken": {
+      "enabled": true,
+      "maxAccountAge": 604800000,
+      "action": "kick",
+      "whitelist": []
+    },
+    "antiWebhook": {
+      "enabled": true,
+      "action": "delete",
+      "whitelist": []
+    },
+    "antiBot": {
+      "enabled": false,
+      "action": "kick"
+    },
+    "antiMassMention": {
+      "enabled": false,
+      "maxMentions": 5,
+      "action": "mute"
+    },
+    "antiCaps": {
+      "enabled": false,
+      "maxCaps": 50,
+      "action": "delete"
+    },
+    "antiInvite": {
+      "enabled": false,
+      "action": "delete"
+    },
+    "antiBan": {
+      "enabled": true,
+      "maxBans": 3,
+      "timeWindow": 60000,
+      "action": "lockdown",
+      "whitelist": []
+    },
+    "logChannel": null,
+    "antiban": {
+      "enabled": true
+    },
+    "antiwebhook": {
+      "enabled": true
+    },
+    "antilink": {
+      "enabled": true
+    },
+    "antispam": {
+      "enabled": false
+    },
+    "antitoken": {
+      "enabled": false
+    },
+    "antibot": {
+      "enabled": true
+    },
+    "antimassmention": {
+      "enabled": false
+    },
+    "anticaps": {
+      "enabled": false
+    },
+    "antiinvite": {
+      "enabled": false
+    }
+  },
+  "1462253213934682405": {
+    "antiban": {
+      "enabled": true
+    },
+    "antiwebhook": {
+      "enabled": true
+    },
+    "antilink": {
+      "enabled": true
+    },
+    "antispam": {
+      "enabled": false
+    },
+    "antitoken": {
+      "enabled": false
+    },
+    "antibot": {
+      "enabled": false
+    },
+    "antimassmention": {
+      "enabled": false
+    },
+    "anticaps": {
+      "enabled": false
+    },
+    "antiinvite": {
+      "enabled": false
+    },
+    "enabled": true
+  },
+  "1473413249062928507": {
+    "enabled": true,
+    "antiban": {
+      "enabled": true
+    },
+    "antiwebhook": {
+      "enabled": true
+    },
+    "antilink": {
+      "enabled": true
+    },
+    "antispam": {
+      "enabled": false
+    },
+    "antitoken": {
+      "enabled": false
+    },
+    "antibot": {
+      "enabled": true
+    },
+    "antimassmention": {
+      "enabled": true
+    },
+    "anticaps": {
+      "enabled": false
+    },
+    "antiinvite": {
+      "enabled": false
+    }
+  },
+  "1458554242565537887": {
+    "enabled": true,
+    "antiban": {
+      "enabled": true
+    },
+    "antiwebhook": {
+      "enabled": true
+    },
+    "antilink": {
+      "enabled": true
+    },
+    "antispam": {
+      "enabled": true
+    },
+    "antitoken": {
+      "enabled": false
+    },
+    "antibot": {
+      "enabled": false
+    },
+    "antimassmention": {
+      "enabled": false
+    },
+    "anticaps": {
+      "enabled": false
+    },
+    "antiinvite": {
+      "enabled": false
+    }
+  }
+}

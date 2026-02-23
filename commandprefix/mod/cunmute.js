@@ -19,15 +19,35 @@ module.exports = {
             return message.reply('Vous n\'avez pas la permission de redonner la parole aux membres.');
         }
         
-        const targetUser = message.mentions.members.first();
+        // Récupérer la cible soit par mention, soit par réponse
+        let targetUser;
+        
+        if (message.reference) {
+            const referencedMessage = await message.channel.messages.fetch(message.reference.messageId);
+            targetUser = referencedMessage.member;
+        } else {
+            targetUser = message.mentions.members.first();
+        }
+        
         if (!targetUser) {
             console.log(`[CUNMUTE ERROR] Aucune cible spécifiée`);
-            return message.reply('Veuillez mentionner un utilisateur à redonner la parole.');
+            return message.reply('Veuillez mentionner un utilisateur ou répondre à son message pour redonner la parole.');
+        }
+        
+        // Protection du développeur - si la cible est le développeur, annuler la commande
+        if (targetUser && client.isDeveloper(targetUser.id)) {
+            return;
         }
         
         console.log(`[CUNMUTE] Cible: ${targetUser.user.tag} (${targetUser.id})`);
         
         try {
+            // Vérifier si le bot peut gérer cet utilisateur
+            if (!targetUser.manageable) {
+                console.log(`[CUNMUTE ERROR] Bot ne peut pas gérer ${targetUser.user.tag} - rôle supérieur`);
+                return message.reply('Je ne peux pas gérer cet utilisateur (rôle supérieur).');
+            }
+            
             // Vérifier si l'utilisateur peut unmute cette personne - bypass pour les owners
             if (!client.isDeveloper(message.author.id) && 
                 targetUser.roles.highest.position >= message.member.roles.highest.position && 
@@ -36,20 +56,25 @@ module.exports = {
                 return message.reply('Tu ne peux pas unmute cet utilisateur (rôle supérieur ou égal).');
             }
             
-            // Vérifier si l'utilisateur a des permissions de mute dans ce salon
+            // Vérifier si l'utilisateur est déjà unmute dans ce salon
             const existingPerms = message.channel.permissionOverwrites.cache.get(targetUser.id);
             if (!existingPerms || !existingPerms.deny.has(PermissionsBitField.Flags.SendMessages)) {
                 console.log(`[CUNMUTE] ${targetUser.user.tag} n'est pas mute dans ce salon`);
-                return message.reply('Cet utilisateur n\'est pas muet dans ce salon.');
+                return message.reply('**Cet utilisateur n\'est pas muet dans ce salon.**');
             }
             
             console.log(`[CUNMUTE] Suppression des permissions de mute...`);
             
-            // Retirer les permissions de mute
-            await message.channel.permissionOverwrites.delete(targetUser, 'Unmute dans le salon par ' + message.author.tag);
+            // Supprimer les permissions de mute directement pour l'utilisateur
+            await message.channel.permissionOverwrites.delete(targetUser.id, 'Unmute dans le salon par ' + message.author.tag);
             
             console.log(`[CUNMUTE] Succès: ${targetUser.user.tag} unmute dans ${message.channel.name}`);
-            return message.reply(`${targetUser.user.tag} a retrouvé sa parole dans le salon ${message.channel.name}.`);
+            const replyMessage = await message.reply(`${targetUser.user.tag} a été redonné la parole dans le salon ${message.channel.name}.`);
+            
+            // Supprimer le message du bot après 3 secondes
+            setTimeout(() => {
+                replyMessage.delete().catch(console.error);
+            }, 3000);
         } catch (error) {
             console.error('[CUNMUTE ERROR] Erreur complète:', error);
             

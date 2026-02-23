@@ -1,0 +1,102 @@
+{
+  "1462253213934682405": {
+    "channelId": "1464341988475404603",
+    "messageId": "1464342034419814543",
+    "categoryId": null,
+    "transcriptChannelId": null,
+    "supportRoleId": null
+  },
+  "1430469062068277290": {
+    "panels": {
+      "support": {
+        "channelId": "1466121307010629935",
+        "messageId": "1466365016834965680",
+        "categoryId": "1466121187297071408",
+        "transcriptChannelId": "1467202911355273408",
+        "supportRoleId": null
+      },
+      "recrutement": {
+        "channelId": "1466121305895076072",
+        "categoryId": "1466121179801714809",
+        "transcriptChannelId": null,
+        "supportRoles": [],
+        "guildId": "1430469062068277290"
+      }
+    }
+  },
+  "1452031287190880299": {
+    "channelId": "1463631456596394098",
+    "messageId": "1464348720828256387",
+    "categoryId": null,
+    "transcriptChannelId": null,
+    "supportRoleId": null
+  },
+  "1462872568536109068": {
+    "channelId": "1464364935373914112",
+    "messageId": "1464365134888698010",
+    "categoryId": null,
+    "transcriptChannelId": null,
+    "supportRoleId": null
+  },
+  "1458554242565537887": {
+    "channelId": "1458556514116833495",
+    "messageId": "1465212487560331469",
+    "categoryId": null,
+    "transcriptChannelId": null,
+    "supportRoleId": null
+  },
+  "1408186881371275274": {
+    "channelId": "1418210871372415117",
+    "messageId": "1465000295816888452",
+    "categoryId": null,
+    "transcriptChannelId": null,
+    "supportRoleId": null
+  },
+  "1464611837059404020": {
+    "channelId": "1464616075252465856",
+    "messageId": "1465032008244924621",
+    "categoryId": null,
+    "transcriptChannelId": null,
+    "supportRoleId": null
+  },
+  "1466542414201229427": {
+    "panels": {
+      "support": {
+        "channelId": "1471505450145939672",
+        "categoryId": null,
+        "transcriptChannelId": "1471854493795745944",
+        "supportRoles": [],
+        "guildId": "1466542414201229427"
+      }
+    }
+  },
+  "1472216021933887512": {
+    "panels": {
+      "support": {
+        "channelId": "1472221461287534765",
+        "categoryId": null,
+        "transcriptChannelId": "1472221469919416402",
+        "supportRoles": [],
+        "guildId": "1472216021933887512"
+      },
+      "recrutement": {
+        "channelId": "1472218379753492582",
+        "categoryId": null,
+        "transcriptChannelId": null,
+        "supportRoles": [],
+        "guildId": "1472216021933887512"
+      }
+    }
+  },
+  "1473735935274254421": {
+    "panels": {
+      "support": {
+        "channelId": "1473771618903003369",
+        "categoryId": null,
+        "transcriptChannelId": "1473771629577506818",
+        "supportRoles": [],
+        "guildId": "1473735935274254421"
+      }
+    }
+  }
+}

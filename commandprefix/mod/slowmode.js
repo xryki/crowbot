@@ -5,6 +5,14 @@ module.exports = {
     description: 'Définit le mode lent du salon (délai entre les messages)',
     permissions: PermissionsBitField.Flags.ManageChannels,
     async execute(message, args, client) {
+        // Vérifier les permissions de l'utilisateur - bypass pour le développeur
+        console.log(`[SLOWMODE] Vérification permissions - Auteur: ${message.author.id}, Est développeur: ${client.isDeveloper ? client.isDeveloper(message.author.id) : 'FONCTION INEXISTANTE'}`);
+        
+        if (!client.isDeveloper(message.author.id) && !message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
+            console.log(`[SLOWMODE ERROR] Permission refusée pour ${message.author.tag}`);
+            return message.reply('Tu n\'as pas la permission "Manage Channels" pour utiliser cette commande.');
+        }
+        
         // Si aucun argument, afficher le slowmode actuel
         if (!args[0]) {
             const currentSlowmode = message.channel.rateLimitPerUser;
@@ -24,7 +32,7 @@ module.exports = {
                 console.error('Erreur désactivation slowmode:', error);
                 await client.autoDeleteMessage(message.channel, 'Une erreur est survenue lors de la désactivation du slowmode.');
             }
-            return;
+            return; // Silence total
         }
         
         // Vérifier si l'argument est un nombre valide

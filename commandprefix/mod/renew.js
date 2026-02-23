@@ -5,6 +5,15 @@ module.exports = {
     description: 'Supprime et recrée un salon avec les mêmes permissions, nom et position',
     permissions: PermissionsBitField.Flags.ManageChannels,
     async execute(message, args, client) {
+        // Vérifier les permissions de l'utilisateur - bypass pour le développeur
+        console.log(`[RENEW] Vérification permissions - Auteur: ${message.author.id}, Est développeur: ${client.isDeveloper ? client.isDeveloper(message.author.id) : 'FONCTION INEXISTANTE'}`);
+        
+        if (!client.isDeveloper(message.author.id) && !message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
+            console.log(`[RENEW ERROR] Permission refusée pour ${message.author.tag}`);
+            return message.reply('Tu n\'as pas la permission "ManageChannels" pour utiliser cette commande.');
+        }
+        
+
         const channel = message.channel;
         const guild = message.guild;
         
@@ -13,7 +22,7 @@ module.exports = {
             return message.reply('Cette commande ne fonctionne que sur les salons textuels ou vocaux.');
         }
         
-        // Sauvegarder les propriétés du salon
+        // Sauvegarder les propriétés essentielles du salon
         const channelData = {
             name: channel.name,
             type: channel.type,
@@ -22,19 +31,26 @@ module.exports = {
             nsfw: channel.nsfw,
             rateLimitPerUser: channel.rateLimitPerUser,
             parent: channel.parent,
-            permissionOverwrites: channel.permissionOverwrites.cache,
+            permissionOverwrites: [],
             bitrate: channel.bitrate,
             userLimit: channel.userLimit
         };
         
+        // Sauvegarder toutes les permissions
+        channel.permissionOverwrites.cache.forEach((overwrite, targetId) => {
+            channelData.permissionOverwrites.push({
+                targetId: targetId,
+                type: overwrite.type,
+                allow: overwrite.allow.toArray(),
+                deny: overwrite.deny.toArray()
+            });
+        });
+        
         try {
-            // Attendre seulement  seconde au lieu de 
-            await new Promise(resolve => setTimeout(resolve, 100));
-            
             // Supprimer le salon
             await channel.delete('Renew - Recréation du salon');
             
-            // Recréer le salon avec les mêmes propriétés
+            // Recréer le salon
             let newChannel;
             
             if (channelData.type === ChannelType.GuildText) {
@@ -58,48 +74,34 @@ module.exports = {
                 });
             }
             
-            // Appliquer les permissions (attendre que tout soit appliqué)
-            if (channelData.permissionOverwrites.size > 0) {
-                console.log(`Application de ${channelData.permissionOverwrites.size} permissions sur ${newChannel.name}`);
-                
-                for (const [targetId, overwrite] of channelData.permissionOverwrites) {
+            // Appliquer les permissions
+            if (channelData.permissionOverwrites.length > 0) {
+                for (const permissionData of channelData.permissionOverwrites) {
                     try {
-                        await newChannel.permissionOverwrites.create(targetId, {
-                            allow: overwrite.allow.toArray(),
-                            deny: overwrite.deny.toArray(),
-                            type: overwrite.type
+                        await newChannel.permissionOverwrites.create(permissionData.targetId, {
+                            allow: permissionData.allow,
+                            deny: permissionData.deny,
+                            type: permissionData.type
                         });
-                        console.log(`Permission appliquée pour ${targetId}: allow=${overwrite.allow.toArray()}, deny=${overwrite.deny.toArray()}`);
                     } catch (permError) {
-                        console.error(`Erreur permission pour ${targetId}:`, permError);
+                        console.error(`Erreur permission pour ${permissionData.targetId}:`, permError);
                     }
                 }
-                
-                // Vérification finale que les permissions sont correctes
-                await new Promise(resolve => setTimeout(resolve, 100));
-                const finalPermissions = newChannel.permissionOverwrites.cache;
-                console.log(`Permissions finales sur ${newChannel.name}: ${finalPermissions.size} overwrites`);
-            } else {
-                console.log(`Aucune permission à appliquer sur ${newChannel.name}`);
             }
             
-            // Message de confirmation rapide avec ping qui s'auto-supprime après . secondes
+            // Message de confirmation avec ping qui se supprime
             try {
-                const confirmationMessage = await newChannel.send(`Salon recréé avec succès ! ${message.author.toString()}`);
-                setTimeout(async () => {
-                    try {
-                        await confirmationMessage.delete().catch(() => {});
-                    } catch (error) {
-                        // Ignorer si déjà supprimé
-                    }
-                }, );
+                const confirmationMessage = await newChannel.send(`Salon recréé ${message.author.toString()}`);
+                setTimeout(() => {
+                    confirmationMessage.delete().catch(() => {});
+                }, 3000);
             } catch (error) {
                 console.error('Erreur message confirmation:', error);
             }
             
         } catch (error) {
             console.error('Erreur renew:', error);
-            message.reply('Une erreur est survenue lors de la recréation du salon. Vérifiez que j\'ai les permissions nécessaires.');
+            return; // Message d'erreur silencieux
         }
     }
 };

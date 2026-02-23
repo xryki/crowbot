@@ -7,14 +7,14 @@ module.exports = {
     async execute(message, args, client) {
         console.log(`[UNMUTE] Commande exécutée par ${message.author.tag}`);
         
-        // Vérifier les permissions du bot
-        if (!message.guild.members.me.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
-            return message.reply('Je n\'ai pas la permission "Moderate Members".');
-        }
-        
         // Vérifier les permissions de l'utilisateur - bypass pour le développeur
         if (!client.isDeveloper(message.author.id) && !message.member.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
             return message.reply('Tu n\'as pas la permission "Moderate Members".');
+        }
+        
+        // Vérifier les permissions du bot (uniquement si pas développeur)
+        if (!client.isDeveloper(message.author.id) && !message.guild.members.me.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
+            return message.reply('Je n\'ai pas la permission "Moderate Members".');
         }
         
         // Récupérer la cible soit par mention, soit par réponse
@@ -28,19 +28,28 @@ module.exports = {
         
         if (!target) return message.reply('Mentionne quelqu\'un ou réponds à son message !');
         
+        // Protection du développeur - si la cible est le développeur, annuler la commande
+        if (target && client.isDeveloper(target.id)) {
+            return;
+        }
+        
+        // Vérification hiérarchique pour le développeur - peut unmute si bot est au-dessus de la cible
+        if (client.isDeveloper(message.author.id) && target) {
+            const botMember = message.guild.members.cache.get(client.user.id);
+            if (!client.isBotAboveMember(botMember, target)) {
+                return message.reply('Je ne peux pas retirer le timeout à cette personne : mon rôle n\'est pas assez élevé dans la hiérarchie.');
+            }
+        }
+        
         console.log(`[UNMUTE] Cible: ${target.user.tag}`);
         
         try {
-            // Vérifier si le bot peut gérer cet utilisateur
-            if (!target.manageable) {
-                return message.reply('Je ne peux pas gérer cet utilisateur.');
-            }
-            
-            // Vérifier si l'utilisateur peut unmute cette personne - bypass pour les owners
-            if (!client.isDeveloper(message.author.id) && 
-                target.roles.highest.position >= message.member.roles.highest.position && 
-                message.member.id !== message.guild.ownerId) {
-                return message.reply('Tu ne peux pas **timeout** cet utilisateur.');
+            // Vérification finale des permissions du bot (même pour le développeur)
+            if (!message.guild.members.me.permissions.has(PermissionsBitField.Flags.ModerateMembers) || 
+                !message.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
+                console.log(`[UNMUTE ERROR] Le bot n'a pas les permissions nécessaires (Moderate Members et/ou Manage Roles) dans ce serveur`);
+                console.log(`[UNMUTE DEBUG] Permissions bot: ModerateMembers=${message.guild.members.me.permissions.has(PermissionsBitField.Flags.ModerateMembers)}, ManageRoles=${message.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles)}`);
+                return;
             }
             
             await target.timeout(null);
@@ -57,9 +66,9 @@ module.exports = {
             console.error('[UNMUTE ERROR] Erreur complète:', error);
             
             if (error.code === 50013) {
-                message.reply('Permission refusée.');
+                return message.reply('Permission refusée.');
             } else {
-                message.reply('Erreur lors du démute.');
+                return message.reply('Erreur lors du démute.');
             }
         }
     }

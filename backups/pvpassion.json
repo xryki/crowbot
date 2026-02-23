@@ -1,0 +1,1241 @@
+{
+  "timestamp": "2026-02-12T13:56:06.322Z",
+  "customName": "pvpassion",
+  "serverInfo": {
+    "name": "pv passion",
+    "icon": "https://cdn.discordapp.com/icons/1463648420760784927/5b1e720eb6ac5a0706e0ac9bf637d835.webp",
+    "banner": null,
+    "description": null,
+    "ownerId": "796422933333409792",
+    "memberCount": 3,
+    "createdAt": "2026-01-21T21:36:16.782Z"
+  },
+  "channels": [
+    {
+      "id": "1463648423168311451",
+      "name": "private tone",
+      "type": 2,
+      "position": 0,
+      "parentId": "1463648423168311450",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 2,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648423168311452",
+      "name": "private talk",
+      "type": 2,
+      "position": 1,
+      "parentId": "1463648423168311450",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 2,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422388170960",
+      "name": "moderator-only",
+      "type": 0,
+      "position": 1,
+      "parentId": "1463648422388170958",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "0",
+          "deny": "3072"
+        }
+      ]
+    },
+    {
+      "id": "1463648423403065556",
+      "name": "logs-voc",
+      "type": 0,
+      "position": 1,
+      "parentId": "1463648423403065554",
+      "topic": "Logs des activités vocales (connexion, déconnexion, déplacement)",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "0",
+          "deny": "1024"
+        }
+      ]
+    },
+    {
+      "id": "1463648423403065554",
+      "name": "Logs",
+      "type": 4,
+      "position": 8,
+      "parentId": null,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "0",
+          "deny": "1024"
+        }
+      ]
+    },
+    {
+      "id": "1463648423168311455",
+      "name": "private vibes",
+      "type": 2,
+      "position": 4,
+      "parentId": "1463648423168311450",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 3,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648423403065548",
+      "name": "sleepcall",
+      "type": 2,
+      "position": 0,
+      "parentId": "1463648423403065547",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 2,
+      "bitrate": 64000,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "0",
+          "deny": "1024"
+        }
+      ]
+    },
+    {
+      "id": "1463648423403065552",
+      "name": "Help",
+      "type": 4,
+      "position": 7,
+      "parentId": null,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422585176255",
+      "name": "🌷    salons vocal 1",
+      "type": 4,
+      "position": 3,
+      "parentId": null,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422388170964",
+      "name": "tickets",
+      "type": 0,
+      "position": 5,
+      "parentId": "1463648422388170958",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "0",
+          "deny": "2048"
+        }
+      ]
+    },
+    {
+      "id": "1463648422388170962",
+      "name": "partenariat",
+      "type": 0,
+      "position": 3,
+      "parentId": "1463648422388170958",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "1024",
+          "deny": "2048"
+        }
+      ]
+    },
+    {
+      "id": "1463648422874841118",
+      "name": "after midnight",
+      "type": 2,
+      "position": 4,
+      "parentId": "1463648422585176255",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "1048576",
+          "deny": "0"
+        }
+      ]
+    },
+    {
+      "id": "1463648422874841119",
+      "name": "low voice only",
+      "type": 2,
+      "position": 5,
+      "parentId": "1463648422585176255",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648423168311449",
+      "name": "charm room",
+      "type": 2,
+      "position": 7,
+      "parentId": "1463648422874841122",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648423403065549",
+      "name": "sleepcall-01",
+      "type": 2,
+      "position": 1,
+      "parentId": "1463648423403065547",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 2,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422874841127",
+      "name": "pretty voices only",
+      "type": 2,
+      "position": 4,
+      "parentId": "1463648422874841122",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422585176251",
+      "name": "hot-zone",
+      "type": 0,
+      "position": 0,
+      "parentId": "1463648422585176250",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "2048",
+          "deny": "0"
+        }
+      ]
+    },
+    {
+      "id": "1463648423168311447",
+      "name": "dont be shy",
+      "type": 2,
+      "position": 5,
+      "parentId": "1463648422874841122",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422585176259",
+      "name": "just us",
+      "type": 2,
+      "position": 3,
+      "parentId": "1463648422585176255",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "0",
+          "deny": "137439264768"
+        }
+      ]
+    },
+    {
+      "id": "1463648422874841125",
+      "name": "sweet trouble",
+      "type": 2,
+      "position": 2,
+      "parentId": "1463648422874841122",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422388170961",
+      "name": "code-of-seduction",
+      "type": 0,
+      "position": 2,
+      "parentId": "1463648422388170958",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "0",
+          "deny": "2048"
+        }
+      ]
+    },
+    {
+      "id": "1463648422874841121",
+      "name": "hot line",
+      "type": 2,
+      "position": 7,
+      "parentId": "1463648422585176255",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648423403065550",
+      "name": "sleepcall room",
+      "type": 2,
+      "position": 2,
+      "parentId": "1463648423403065547",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 3,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648423168311454",
+      "name": "private sexcall",
+      "type": 2,
+      "position": 3,
+      "parentId": "1463648423168311450",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 2,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422585176250",
+      "name": "👅     salons textuels",
+      "type": 4,
+      "position": 2,
+      "parentId": null,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422585176258",
+      "name": "soft voices only",
+      "type": 2,
+      "position": 2,
+      "parentId": "1463648422585176255",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422585176252",
+      "name": "hot-pictures",
+      "type": 0,
+      "position": 1,
+      "parentId": "1463648422585176250",
+      "topic": "📸",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422388170959",
+      "name": "sweet-alerts",
+      "type": 0,
+      "position": 0,
+      "parentId": "1463648422388170958",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "16448",
+          "deny": "377957156864"
+        }
+      ]
+    },
+    {
+      "id": "1463648423168311448",
+      "name": "say less",
+      "type": 2,
+      "position": 6,
+      "parentId": "1463648422874841122",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422585176253",
+      "name": "hot-cmd",
+      "type": 0,
+      "position": 2,
+      "parentId": "1463648422585176250",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "64",
+          "deny": "49152"
+        }
+      ]
+    },
+    {
+      "id": "1463648422388170957",
+      "name": "Nyxo",
+      "type": 2,
+      "position": 1,
+      "parentId": "1463648422388170955",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420857385057",
+          "type": 0,
+          "allow": "1049600",
+          "deny": "0"
+        },
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "0",
+          "deny": "1049600"
+        },
+        {
+          "id": "1463648420928557238",
+          "type": 0,
+          "allow": "1049600",
+          "deny": "0"
+        }
+      ]
+    },
+    {
+      "id": "1463648422874841123",
+      "name": "charm activited",
+      "type": 2,
+      "position": 0,
+      "parentId": "1463648422874841122",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422585176254",
+      "name": "love-room",
+      "type": 0,
+      "position": 3,
+      "parentId": "1463648422585176250",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648423403065547",
+      "name": "👤   sleepcall",
+      "type": 4,
+      "position": 6,
+      "parentId": null,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648423168311450",
+      "name": "👩‍❤️‍👩   private",
+      "type": 4,
+      "position": 5,
+      "parentId": null,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422874841122",
+      "name": "❤️‍🔥    salons vocal 2",
+      "type": 4,
+      "position": 4,
+      "parentId": null,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422388170955",
+      "name": "❤️‍🩹    vocaux owner",
+      "type": 4,
+      "position": 0,
+      "parentId": null,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "0",
+          "deny": "1024"
+        }
+      ]
+    },
+    {
+      "id": "1463648423403065553",
+      "name": "chat-ct",
+      "type": 0,
+      "position": 0,
+      "parentId": "1463648423403065552",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "0",
+          "deny": "1024"
+        }
+      ]
+    },
+    {
+      "id": "1463648422388170956",
+      "name": "sexy passion",
+      "type": 2,
+      "position": 0,
+      "parentId": "1463648422388170955",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420928557235",
+          "type": 0,
+          "allow": "36701952",
+          "deny": "7076595110438993"
+        },
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "0",
+          "deny": "1049600"
+        }
+      ]
+    },
+    {
+      "id": "1463648422874841126",
+      "name": "sugar tone",
+      "type": 2,
+      "position": 3,
+      "parentId": "1463648422874841122",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648423403065555",
+      "name": "logs-chat",
+      "type": 0,
+      "position": 0,
+      "parentId": "1463648423403065554",
+      "topic": "Logs des messages (création, modification, suppression)",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "0",
+          "deny": "1024"
+        }
+      ]
+    },
+    {
+      "id": "1463648422585176257",
+      "name": "late night talk",
+      "type": 2,
+      "position": 1,
+      "parentId": "1463648422585176255",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "0",
+          "deny": "0"
+        }
+      ]
+    },
+    {
+      "id": "1463648422874841120",
+      "name": "no sleep tonight",
+      "type": 2,
+      "position": 6,
+      "parentId": "1463648422585176255",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648423403065551",
+      "name": "sleepcall zone",
+      "type": 2,
+      "position": 3,
+      "parentId": "1463648423403065547",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 4,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422388170963",
+      "name": "mods",
+      "type": 0,
+      "position": 4,
+      "parentId": "1463648422388170958",
+      "topic": null,
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "0",
+          "deny": "1024"
+        }
+      ]
+    },
+    {
+      "id": "1463648423168311453",
+      "name": "private sexcam",
+      "type": 2,
+      "position": 2,
+      "parentId": "1463648423168311450",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 2,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422874841124",
+      "name": "sinlent tension",
+      "type": 2,
+      "position": 1,
+      "parentId": "1463648422874841122",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648422388170958",
+      "name": "🌸     news",
+      "type": 4,
+      "position": 1,
+      "parentId": null,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648423617233128",
+      "name": "logs-role",
+      "type": 0,
+      "position": 2,
+      "parentId": "1463648423403065554",
+      "topic": "Logs des rôles (ajout, retrait, modification)",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "0",
+          "deny": "1024"
+        }
+      ]
+    },
+    {
+      "id": "1463648422585176256",
+      "name": "esex",
+      "type": 2,
+      "position": 0,
+      "parentId": "1463648422585176255",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 0,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1463648423617233129",
+      "name": "logs-commands",
+      "type": 0,
+      "position": 3,
+      "parentId": "1463648423403065554",
+      "topic": "Logs des commandes utilisées",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "permissionOverwrites": [
+        {
+          "id": "1463648420760784927",
+          "type": 0,
+          "allow": "0",
+          "deny": "1024"
+        }
+      ]
+    },
+    {
+      "id": "1463648423168311456",
+      "name": "private hotline",
+      "type": 2,
+      "position": 5,
+      "parentId": "1463648423168311450",
+      "nsfw": false,
+      "rateLimitPerUser": 0,
+      "userLimit": 4,
+      "bitrate": 64000,
+      "permissionOverwrites": []
+    }
+  ],
+  "roles": [
+    {
+      "id": "1463648420857385060",
+      "name": "papa ryz",
+      "color": 0,
+      "position": 25,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420928557238",
+      "name": "Mia",
+      "color": 16777215,
+      "position": 37,
+      "permissions": "8204145864945399",
+      "hoist": true,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420802592823",
+      "name": "mom",
+      "color": 16760049,
+      "position": 14,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648421008113726",
+      "name": "bot",
+      "color": 0,
+      "position": 40,
+      "permissions": "7047321086306015",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420760784935",
+      "name": "Nyxo",
+      "color": 16777215,
+      "position": 8,
+      "permissions": "8",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420760784928",
+      "name": "ND",
+      "color": 0,
+      "position": 1,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420802592820",
+      "name": "S x P",
+      "color": 8539032,
+      "position": 11,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420760784929",
+      "name": "Soumise de Nyxo",
+      "color": 15327456,
+      "position": 2,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420857385059",
+      "name": "sexy 92i",
+      "color": 10158150,
+      "position": 24,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420760784933",
+      "name": "soumise du serv",
+      "color": 0,
+      "position": 6,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1471504905268236445",
+      "name": "Gestion [+]",
+      "color": 0,
+      "position": 41,
+      "permissions": "8",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420928557235",
+      "name": "sexy passion",
+      "color": 9854847,
+      "position": 34,
+      "permissions": "0",
+      "hoist": true,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420928557234",
+      "name": "Rôle perm",
+      "color": 0,
+      "position": 33,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420802592822",
+      "name": "W",
+      "color": 9807270,
+      "position": 13,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420760784936",
+      "name": "passionné",
+      "color": 9807270,
+      "position": 9,
+      "permissions": "0",
+      "hoist": true,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420802592826",
+      "name": "princess",
+      "color": 16735702,
+      "position": 17,
+      "permissions": "0",
+      "hoist": true,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420928557240",
+      "name": "co owner",
+      "color": 8069934,
+      "position": 39,
+      "permissions": "7038523952800645",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420760784931",
+      "name": "perm II",
+      "color": 0,
+      "position": 4,
+      "permissions": "35184610116161",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420802592825",
+      "name": "princess féroce",
+      "color": 1447704,
+      "position": 16,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420802592828",
+      "name": "eaq ダ",
+      "color": 1146986,
+      "position": 19,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420802592824",
+      "name": "S x A x M",
+      "color": 10181046,
+      "position": 15,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648421008113729",
+      "name": "👑 - elite",
+      "color": 16711889,
+      "position": 44,
+      "permissions": "8864258447638527",
+      "hoist": true,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420857385057",
+      "name": "jess x lyly",
+      "color": 11342935,
+      "position": 22,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420857385055",
+      "name": "ℂ𝕙𝕖𝕟 ℤ𝕖𝕟 ⁶₆⁷",
+      "color": 12976128,
+      "position": 20,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420802592827",
+      "name": "uhq",
+      "color": 5439488,
+      "position": 18,
+      "permissions": "49152",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420928557236",
+      "name": "ryry",
+      "color": 657930,
+      "position": 35,
+      "permissions": "6795119335776833",
+      "hoist": true,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420760784934",
+      "name": "perm picture",
+      "color": 0,
+      "position": 7,
+      "permissions": "446676912192",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420857385064",
+      "name": "✿ moderateur ✿",
+      "color": 5025232,
+      "position": 29,
+      "permissions": "6756498952691841",
+      "hoist": true,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420857385058",
+      "name": "kefta",
+      "color": 16731803,
+      "position": 23,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420760784930",
+      "name": "perm I",
+      "color": 0,
+      "position": 3,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420857385063",
+      "name": "★ administrateur ★",
+      "color": 72504,
+      "position": 28,
+      "permissions": "6765845991989953",
+      "hoist": true,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420802592819",
+      "name": "impardonnable",
+      "color": 16746443,
+      "position": 10,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420760784932",
+      "name": "Nyxo x himself",
+      "color": 15592941,
+      "position": 5,
+      "permissions": "8864262743130111",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420857385062",
+      "name": "vocal privilege",
+      "color": 5252132,
+      "position": 27,
+      "permissions": "32555008",
+      "hoist": true,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420857385061",
+      "name": "Rôle perso",
+      "color": 0,
+      "position": 26,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648421008113727",
+      "name": "pa",
+      "color": 986895,
+      "position": 42,
+      "permissions": "8",
+      "hoist": true,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420928557231",
+      "name": "➳ trusted",
+      "color": 2293893,
+      "position": 30,
+      "permissions": "6756636659360321",
+      "hoist": true,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648421008113728",
+      "name": "VIP",
+      "color": 721455,
+      "position": 43,
+      "permissions": "8",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420928557233",
+      "name": "l'hajj du serv",
+      "color": 10303544,
+      "position": 32,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420802592821",
+      "name": "ᴇɴᴅ",
+      "color": 2894892,
+      "position": 12,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420928557237",
+      "name": "Rôle perso owner",
+      "color": 0,
+      "position": 36,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420928557232",
+      "name": "𝑟𝑦𝑧 𝑥 𝑗𝑢𝑗𝑢",
+      "color": 7145785,
+      "position": 31,
+      "permissions": "0",
+      "hoist": true,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420928557239",
+      "name": "papa ryry",
+      "color": 0,
+      "position": 38,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    },
+    {
+      "id": "1463648420857385056",
+      "name": "sexy raffiner",
+      "color": 16742565,
+      "position": 21,
+      "permissions": "0",
+      "hoist": false,
+      "mentionable": false,
+      "icon": null,
+      "unicodeEmoji": null
+    }
+  ],
+  "emojis": [],
+  "stickers": []
+}

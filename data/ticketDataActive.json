@@ -1,0 +1,37 @@
+{
+  "1467583793060642897": {
+    "userId": "1315066334312403045",
+    "panelKey": "support",
+    "reason": "support_general",
+    "createdAt": 1769969641838,
+    "messageId": "1467583795665567744"
+  },
+  "1467999521987625273": {
+    "userId": "1039784517214425168",
+    "panelKey": "support",
+    "reason": "other",
+    "createdAt": 1770068761004,
+    "messageId": "1467999523782529086"
+  },
+  "1469434667970199842": {
+    "userId": "1363991848833515571",
+    "panelKey": "support",
+    "reason": "support_general",
+    "createdAt": 1770410927230,
+    "messageId": "1469434675931119799"
+  },
+  "1469481981908750608": {
+    "userId": "1265798399815323679",
+    "panelKey": "recrutement",
+    "reason": "staff_application",
+    "createdAt": 1770422208167,
+    "messageId": "1469481991203328172"
+  },
+  "1470134249624699133": {
+    "userId": "1459676637338538123",
+    "panelKey": "recrutement",
+    "reason": "staff_application",
+    "createdAt": 1770577719049,
+    "messageId": "1470134251146973385"
+  }
+}

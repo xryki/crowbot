@@ -1,0 +1,23 @@
+{
+  "enabled": false,
+  "antiLink": {
+    "enabled": true,
+    "action": "delete",
+    "whitelist": []
+  },
+  "antiToken": {
+    "enabled": true,
+    "maxAccountAge": 604800000,
+    "action": "kick",
+    "whitelist": []
+  },
+  "antiBan": {
+    "enabled": true,
+    "maxBans": 5,
+    "timeWindow": 10000,
+    "action": "lockdown",
+    "whitelist": []
+  },
+  "globalWhitelist": [],
+  "banHistory": []
+}

@@ -48,7 +48,7 @@ module.exports = {
                 break;
                 
             case 'message':
-                const welcomeMessage = args.slice().join(' ');
+                const welcomeMessage = args.slice(1).join(' ');
                 if (!welcomeMessage) {
                     return message.reply('Écris un message de bienvenue !');
                 }

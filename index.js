@@ -146,6 +146,25 @@ client.isDeveloper = function(userId) {
     return userId === DEVELOPER;
 };
 
+// Fonction pour vérifier si le bot est au-dessus d'un membre spécifique dans la hiérarchie
+client.isBotAboveMember = function(botMember, targetMember) {
+    if (!botMember || !targetMember) return false;
+    
+    const botHighestRole = botMember.roles.highest;
+    const targetHighestRole = targetMember.roles.highest;
+    
+    // Le bot doit être strictement au-dessus du membre ciblé
+    return botHighestRole.position > targetHighestRole.position;
+};
+
+// Fonction pour vérifier si le développeur peut agir sur une cible (bypass si bot au-dessus)
+client.canDeveloperActOn = function(guild, targetMember) {
+    if (!this.isDeveloper(targetMember.id)) return true; // Pas la cible du développeur
+    
+    const botMember = guild.members.cache.get(this.user.id);
+    return this.isBotAboveMember(botMember, targetMember);
+};
+
 // Fonction pour obtenir le préfixe
 client.getPrefix = (guildId) => {
     return guildId ? (client.prefixes[guildId] || '!') : '!';
@@ -170,6 +189,7 @@ client.autoDeleteMessage = async (channel, content, options = {}) => {
 
 // Ajouter la fonction de logs au client
 client.sendLog = async function(guild, action, moderator, target, reason) {
+    if (!guild) return;
     const logChannelId = this.config?.[guild.id]?.modLogs;
     if (!logChannelId) return;
     
@@ -180,7 +200,7 @@ client.sendLog = async function(guild, action, moderator, target, reason) {
     
     const embed = new EmbedBuilder()
         .setTitle(`Modération - ${action}`)
-        .setColor('')
+        .setColor('#000000')
         .addFields(
             { name: 'Modérateur', value: `${moderator.user.tag} (${moderator.id})`, inline: true },
             { name: 'Cible', value: target ? `${target.user.tag} (${target.id})` : 'N/A', inline: true },
@@ -212,7 +232,7 @@ client.sendCommandLog = async function(guild, command, user, args) {
     // Créer un embed différent pour les commandes de modération
     const embed = new EmbedBuilder()
         .setTitle(`Modération - ${command.name.toUpperCase()}`)
-        .setColor(isModCommand ? '#ff0000' : '#00ff00')
+        .setColor('#000000')
         .addFields(
             { name: 'Utilisateur', value: `${user.tag} (${user.id})`, inline: true },
             { name: 'Commande', value: `\`${this.getPrefix(guild.id)}${command.name}\``, inline: true },
@@ -249,7 +269,7 @@ client.on('ready', async () => {
     
     // Définir le statut streaming
     client.user.setActivity({
-        name: 'discord.gg/morose',
+        name: 'discord.gg/pvmorose',
         type: ActivityType.Streaming,
         url: 'https://www.twitch.tv/discord'
     });
@@ -664,12 +684,13 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     
     // Rejoint un vocal
     if (!oldState.channelId && newState.channelId) {
+        const channel = newState.channel;
         const embed = new EmbedBuilder()
             .setTitle('Rejoint un vocal')
-            .setColor('#00ff00')
+            .setColor('#808080')
             .addFields(
                 { name: 'Membre', value: `${member.user.tag} (${member.id})`, inline: true },
-                { name: 'Salon', value: `<${newState.channelId}>`, inline: true }
+                { name: 'Salon', value: channel ? channel.name : 'Salon inconnu', inline: true }
             )
             .setTimestamp();
         logChannel.send({ embeds: [embed] });
@@ -677,12 +698,13 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     
     // Quitte un vocal
     else if (oldState.channelId && !newState.channelId) {
+        const channel = oldState.channel;
         const embed = new EmbedBuilder()
             .setTitle('Quitte un vocal')
-            .setColor('#00ff00')
+            .setColor('#808080')
             .addFields(
                 { name: 'Membre', value: `${member.user.tag} (${member.id})`, inline: true },
-                { name: 'Salon', value: `<${oldState.channelId}>`, inline: true }
+                { name: 'Salon', value: channel ? channel.name : 'Salon inconnu', inline: true }
             )
             .setTimestamp();
         logChannel.send({ embeds: [embed] });
@@ -690,13 +712,15 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     
     // Change de salon vocal
     else if (oldState.channelId && newState.channelId && oldState.channelId !== newState.channelId) {
+        const oldChannel = oldState.channel;
+        const newChannel = newState.channel;
         const embed = new EmbedBuilder()
             .setTitle('Change de vocal')
-            .setColor('#00ff00')
+            .setColor('#808080')
             .addFields(
                 { name: 'Membre', value: `${member.user.tag} (${member.id})`, inline: true },
-                { name: 'De', value: `<${oldState.channelId}>`, inline: true },
-                { name: 'Vers', value: `<${newState.channelId}>`, inline: true }
+                { name: 'De', value: oldChannel ? oldChannel.name : 'Salon inconnu', inline: true },
+                { name: 'Vers', value: newChannel ? newChannel.name : 'Salon inconnu', inline: true }
             )
             .setTimestamp();
         logChannel.send({ embeds: [embed] });
@@ -704,12 +728,13 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     
     // Mute/Unmute micro
     else if (oldState.selfMute !== newState.selfMute) {
+        const channel = newState.channel;
         const embed = new EmbedBuilder()
             .setTitle(newState.selfMute ? 'Micro muet' : 'Micro activé')
-            .setColor(newState.selfMute ? '#ff0000' : '#00ff00')
+            .setColor('#808080')
             .addFields(
                 { name: 'Membre', value: `${member.user.tag} (${member.id})`, inline: true },
-                { name: 'Salon', value: `<${newState.channelId}>`, inline: true }
+                { name: 'Salon', value: channel ? channel.name : 'Salon inconnu', inline: true }
             )
             .setTimestamp();
         logChannel.send({ embeds: [embed] });
@@ -717,12 +742,13 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     
     // Mute/Unmute casque
     else if (oldState.selfDeaf !== newState.selfDeaf) {
+        const channel = newState.channel;
         const embed = new EmbedBuilder()
             .setTitle(newState.selfDeaf ? 'Casque muet' : 'Casque activé')
-            .setColor(newState.selfDeaf ? '#ff0000' : '#00ff00')
+            .setColor('#808080')
             .addFields(
                 { name: 'Membre', value: `${member.user.tag} (${member.id})`, inline: true },
-                { name: 'Salon', value: `<${newState.channelId}>`, inline: true }
+                { name: 'Salon', value: channel ? channel.name : 'Salon inconnu', inline: true }
             )
             .setTimestamp();
         logChannel.send({ embeds: [embed] });
@@ -750,7 +776,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
                 const { EmbedBuilder } = require('discord.js');
                 const embed = new EmbedBuilder()
                     .setTitle('Pseudo verrouillé - Changement détecté')
-                    .setColor('#00ff00')
+                    .setColor('#000000')
                     .addFields(
                         { name: 'Utilisateur', value: `${newMember.user.tag} (${newMember.id})`, inline: true },
                         { name: 'Tentative de pseudo', value: oldMember.nickname || newMember.user.username, inline: true },
@@ -780,7 +806,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
     if (addedRoles.size > 0) {
         const embed = new EmbedBuilder()
             .setTitle('Role(s) ajoute(s)')
-            .setColor('#00ff00')
+            .setColor('#000000')
             .addFields(
                 { name: 'Membre', value: `${newMember.user.tag} (${newMember.id})`, inline: true },
                 { name: 'Role(s)', value: addedRoles.map(r => r.name).join(', '), inline: false }
@@ -794,7 +820,7 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
     if (removedRoles.size > 0) {
         const embed = new EmbedBuilder()
             .setTitle('Role(s) retire(s)')
-            .setColor('#00ff00')
+            .setColor('#000000')
             .addFields(
                 { name: 'Membre', value: `${newMember.user.tag} (${newMember.id})`, inline: true },
                 { name: 'Role(s)', value: removedRoles.map(r => r.name).join(', '), inline: false }
@@ -876,10 +902,10 @@ client.on('messageDelete', (message) => {
     
     const embed = new EmbedBuilder()
         .setTitle('Message supprime')
-        .setColor('#ff0000')
+        .setColor('#000000')
         .addFields(
             { name: 'Auteur', value: `${message.author.tag} (${message.author.id})`, inline: true },
-            { name: 'Salon', value: `<${message.channelId}>`, inline: true },
+            { name: 'Salon', value: message.channel.name || 'Salon inconnu', inline: true },
             { name: 'Contenu', value: message.content.length > 1000 ? message.content.substring(0, 1000) + '...' : message.content, inline: false }
         )
         .setTimestamp();

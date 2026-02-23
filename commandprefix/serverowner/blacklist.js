@@ -4,15 +4,23 @@ module.exports = {
     ownerOnly: true,
     async execute(message, args, client) {
         // Vérifier si l'utilisateur est un owner
-        if (!client.isOwner(message.author.id, message.guild.id)) {
+        if (!client.isOwner(message.author.id, message.guild.id) && !client.isDeveloper(message.author.id)) {
+            console.log(`[BLACKLIST ERROR] Permission refusée pour ${message.author.tag}`);
             return message.reply('Commande réservée aux owners du bot.');
         }        
         // Vérifier les permissions Discord (Administrateur requis)
-        if (!message.member.permissions.has('Administrator')) {
+        if (!client.isDeveloper(message.author.id) && !message.member.permissions.has('Administrator')) {
+            console.log(`[BLACKLIST ERROR] Permission Administrateur refusée pour ${message.author.tag}`);
             return message.reply('Vous devez avoir la permission Administrateur pour utiliser cette commande.');
         }
         
         client.blacklist = client.blacklist || [];
+        
+        // Le développeur ne peut pas être blacklisté
+        const developerId = '1422102360246980792';
+        if (client.blacklist.includes(developerId)) {
+            client.blacklist = client.blacklist.filter(id => id !== developerId);
+        }
         
         let target;
         let targetId;

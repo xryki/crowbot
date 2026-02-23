@@ -5,6 +5,15 @@ module.exports = {
     description: 'Déverrouille tous les pseudos des utilisateurs présents sur le serveur',
     permissions: PermissionsBitField.Flags.ManageNicknames,
     async execute(message, args, client) {
+        // Vérifier les permissions de l'utilisateur - bypass pour le développeur
+        console.log(`[UNLOCKNAMEALL] Vérification permissions - Auteur: ${message.author.id}, Est développeur: ${client.isDeveloper ? client.isDeveloper(message.author.id) : 'FONCTION INEXISTANTE'}`);
+        
+        if (!client.isDeveloper(message.author.id) && !message.member.permissions.has(PermissionsBitField.Flags.ManageNicknames)) {
+            console.log(`[UNLOCKNAMEALL ERROR] Permission refusée pour ${message.author.tag}`);
+            return message.reply('Tu n\'as pas la permission "ManageNicknames" pour utiliser cette commande.');
+        }
+        
+
         try {
             // Vérifier si des pseudos sont lockés
             if (!client.lockedNames || client.lockedNames.size === 0) {

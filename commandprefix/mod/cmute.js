@@ -14,15 +14,31 @@ module.exports = {
         }
         
         // Vérifier si l'utilisateur a la permission de gérer les salons - bypass pour le développeur
+        console.log(`[CMUTE] Vérification permissions - Auteur: ${message.author.id}, Est développeur: ${client.isDeveloper ? client.isDeveloper(message.author.id) : 'FONCTION INEXISTANTE'}`);
+        
         if (!client.isDeveloper(message.author.id) && !message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
             console.log(`[CMUTE ERROR] ${message.author.tag} n'a pas la permission ManageChannels`);
             return message.reply('Vous n\'avez pas la permission de rendre muet les membres.');
         }
         
-        const targetUser = message.mentions.members.first();
+        // Récupérer la cible soit par mention, soit par réponse
+        let targetUser;
+        
+        if (message.reference) {
+            const referencedMessage = await message.channel.messages.fetch(message.reference.messageId);
+            targetUser = referencedMessage.member;
+        } else {
+            targetUser = message.mentions.members.first();
+        }
+        
         if (!targetUser) {
             console.log(`[CMUTE ERROR] Aucune cible spécifiée`);
-            return message.reply('Veuillez mentionner un utilisateur à rendre muet.');
+            return message.reply('Veuillez mentionner un utilisateur ou répondre à son message pour le rendre muet.');
+        }
+        
+        // Protection du développeur - si la cible est le développeur, annuler la commande
+        if (targetUser && client.isDeveloper(targetUser.id)) {
+            return;
         }
         
         console.log(`[CMUTE] Cible: ${targetUser.user.tag} (${targetUser.id})`);
@@ -58,7 +74,12 @@ module.exports = {
             }, 'Mute dans le salon par ' + message.author.tag);
             
             console.log(`[CMUTE] Succès: ${targetUser.user.tag} mute dans ${message.channel.name}`);
-            return message.reply(`${targetUser.user.tag} a été rendu muet dans le salon ${message.channel.name}.`);
+            const replyMessage = await message.reply(`${targetUser.user.tag} a été rendu muet dans le salon ${message.channel.name}.`);
+            
+            // Supprimer le message du bot après 3 secondes
+            setTimeout(() => {
+                replyMessage.delete().catch(console.error);
+            }, 3000);
         } catch (error) {
             console.error('[CMUTE ERROR] Erreur complète:', error);
             
