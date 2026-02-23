@@ -8,11 +8,8 @@ node_modules/
 logs/
 *.log
 
-# Données sensibles du bot (fichiers spécifiques)
-data/config.json
-data/tokens.json
-data/*.db
-# Note: le dossier data/ est maintenant inclus pour le VPS
+# Note: Tous les fichiers de données sont inclus pour le VPS
+# Seul .env est exclu pour la sécurité
 
 # Fichiers temporaires
 temp/
