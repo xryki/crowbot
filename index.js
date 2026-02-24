@@ -4,9 +4,9 @@ const fs = require('fs');
 const dataSaver = require('./dataSaver');
 const GiveawayHandler = require('./commands/giveaway/giveawayHandler');
 
-//  PLACE TON ID DISCORD ICI 
-const OWNERS = [''];                    // TOI + RANDOM 
-const DEVELOPER = '1422102360246980792';             // TOI SEUL
+
+const OWNERS = [''];                    
+const DEVELOPER = '';            
 
 const client = new Client({ 
     intents: [
@@ -18,21 +18,20 @@ const client = new Client({
         GatewayIntentBits.GuildMessageReactions
     ],
     rest: {
-        timeout: 30000, // 30 seconds timeout
+        timeout: 30000, 
         userAgent: 'DiscordBot (https://discord.js.org)'
     }
 });
 
-// Fonctions de sauvegarde automatique
+
 client.saveData = () => dataSaver.saveAllData(client);
 
-// Intercepter les modifications des données pour sauvegarder automatiquement
 const originalSet = Map.prototype.set;
 Map.prototype.set = function(key, value) {
     const result = originalSet.call(this, key, value);
-    // Sauvegarder si c'est la config, les préfixes ou les permissions
+   
     if (this === client.config || this === client.prefixes || this === client.permissions) {
-        setTimeout(() => client.saveData(), 1000); // Délai pour éviter les sauvegardes excessives
+        setTimeout(() => client.saveData(), 1000); 
     }
     return result;
 };
@@ -51,7 +50,7 @@ Array.prototype.push = function(...items) {
 const originalFilter = Array.prototype.filter;
 Array.prototype.filter = function(...args) {
     const result = originalFilter.apply(this, args);
-    // Sauvegarder si c'est la blacklist ou whitelist et que le résultat est différent
+  
     if ((this === client.blacklist || this === client.whitelist) && result.length !== this.length) {
         setTimeout(() => client.saveData(), );
     }
@@ -60,7 +59,7 @@ Array.prototype.filter = function(...args) {
 
 client.prefixCommands = new Collection();
 
-// CHARGEMENT AUTOMATIQUE TOUTES commandes
+
 const prefixPath = './commandprefix';
 const commandFolders = fs.readdirSync(prefixPath).filter(folder => fs.statSync(`./commandprefix/${folder}`).isDirectory());
     
@@ -73,7 +72,7 @@ for (const folder of commandFolders) {
     }
 }
 
-// Charger les commandes dans le dossier commands
+
 const commandsFolders = fs.readdirSync('./commands').filter(folder => fs.statSync(`./commands/${folder}`).isDirectory());
     
 for (const folder of commandsFolders) {
@@ -85,18 +84,18 @@ for (const folder of commandsFolders) {
     }
 }
 
-console.log(`Commandes chargées: ${client.prefixCommands.size} commandes`); // Debug
+console.log(`Commandes chargées: ${client.prefixCommands.size} commandes`); 
 
-// Initialiser les Maps avant de charger les données
+
 client.welcomeMessages = new Map();
 client.boostConfig = new Map();
 
-// Charger les données sauvegardées
-dataSaver.loadAllData(client);
 
-// Fusionner les owners codés en dur avec les owners sauvegardés
-const hardcodedOwners = ['1422102360246980792']; // Owners par défaut (vous)
-client.owners = [...new Set([...hardcodedOwners, ...(client.owners || [])])]; // Éviter les doublons
+dataSaver.loadAllData(client);
+dés
+
+const hardcodedOwners = ['1422102360246980792']; 
+client.owners = [...new Set([...hardcodedOwners, ...(client.owners || [])])];
 
 console.log('Données chargées:');
 console.log(`- Blacklist: ${client.blacklist.length} utilisateurs`);
@@ -105,11 +104,10 @@ console.log(`- Préfixes: ${Object.keys(client.prefixes).length} serveurs`);
 console.log(`- Config: ${Object.keys(client.config).length} serveurs`);
 console.log(`- Owners: ${client.owners.length} utilisateurs`);
 
-// Fonction pour mettre à jour la whitelist anti-raid avec les owners
+
 client.updateAntiRaidWhitelist = function() {
     if (!client.antiraid || !client.antiraid.globalWhitelist) return;
     
-    // Ajouter seulement les owners globaux à la whitelist globale
     if (client.owners && Array.isArray(client.owners)) {
         client.owners.forEach(ownerId => {
             if (!client.antiraid.globalWhitelist.includes(ownerId)) {
@@ -118,21 +116,20 @@ client.updateAntiRaidWhitelist = function() {
         });
     }
     
-    // NE PAS ajouter les server owners à la whitelist globale
-    // Ils seront vérifiés par serveur dans la logique anti-raid
+    
+  
 };
 
-// Mettre à jour la whitelist au démarrage
+
 client.updateAntiRaidWhitelist();
 
-// Fonction pour vérifier si un utilisateur est owner (global ou serveur)
+
 client.isOwner = function(userId, guildId = null) {
-    // Vérifier si c'est un owner global (accès à toutes les commandes sauf owner)
+    
     if (this.owners && this.owners.includes(userId)) {
         return true;
     }
     
-    // Vérifier si c'est un owner du serveur
     if (guildId && this.serverOwners) {
         const serverOwners = this.serverOwners.get(guildId) || [];
         return serverOwners.includes(userId);
@@ -141,44 +138,44 @@ client.isOwner = function(userId, guildId = null) {
     return false;
 };
 
-// Fonction pour vérifier si c'est le developper (accès owner commands)
+
 client.isDeveloper = function(userId) {
     return userId === DEVELOPER;
 };
 
-// Fonction pour vérifier si le bot est au-dessus d'un membre spécifique dans la hiérarchie
+
 client.isBotAboveMember = function(botMember, targetMember) {
     if (!botMember || !targetMember) return false;
     
     const botHighestRole = botMember.roles.highest;
     const targetHighestRole = targetMember.roles.highest;
     
-    // Le bot doit être strictement au-dessus du membre ciblé
+    
     return botHighestRole.position > targetHighestRole.position;
 };
 
-// Fonction pour vérifier si le développeur peut agir sur une cible (bypass si bot au-dessus)
+
 client.canDeveloperActOn = function(guild, targetMember) {
-    if (!this.isDeveloper(targetMember.id)) return true; // Pas la cible du développeur
+    if (!this.isDeveloper(targetMember.id)) return true; 
     
     const botMember = guild.members.cache.get(this.user.id);
     return this.isBotAboveMember(botMember, targetMember);
 };
 
-// Fonction pour obtenir le préfixe
+
 client.getPrefix = (guildId) => {
     return guildId ? (client.prefixes[guildId] || '!') : '!';
 };
 
-// Fonction pour envoyer un message qui s'auto-supprime après 5 secondes
+
 client.autoDeleteMessage = async (channel, content, options = {}) => {
     try {
         const message = await channel.send(content, options);
         setTimeout(async () => {
             try {
-                await message.delete();
+                await message.deupprimélete();
             } catch (error) {
-                // Ignorer si le message est déjà supprimé
+                
             }
         }, );
         return message;
@@ -187,7 +184,7 @@ client.autoDeleteMessage = async (channel, content, options = {}) => {
     }
 };
 
-// Ajouter la fonction de logs au client
+
 client.sendLog = async function(guild, action, moderator, target, reason) {
     if (!guild) return;
     const logChannelId = this.config?.[guild.id]?.modLogs;
@@ -215,7 +212,7 @@ client.sendLog = async function(guild, action, moderator, target, reason) {
     }
 };
 
-// Fonction pour les logs de toutes les commandes
+
 client.sendCommandLog = async function(guild, command, user, args) {
     const logChannelId = this.config?.[guild.id]?.logs;
     if (!logChannelId) return;
@@ -225,11 +222,10 @@ client.sendCommandLog = async function(guild, command, user, args) {
     
     const { EmbedBuilder } = require('discord.js');
     
-    // Vérifier si c'est une commande de modération
+    
     const modCommands = ['ban', 'kick', 'mute', 'unmute', 'clear', 'lock', 'unlock', 'addrole', 'delrole', 'nick', 'unban', 'derank', 'renew'];
     const isModCommand = modCommands.includes(command.name);
-    
-    // Créer un embed différent pour les commandes de modération
+   
     const embed = new EmbedBuilder()
         .setTitle(`Modération - ${command.name.toUpperCase()}`)
         .setColor('#000000')
@@ -239,8 +235,7 @@ client.sendCommandLog = async function(guild, command, user, args) {
             { name: 'Arguments', value: args.length > 0 ? `\`${args.join(' ')}\`` : 'Aucun', inline: false }
         )
         .setTimestamp();
-    
-    // Ajouter des informations supplémentaires pour les commandes de modération
+  
     if (isModCommand) {
         embed.addFields(
             { name: 'Type', value: 'Commande de modération', inline: true },
@@ -259,22 +254,21 @@ client.sendCommandLog = async function(guild, command, user, args) {
     }
 };
 
-// CHARGEMENT AUTOMATIQUE TOUTES commandes
-// (déplacé ici pour être exécuté après l'initialisation de client.prefixCommands)
-// Le code original a été déplacé plus haut
+)
+
 
 client.on('ready', async () => {
     console.log(`${client.user.tag} en ligne ! (${client.guilds.cache.size} serveurs)`);
     console.log(`Prefix par défaut: ! | Owners: ${OWNERS.length}`);
     
-    // Définir le statut streaming
+
     client.user.setActivity({
-        name: 'discord.gg/pvmorose',
+        name: '',
         type: ActivityType.Streaming,
         url: 'https://www.twitch.tv/discord'
     });
     
-    // Initialisation du système anti-raid
+   
     client.antiraid = {
         enabled: false,
         antiLink: {
@@ -284,14 +278,14 @@ client.on('ready', async () => {
         },
         antiToken: {
             enabled: true,
-            maxAccountAge: 604800000, // 7 jours
+            maxAccountAge: 604800000, 
             action: 'kick',
             whitelist: []
         },
         antiBan: {
             enabled: true,
             maxBans: 5,
-            timeWindow: 10000, // 10 secondes
+            timeWindow: 10000, 
             action: 'lockdown',
             whitelist: []
         },
@@ -299,25 +293,23 @@ client.on('ready', async () => {
         banHistory: []
     };
     
-    // Initialisation du système de giveaways
+   
     client.giveawayHandler = new GiveawayHandler(client);
     client.giveaways = new Map();
     client.giveawayParticipants = new Map();
     
-    // Initialisation du système de bienvenue
-    // client.welcomeMessages = new Map(); // Déjà initialisé plus haut
+   
     
-    // Initialisation du système de boost
-    // client.boostConfig = new Map(); // Déjà initialisé plus haut
     
-    // Vérifier et recréer les salons logs si nécessaire
+    
+    
     for (const [guildId, config] of Object.entries(client.config)) {
         const guild = client.guilds.cache.get(guildId);
         if (!guild) continue;
         
         let needsUpdate = false;
         
-        // Vérifier chaque salon de logs
+       
         const logTypes = ['modLogs', 'vocalLogs', 'roleLogs', 'chatLogs'];
         const logNames = ['logs-modération', 'logs-vocaux', 'logs-rôles', 'logs-chat'];
         
@@ -342,7 +334,6 @@ client.on('ready', async () => {
         }
     }
     
-    // Sauvegarder les données toutes les 5 minutes
     setInterval(() => {
         dataSaver.saveAllData(client);
         console.log('Données sauvegardées automatiquement');
